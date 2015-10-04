@@ -1,0 +1,223 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.module.apikit.odata.processor;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.transport.PropertyScope;
+import org.mule.module.apikit.AbstractRouter;
+import org.mule.module.apikit.odata.ODataPayload;
+import org.mule.module.apikit.odata.exception.ODataInvalidFlowResponseException;
+import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
+import org.mule.module.apikit.odata.formatter.ODataApiKitFormatter;
+import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
+import org.mule.module.apikit.odata.metadata.GatewayMetadataManager;
+import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataEntityNotFoundException;
+import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataFieldsException;
+import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataFormatException;
+import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataResourceNotFound;
+import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
+import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
+import org.mule.module.apikit.odata.model.Entry;
+import org.mule.module.apikit.odata.util.Helper;
+import org.mule.transport.NullPayload;
+
+public class ODataApikitProcessor extends ODataRequestProcessor
+{
+	private String path;
+	private String query;
+	private String entity;
+	private boolean entityCount;
+	private static final String[] methodsWithBody = { "POST", "PUT" };
+
+	// TODO this attr is not used in project
+	private Map<String, Object> keys;
+
+	
+	public ODataApikitProcessor(GatewayMetadataManager metadataManager, String entity, String query, Map<String, Object> keys, boolean count)
+	{
+		super(metadataManager);
+		this.query = query;
+		this.entity = entity;
+		this.entityCount = count;
+		this.keys = keys;
+		this.path = generatePath(entity, keys);
+	}
+
+	private String generatePath(String entity, Map<String, Object> keys) {
+		String path = "";
+		if (keys.size() == 0) {
+			path = "/" + entity;
+		} else if (keys.size() == 1) {
+			String key = (String) keys.keySet().toArray()[0];
+			String id = (String) keys.get(key);
+			path = "/" + entity + "/" + id;
+		} else if (keys.size() > 1) {
+			path = "/" + entity + "/";
+
+			String uriKeys = "";
+
+			String delimiter = "";
+			for (Map.Entry<String, Object> entry : keys.entrySet()) {
+				uriKeys += delimiter + entry.getKey() + "_" + entry.getValue();
+				delimiter = " :: ";
+			}
+			List<String> parsedKeys = Arrays.asList(uriKeys.split(" :: "));
+			Collections.sort(parsedKeys);
+
+			path += StringUtils.join(parsedKeys, "-");
+		}
+		return path;
+	}
+
+	@Override
+	public ODataPayload process(MuleEvent event, AbstractRouter router, Format format) throws Exception
+	{
+		String oDataURL = getCompleteUrl(event);
+		
+		//truncate the URL at the entity
+		oDataURL = oDataURL.substring(0, oDataURL.indexOf(entity));
+		
+		List<Entry> entries = processEntityRequest(event, router, format);
+		ODataPayload oDataPayload;
+
+		if (isEntityCount()) {
+			if (format.equals(Format.Plain) || format.equals(Format.Default)) {
+				String count = String.valueOf(entries.size());
+				oDataPayload = new ODataPayload(count);
+			} else {
+				throw new ODataInvalidFormatException("Unsupported media type requested.");
+			}
+		} else {
+			oDataPayload = new ODataPayload(entries);
+			oDataPayload.setFormatter(new ODataApiKitFormatter(
+					getMetadataManager(), entries, entity, oDataURL));
+		}
+
+		return oDataPayload;
+	}
+
+	public List<Entry> processEntityRequest(MuleEvent event, AbstractRouter router, Format format) throws Exception
+	{
+		List<Entry> entries = new ArrayList<Entry>();
+
+		String uri = event.getMessage().getInboundProperty("http.request.path");
+		String basePath = uri.substring(0, uri.toLowerCase().indexOf("/odata.svc"));
+		String httpRequest = basePath + this.path + "?" + this.query;
+		String httpRequestPath = basePath + this.path;
+
+		String httpQueryString = this.query;
+		Map<String, String> httpQueryParams = Helper.queryToMap(query);
+
+		Logger.getLogger(getClass()).info("New httpRequest: "+httpRequest);
+		Logger.getLogger(getClass()).info("New httpRequestPath: "+httpRequestPath);
+		event.getMessage().setProperty("http.request", httpRequest, PropertyScope.INBOUND);
+		event.getMessage().setProperty("http.request.path", httpRequestPath, PropertyScope.INBOUND);
+		event.getMessage().setProperty("http.query.string", httpQueryString, PropertyScope.INBOUND);
+		event.getMessage().setProperty("http.query.params", httpQueryParams, PropertyScope.INBOUND);
+		event.getMessage().setProperty("http.relative.path", this.path, PropertyScope.INBOUND);	
+		event.getMessage().setProperty("accept", "application/json", PropertyScope.INBOUND);
+	
+		String httpMethod = event.getMessage().getInboundProperty("http.method").toString().toLowerCase();
+
+		if (Arrays.asList(methodsWithBody).contains(httpMethod.toUpperCase()))
+		{
+			String payloadAsString = event.getMessage().getPayloadAsString();
+			boolean isXml = !format.equals(Format.Json);
+			payloadAsString = XmlBodyToJSonConverter.convertXMLPayloadIfRequired(isXml, payloadAsString);
+			event.getMessage().setPayload(payloadAsString);
+		}
+
+		MuleEvent response = router.process(event);
+		
+		entries = verifyFlowResponse(response);
+
+		return entries;
+	}
+
+	private List<Entry> verifyFlowResponse(MuleEvent response) throws GatewayMetadataEntityNotFoundException,  GatewayMetadataFieldsException, GatewayMetadataResourceNotFound, GatewayMetadataFormatException, ODataInvalidFlowResponseException
+	{	
+		try {
+			GatewayMetadataManager metadataManager = getMetadataManager();
+			EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
+			List<Entry> entries;
+	
+			String message = response.getMessageAsString();
+			Object payload = response.getMessage().getPayload();
+
+			if (payload instanceof NullPayload) {
+				entries = new ArrayList<Entry>();
+			} else if (message != null) {
+				entries = Helper.transformJsonToEntryList(message);
+			} else {
+				throw new ODataInvalidFlowResponseException("The payload of the response should be a valid json.");
+			}
+			
+			int entryNumber = 1;
+			for (Entry entry : entries)
+			{
+				//verifies the # of properties matches the definition
+				if (entry.getProperties().entrySet().size() > entityDefinition.getProperties().size())
+					throw new ODataInvalidFlowResponseException("There are absent properties in flow response (entry #" + (entryNumber++) + ")");
+	
+				//verifies each property against the definition
+				for (String propertyName : entry.getProperties().keySet())
+				{
+					EntityDefinitionProperty entityDefinitionProperty = entityDefinition.findPropertyDefinition(propertyName);
+					if (entityDefinitionProperty == null)
+						throw new ODataInvalidFlowResponseException("Property '" + propertyName + "' was not expected for entity '" + entityDefinition.getName() + "'");
+				}
+			}
+			
+			return entries;
+		} catch (MuleException me) {
+			throw new ODataInvalidFlowResponseException(me.getMessage());
+		}
+	}
+
+	public String getPath()
+	{
+		return path;
+	}
+
+	public void setPath(String path)
+	{
+		this.path = path;
+	}
+
+	public String getQuery()
+	{
+		return query;
+	}
+
+	public void setQuery(String query)
+	{
+		this.query = query;
+	}
+
+	public boolean isEntityCount()
+	{
+		return entityCount;
+	}
+	
+	public Map<String, Object> getKeys() {
+		return keys;
+	}
+	
+	public void setKeys(Map<String, Object> keys)
+	{
+		this.keys = keys;
+	}
+}
