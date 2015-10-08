@@ -24,12 +24,17 @@ public class ODataService implements Service {
 	private static final String ODATA_SVC_URI_PREFIX = "odata.svc";
 	private static final String CONTEXT_INITIALIZED = "contextInitialized";
 	
+	public boolean evaluateURI(MuleEvent event) {
+		String path = event.getMessage().getInboundProperty("http.relative.path");
+		return path.contains(ODATA_SVC_URI_PREFIX);
+	}
+	
 	public MuleEvent processBlockingRequest(MuleEvent event, AbstractRequestResponseMessageProcessor abstractRouter) throws MuleException {
 		Logger.getLogger(ODataService.class).info("Handling odata enabled request.");
 		
 		Router router = (Router) abstractRouter; 	
 		
-		if(event.getMessage().getInboundProperty(CONTEXT_INITIALIZED) == null){
+		if(event.getMessage().getOutboundProperty(CONTEXT_INITIALIZED) == null){
 			
 				try {
 					initializeModel(event, router);
@@ -38,15 +43,10 @@ public class ODataService implements Service {
 					return ODataErrorHandler.handle(event, e);
 				}
 			
-			event.getMessage().setProperty(CONTEXT_INITIALIZED, true, PropertyScope.INBOUND);
+			event.getMessage().setProperty(CONTEXT_INITIALIZED, true, PropertyScope.OUTBOUND);
 		}
 		
-		if (ODataService.isODataRequest(event)) {		
-			return ODataService.processODataRequest(event, router);
-		} else {
-			event.getMessage().removeProperty(CONTEXT_INITIALIZED, PropertyScope.INBOUND);
-			return router.process(event);
-		}
+		return ODataService.processODataRequest(event, router);
 	}
 	
 
@@ -87,14 +87,4 @@ public class ODataService implements Service {
 		}
 	}
 
-	/**
-	 * Returns true if the path of the HTTP request starts with the OData prefix
-	 * 
-	 * @param event
-	 * @return
-	 */
-	protected static boolean isODataRequest(MuleEvent event) {
-		String path = event.getMessage().getInboundProperty("http.relative.path");
-		return path.contains(ODATA_SVC_URI_PREFIX);
-	}
 }
