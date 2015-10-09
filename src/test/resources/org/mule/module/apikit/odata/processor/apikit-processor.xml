@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="EE-3.6.1"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+	<apikit:config raml="org/mule/module/apikit/odata/odata.raml" extensionEnabled="true" consoleEnabled="true" consolePath="console" />
+
+	<flow name="main">
+		<http:inbound-endpoint port="${serverPort}" host="localhost" path="api" />
+		<apikit:router />
+		<exception-strategy ref="apiKitGlobalExceptionMapping" />
+	</flow>
+
+	<flow name="put:/orders/{id}">
+		<set-payload value="Not implemented" doc:name="Set Payload" />
+	</flow>
+	<flow name="put:/customers/{id}">
+		<set-payload value="Not Implemented" doc:name="Set Payload" />
+	</flow>
+	<flow name="delete:/orders/{id}">
+		<set-payload value="Not Implemented" doc:name="Set Payload" />
+	</flow>
+	<flow name="delete:/customers/{id}">
+		<set-payload value="Not Implemented" doc:name="Set Payload" />
+	</flow>
+	<flow name="get:/orders">
+	<component class="org.mule.module.apikit.odata.processor.SamplesToPayloadTransformer" doc:name="Java" />
+	</flow>
+	<flow name="get:/customers">
+		<set-payload value="Not Implemented" doc:name="Set Payload" />
+	</flow>
+	<flow name="get:/orders/{id}">
+		<component class="org.mule.module.apikit.odata.processor.SamplesToPayloadTransformer" doc:name="Java" />
+	</flow>
+	<flow name="get:/customers/{id}">
+		<set-payload value="Not Implemented" doc:name="Set Payload" />
+	</flow>
+	<flow name="post:/orders">
+		<component class="org.mule.module.apikit.odata.processor.SamplesToPayloadTransformer" doc:name="Java" />
+	</flow>
+	<flow name="post:/customers">
+		<set-payload value="Not Implemented" doc:name="Set Payload" />
+	</flow>
+
+	<apikit:mapping-exception-strategy
+		name="apiKitGlobalExceptionMapping">
+		<apikit:mapping statusCode="404">
+			<apikit:exception
+				value="org.mule.module.apikit.exception.NotFoundException" />
+			<set-property propertyName="Content-Type" value="text/plain" />
+			<set-payload value="Resource not found" />
+		</apikit:mapping>
+	</apikit:mapping-exception-strategy>
+
+</mule>
