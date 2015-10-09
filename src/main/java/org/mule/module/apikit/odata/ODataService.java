@@ -30,7 +30,7 @@ public class ODataService implements Service {
 	private static final String ODATA_SVC_URI_PREFIX = "odata.svc";
 	private static final String CONTEXT_INITIALIZED = "contextInitialized";
 
-	public boolean evaluateURI(MuleEvent event) {
+	public boolean isExecutable(MuleEvent event) {
 		String path = event.getMessage().getInboundProperty("http.relative.path");
 		return path.contains(ODATA_SVC_URI_PREFIX);
 	}
