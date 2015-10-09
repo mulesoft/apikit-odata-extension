@@ -1,0 +1,26 @@
+{
+  "d": {
+    "results": [
+      {
+        "__metadata": {
+          "id": "https://localhost/odata.svc/orders(10248)",
+          "uri": "https://localhost/odata.svc/orders(10248)",
+          "type": "odata2.namespace.orders"
+        },
+        "OrderID": 10248,
+        "ShipName": "Vins et alcools Chevalier",
+        "ShipAddress": "59 rue de l-Abbaye"
+      },
+      {
+        "__metadata": {
+          "id": "https://localhost/odata.svc/orders(10249)",
+          "uri": "https://localhost/odata.svc/orders(10249)",
+          "type": "odata2.namespace.orders"
+        },
+        "OrderID": 10249,
+        "ShipName": "Toms Spezialitten",
+        "ShipAddress": "Luisenstr. 48"
+      }
+    ]
+  }
+}

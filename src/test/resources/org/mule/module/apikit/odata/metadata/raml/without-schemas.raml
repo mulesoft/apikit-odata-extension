@@ -1,0 +1,81 @@
+#%RAML 0.8
+title: Auto-generated RAML for DataGateway
+version: 0.1
+traits: 
+- orderby:
+      queryParameters:
+        parms:
+          description: The number of pages to return
+          type: string
+- top:
+      queryParameters:
+        parms:
+          description: The number of pages to return
+          type: number
+- skip:
+      queryParameters:
+        parms:
+          description: The number of pages to return
+          type: number
+- filter:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: array
+- expand:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+- format:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+- select:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+- inlinecount:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+
+/gateways: 
+    displayName: gateways
+    is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+    get: 
+        description: Read
+    delete: 
+        description: Delete
+    post: 
+        description: Create
+    /{gatewaysId}: 
+        displayName: gateways Id
+        is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+        get: 
+            description: Read
+        delete: 
+            description: Delete
+        put: 
+            description: Update
+/users: 
+    displayName: users
+    is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+    get: 
+        description: Read
+    delete: 
+        description: Delete
+    post: 
+        description: Create
+    /{usersId}: 
+        displayName: users Id
+        is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+        get: 
+            description: Read
+        delete: 
+            description: Delete
+        put: 
+            description: Update

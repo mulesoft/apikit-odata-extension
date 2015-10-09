@@ -1,0 +1,85 @@
+#%RAML 0.8
+title: Auto-generated RAML for DataGateway
+version: 0.1
+traits: 
+- orderby:
+      queryParameters:
+        parms:
+          description: The number of pages to return
+          type: string
+- top:
+      queryParameters:
+        parms:
+          description: The number of pages to return
+          type: number
+- skip:
+      queryParameters:
+        parms:
+          description: The number of pages to return
+          type: number
+- filter:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: array
+- expand:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+- format:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+- select:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+- inlinecount:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+schemas: 
+- gateways: |
+    	{"additionalProperties":false,"properties":{"draft":{"fieldName": "draft","nullable":true,"description":"bla","type":"boolean","sample":12,"maxLength":5},"ch_full_domain":{"fieldName": "ch_full_domain","nullable":true,"description":"bla","type":"string","sample":12,"maxLength":5},"name":{"fieldName": "name","nullable":true,"description":"bla","type":"string","sample":12,"maxLength":45},"description":{"fieldName": "description","nullable":true,"description":"bla","type":"string","sample":12,"maxLength":45},"ch_domain":{"fieldName": "ch_domain","nullable":true,"description":"bla","type":"string","sample":12,"maxLength":5},"id":{"fieldName": "id","nullable":false,"description":"bla","type":"integer","sample":12,"maxLength":4,"key":true},"published":{"fieldName": "published","nullable":true,"description":"bla","type":"boolean","sample":12,"maxLength":5},"status":{"fieldName": "status","nullable":true,"description":"bla","type":"string","sample":12,"maxLength":255}},"required":["id","name","description","status","published","status","published","draft","ch_domain","ch_full_domain"],"remoteName":"gateways"}
+- users: |
+    	{"$schema":"http://json-schema.org/draft-04/schema#","additionalProperties":false,"type":"object","remoteName":"users"}
+/gateways: 
+    displayName: gateways
+    is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+    get: 
+        description: Read
+    delete: 
+        description: Delete
+    post: 
+        description: Create
+    /{gatewaysId}: 
+        displayName: gateways Id
+        is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+        get: 
+            description: Read
+        delete: 
+            description: Delete
+        put: 
+            description: Update
+/users: 
+    displayName: users
+    is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+    get: 
+        description: Read
+    delete: 
+        description: Delete
+    post: 
+        description: Create
+    /{usersId}: 
+        displayName: users Id
+        is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+        get: 
+            description: Read
+        delete: 
+            description: Delete
+        put: 
+            description: Update

@@ -1,0 +1,113 @@
+#%RAML 0.8
+title: Auto-generated RAML for DataGateway
+version: 0.1
+traits: 
+- orderby:
+      queryParameters:
+        parms:
+          description: The number of pages to return
+          type: string
+- top:
+      queryParameters:
+        parms:
+          description: The number of pages to return
+          type: number
+- skip:
+      queryParameters:
+        parms:
+          description: The number of pages to return
+          type: number
+- filter:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: array
+- expand:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+- format:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+- select:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+- inlinecount:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+schemas: 
+- orders: |
+     {"$schema":"http://json-schema.org/draft-04/schema#","additionalProperties":false,"remoteName":"Orders","properties":{"OrderID":{"maxLength":"11","description":"","nullable":false,"type":"integer","fieldName":"OrderID","key":true,"sample":"10248"},"ShipAddress":{"maxLength":"60","description":"","nullable":true,"type":"string","fieldName":"ShipAddress","sample":"60"},"ShipName":{"maxLength":"40","description":"","nullable":true,"type":"string","fieldName":"ShipName","key":true,"sample":""}},"required":["OrderID","ShipName","ShipAddress"]}
+- customers: |
+     {"$schema":"http://json-schema.org/draft-04/schema#","additionalProperties":false,"remoteName":"Customers","properties":{"ContactName":{"maxLength":"30","description":"","nullable":true,"type":"string","fieldName":"ContactName","sample":""},"CustomerID":{"maxLength":"5","description":"","nullable":false,"type":"string","fieldName":"CustomerID","key":true,"sample":"10248"},"CompanyName":{"maxLength":"40","description":"","nullable":true,"type":"string","fieldName":"CompanyName","sample":""},"ContactTitle":{"maxLength":"30","description":"","nullable":true,"type":"string","fieldName":"ContactTitle","sample":""}},"required":["CustomerID","CompanyName","ContactName","ContactTitle"]}
+/{entity}: 
+    is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+    get: 
+        description: Read
+        responses:
+         200:
+          body:
+            application/json: ~
+            application/xml: ~
+    delete: 
+        description: Delete
+        responses:
+         200:
+          body:
+           application/json: ~
+           application/xml: ~
+    post: 
+        description: Create
+        responses:
+         200:
+          body:
+             application/json: ~
+             application/xml: ~
+    /{id}: 
+        is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+        get: 
+            description: Read
+            responses:
+             200:
+              body:
+               application/json: ~
+               application/xml: ~
+        delete: 
+            description: Delete
+            responses:
+             200:
+              body:
+               application/json: ~
+               application/xml: ~
+        put: 
+            description: Update
+            responses:
+             200:
+              body:
+               application/json: ~
+               application/xml: ~
+/gw:
+ /admin:
+  /entities:
+    get: 
+     description: Read
+     responses:
+       200:
+        body:
+         application/json: ~
+         application/xml: ~
+    /{id}:
+      get: 
+       description: Read
+       responses:
+         200:
+          body:
+           application/json: ~
+           application/xml: ~

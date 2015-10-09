@@ -1,0 +1,223 @@
+#%RAML 0.8
+title: Auto-generated RAML for DataGateway
+version: "0.1"
+traits:
+  - orderby:
+      queryParameters:
+        parms:
+          description: The number of pages to return
+          type: string
+  - top:
+      queryParameters:
+        parms:
+          description: The number of pages to return
+          type: number
+  - skip:
+      queryParameters:
+        parms:
+          description: The number of pages to return
+          type: number
+  - filter:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: array
+  - expand:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+  - format:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+  - select:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+  - inlinecount:
+      queryParameters:
+        parms:
+          description: Collection of filters
+          type: string
+schemas: 
+  - users: |
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "name": "users",
+        "remoteName": "Users",
+        "hasPrimaryKey": true,
+        "properties": {
+          "userId": {
+            "sample": "1",
+            "fieldName": "userId",
+            "type": "integer",
+            "maxLength": "11",
+            "description": "",
+            "key": true,
+            "nullable": false
+          },
+          "name": {
+            "sample": "",
+            "fieldName": "name",
+            "type": "string",
+            "maxLength": "40",
+            "description": "",
+            "key": false,
+            "nullable": true
+          },
+          "age": {
+            "sample": "60",
+            "fieldName": "age",
+            "type": "int",
+            "maxLength": "60",
+            "description": "",
+            "key": false,
+            "nullable": true
+          }
+        }
+      }
+  - customers: |
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "name": "customers",
+        "remoteName": "Customer",
+        "hasPrimaryKey": true,
+        "properties": {
+          "name": {
+            "sample": "",
+            "fieldName": "name",
+            "type": "string",
+            "maxLength": "40",
+            "description": "",
+            "key": true,
+            "nullable": true
+          },
+          "age": {
+            "sample": "60",
+            "fieldName": "age",
+            "type": "int",
+            "maxLength": "60",
+            "description": "",
+            "key": true,
+            "nullable": true
+          },
+          "zebra": {
+            "sample": "60",
+            "fieldName": "zebra",
+            "type": "int",
+            "maxLength": "60",
+            "description": "",
+            "key": true,
+            "nullable": true
+          }
+        }
+      }
+
+  - Weird-resource_NAME: |
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "name": "Weird-resource_NAME",
+        "remoteName": "Weird-resource_NAME",
+        "hasPrimaryKey": true,
+        "properties": {
+          "just-A_key": {
+            "sample": "",
+            "fieldName": "just-A_key",
+            "type": "string",
+            "maxLength": "40",
+            "description": "",
+            "key": true,
+            "nullable": true
+          },
+          "ANOTHER-strange_Key": {
+            "sample": "60",
+            "fieldName": "ANOTHER-strange_Key",
+            "type": "int",
+            "maxLength": "60",
+            "description": "",
+            "key": true,
+            "nullable": true
+          }
+        }
+      }
+
+/users: 
+  get: 
+    description: Read
+    is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+    responses:
+      200:
+        body:
+          application/json: ~
+          application/xml: ~
+  post: 
+    description: Create    
+  /{id}: 
+    get: 
+      description: Read
+      is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+      responses:
+        200:
+          body:
+            application/json: ~
+            application/xml: ~
+    delete: 
+      description: Delete      
+    put: 
+      description: Update      
+
+/customers: 
+  get: 
+    description: Read
+    is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+    responses:
+      200:
+        body:
+          application/json: ~
+          application/xml: ~    
+  post: 
+    description: Create    
+  /{id}: 
+    get: 
+      description: Read
+      is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+      responses:
+        200:
+          body:
+            application/json: ~
+            application/xml: ~             
+    delete: 
+      description: Delete      
+    put: 
+      description: Update
+
+/Weird-resource_NAME: 
+  get: 
+    description: Read
+    is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+    responses:
+      200:
+        body:
+          application/json: ~
+          application/xml: ~    
+  post: 
+    description: Create    
+  /{id}: 
+    get: 
+      description: Read
+      is: [orderby, top, skip, filter, expand, format, select, inlinecount]
+      responses:
+        200:
+          body:
+            application/json: ~
+            application/xml: ~             
+    delete: 
+      description: Delete      
+    put: 
+      description: Update
