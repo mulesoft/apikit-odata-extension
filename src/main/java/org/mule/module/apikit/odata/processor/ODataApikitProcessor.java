@@ -115,8 +115,6 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		String httpQueryString = this.query;
 		Map<String, String> httpQueryParams = Helper.queryToMap(query);
 
-		Logger.getLogger(getClass()).info("New httpRequest: " + httpRequest);
-		Logger.getLogger(getClass()).info("New httpRequestPath: " + httpRequestPath);
 		event.getMessage().setProperty("http.request", httpRequest, PropertyScope.INBOUND);
 		event.getMessage().setProperty("http.request.path", httpRequestPath, PropertyScope.INBOUND);
 		event.getMessage().setProperty("http.query.string", httpQueryString, PropertyScope.INBOUND);

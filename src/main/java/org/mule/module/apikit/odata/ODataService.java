@@ -31,8 +31,7 @@ public class ODataService implements Service {
 	private static final String CONTEXT_INITIALIZED = "contextInitialized";
 
 	public boolean isExecutable(MuleEvent event) {
-		String path = event.getMessage().getInboundProperty("http.relative.path");
-		return path.contains(ODATA_SVC_URI_PREFIX);
+		return true;
 	}
 
 	public MuleEvent processBlockingRequest(MuleEvent event, AbstractRequestResponseMessageProcessor abstractRouter) throws MuleException {
@@ -52,7 +51,14 @@ public class ODataService implements Service {
 			event.getMessage().setProperty(CONTEXT_INITIALIZED, true, PropertyScope.OUTBOUND);
 		}
 
-		return ODataService.processODataRequest(event, router);
+		String path = event.getMessage().getInboundProperty("http.relative.path");
+	
+		if (path.contains(ODATA_SVC_URI_PREFIX)) {
+			return ODataService.processODataRequest(event, router);
+		} else {
+			event.getMessage().removeProperty(CONTEXT_INITIALIZED, PropertyScope.OUTBOUND);
+			return router.process(event);
+		}
 	}
 
 	protected static void initializeModel(MuleEvent event, Router router) throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound,
