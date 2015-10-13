@@ -13,7 +13,7 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import org.mule.module.apikit.odata.metadata.GatewayMetadataManager;
+import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 import org.mule.module.apikit.odata.model.Entry;
 import org.mule.module.apikit.odata.util.Helper;
@@ -26,10 +26,10 @@ public class ODataApiKitFormatter implements ODataPayloadFormatter {
 	private List<Entry> entries;
 	private String entityName;
 	private String url;
-	private GatewayMetadataManager gatewayMetadataManager;
+	private OdataMetadataManager odataMetadataManager;
 
-	public ODataApiKitFormatter(GatewayMetadataManager gatewayMetadataManager, List<Entry> entities, String entityName, String url) {
-		this.gatewayMetadataManager = gatewayMetadataManager;
+	public ODataApiKitFormatter(OdataMetadataManager odataMetadataManager, List<Entry> entities, String entityName, String url) {
+		this.odataMetadataManager = odataMetadataManager;
 		this.entries = entities;
 		this.entityName = entityName;
 		this.url = url;
@@ -42,7 +42,7 @@ public class ODataApiKitFormatter implements ODataPayloadFormatter {
 		FormatWriter<EntitiesResponse> fw = FormatWriterFactory.getFormatWriter(EntitiesResponse.class, Arrays.asList(MediaType.valueOf(MediaType.WILDCARD)),
 				format.name(), null);
 
-		EntityDefinitionSet entitySet = gatewayMetadataManager.getEntitySet();
+		EntityDefinitionSet entitySet = odataMetadataManager.getEntitySet();
 		EntitiesResponse entitiesResponse = Helper.convertEntriesToOEntries(entries, entityName, entitySet);
 
 		StringWriter sw = new StringWriter();

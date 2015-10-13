@@ -8,19 +8,15 @@ package org.mule.module.apikit.odata.metadata.exception;
 
 import org.mule.module.apikit.odata.exception.ODataException;
 
-/**
- * 
- * @author arielsegura
- */
-public class GatewayMetadataFieldsException extends ODataException {
+public class OdataMetadataFormatException extends ODataException {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 2615177524761296514L;
+	private static final long serialVersionUID = 5204095913133985770L;
 
-	public GatewayMetadataFieldsException(String message) {
-		super(message, 404);
+	public OdataMetadataFormatException(String message) {
+		super(message, 415);
 	}
 
 }

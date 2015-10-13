@@ -12,14 +12,15 @@ import org.mule.module.apikit.odata.exception.ODataException;
  * 
  * @author arielsegura
  */
-public class GatewayMetadataResourceNotFound extends ODataException {
+public class OdataMetadataFieldsException extends ODataException {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 7839109007316280213L;
+	private static final long serialVersionUID = 2615177524761296514L;
 
-	public GatewayMetadataResourceNotFound(String message) {
+	public OdataMetadataFieldsException(String message) {
 		super(message, 404);
 	}
+
 }

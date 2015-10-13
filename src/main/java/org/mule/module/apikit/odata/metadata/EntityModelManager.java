@@ -15,8 +15,8 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataFieldsException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataResourceNotFound;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
@@ -41,8 +41,8 @@ public class EntityModelManager {
 
 	}
 
-	public EntityDefinitionSet getEntitiesFromSchema() throws JsonSyntaxException, FileNotFoundException, IOException, GatewayMetadataFieldsException,
-			GatewayMetadataResourceNotFound, JSONException {
+	public EntityDefinitionSet getEntitiesFromSchema() throws JsonSyntaxException, FileNotFoundException, IOException, OdataMetadataFieldsException,
+			OdataMetadataResourceNotFound, JSONException {
 
 		EntityDefinitionSet entitySet = new EntityDefinitionSet();
 		JSONObject obj = new JSONObject(FileUtils.readFromFile("json-schema.json"));
@@ -62,7 +62,7 @@ public class EntityModelManager {
 
 			JSONObject properties = schema.getJSONObject("properties");
 			if (properties == null) {
-				throw new GatewayMetadataResourceNotFound("Properties not found in entity " + entityName + ".");
+				throw new OdataMetadataResourceNotFound("Properties not found in entity " + entityName + ".");
 			}
 			entity.setProperties(parseEntityProperties(properties));
 			entitySet.addEntity(entity);
@@ -71,7 +71,7 @@ public class EntityModelManager {
 		return entitySet;
 	}
 
-	private List<EntityDefinitionProperty> parseEntityProperties(JSONObject properties) throws GatewayMetadataFieldsException, JSONException {
+	private List<EntityDefinitionProperty> parseEntityProperties(JSONObject properties) throws OdataMetadataFieldsException, JSONException {
 		List<EntityDefinitionProperty> entityProperties = new ArrayList<EntityDefinitionProperty>();
 		if (properties != null) {
 			Iterator it = properties.keys();
@@ -100,9 +100,9 @@ public class EntityModelManager {
 		return entityProperties;
 	}
 
-	private void checkFieldNotNull(String expected, Object actual) throws GatewayMetadataFieldsException {
+	private void checkFieldNotNull(String expected, Object actual) throws OdataMetadataFieldsException {
 		if (actual == null) {
-			throw new GatewayMetadataFieldsException(expected + " not found.");
+			throw new OdataMetadataFieldsException(expected + " not found.");
 		}
 	}
 }

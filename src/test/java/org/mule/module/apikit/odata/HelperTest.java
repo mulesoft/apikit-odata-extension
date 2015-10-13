@@ -18,9 +18,9 @@ import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataFieldsException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataFormatException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataResourceNotFound;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 
 public class HelperTest {
 
@@ -30,7 +30,7 @@ public class HelperTest {
 
 	@Ignore
 	@Test
-	public void test() throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound, JSONException, IOException, GatewayMetadataFormatException {
+	public void test() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, JSONException, IOException, OdataMetadataFormatException {
 		// Assert.assertEquals(Helper.refreshMetadataManager("datagateway-definition.raml").getEntitySet(),
 		// Helper.refreshMetadataManager(new
 		// URL("http://localhost:8081/api/config")).getEntitySet());

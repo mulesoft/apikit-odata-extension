@@ -9,18 +9,25 @@ package org.mule.module.apikit.odata.processor;
 import org.mule.api.MuleEvent;
 import org.mule.module.apikit.AbstractRouter;
 import org.mule.module.apikit.odata.ODataPayload;
+import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.formatter.ODataPayloadMetadataFormatter;
-import org.mule.module.apikit.odata.metadata.GatewayMetadataManager;
+import org.mule.module.apikit.odata.exception.ODataMethodNotAllowedException;
 
 public class ODataMetadataProcessor extends ODataRequestProcessor {
-	public ODataMetadataProcessor(GatewayMetadataManager metadataManager) {
-		super(metadataManager);
+	public ODataMetadataProcessor(OdataContext odataContext) {
+		super(odataContext);
 	}
 
-	public ODataPayload process(MuleEvent event, AbstractRouter router, Format format) throws Exception {
-		ODataPayload oDataPayload = new ODataPayload();
-		oDataPayload.setFormatter(new ODataPayloadMetadataFormatter(getMetadataManager()));
-		return oDataPayload;
+	public ODataPayload process(MuleEvent event, AbstractRouter router, Format format) throws Exception
+	{
+		if("GET".equalsIgnoreCase(super.oDataContext.getMethod())){
+			ODataPayload oDataPayload = new ODataPayload();
+			oDataPayload.setFormatter(new ODataPayloadMetadataFormatter(getMetadataManager()));
+			return oDataPayload;
+		} else{
+			throw new ODataMethodNotAllowedException("GET");
+		}
+
 	}
 }

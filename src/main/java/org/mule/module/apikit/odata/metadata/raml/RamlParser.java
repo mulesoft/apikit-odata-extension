@@ -16,9 +16,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataFieldsException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataFormatException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataResourceNotFound;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
@@ -38,20 +38,20 @@ public class RamlParser {
 	private static final String LENGTH_PROPERTY_TEXT = "maxLength";
 	private static final String KEY_PROPERTY_TEXT = "key";
 
-	public EntityDefinitionSet getEntitiesFromRaml(String path) throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound,
-			GatewayMetadataFormatException {
+	public EntityDefinitionSet getEntitiesFromRaml(String path) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
+			OdataMetadataFormatException {
 		RamlParserUtils.validateRaml(path);
 		return getEntitiesFromRaml(new RamlDocumentBuilder().build(path));
 	}
 
-	public EntityDefinitionSet getEntitiesFromRaml(InputStream inputStream) throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound,
-			GatewayMetadataFormatException {
+	public EntityDefinitionSet getEntitiesFromRaml(InputStream inputStream) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
+			OdataMetadataFormatException {
 		RamlParserUtils.validateRaml(inputStream);
 		return getEntitiesFromRaml(new RamlDocumentBuilder().build(inputStream));
 	}
 
-	public EntityDefinitionSet getEntitiesFromRaml(Raml raml) throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound,
-			GatewayMetadataFormatException {
+	public EntityDefinitionSet getEntitiesFromRaml(Raml raml) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
+			OdataMetadataFormatException {
 		Logger.getLogger(getClass()).info("Loading entities from RAML...");
 		Long initTime = System.nanoTime();
 		Long part = System.nanoTime();
@@ -61,7 +61,7 @@ public class RamlParser {
 		List<Map<String, String>> schemas = raml.getSchemas();
 
 		if (schemas.isEmpty()) {
-			throw new GatewayMetadataFormatException("No schemas found. ");
+			throw new OdataMetadataFormatException("No schemas found. ");
 		}
 		part = System.nanoTime();
 		Logger.getLogger(getClass()).info("Parsing schemas reached in " + (part - initTime) / 1000000);
@@ -69,7 +69,7 @@ public class RamlParser {
 		for (int i = 0; i < schemas.size(); i++) {
 			Map<String, String> schema = schemas.get(i);
 			if (schema.keySet().size() != 1) {
-				throw new GatewayMetadataFormatException("A schema must contain only one key and it has " + schema.keySet().size());
+				throw new OdataMetadataFormatException("A schema must contain only one key and it has " + schema.keySet().size());
 			}
 			String entityName = (String) schema.keySet().toArray()[0];
 
@@ -78,7 +78,7 @@ public class RamlParser {
 			try {
 				jsonSchema = new JSONObject(schema.get(entityName));
 			} catch (JSONException ex) {
-				throw new GatewayMetadataFormatException(ex.getMessage());
+				throw new OdataMetadataFormatException(ex.getMessage());
 			}
 			Logger.getLogger(getClass()).info("Schema to JSON in " + (System.nanoTime() - part) / 1000000 + " ms!");
 
@@ -89,7 +89,7 @@ public class RamlParser {
 
 			JSONObject properties = getJsonObjectFromJson(jsonSchema, "properties");
 			if (properties == null) {
-				throw new GatewayMetadataResourceNotFound("Properties not found in entity " + entityName + ".");
+				throw new OdataMetadataResourceNotFound("Properties not found in entity " + entityName + ".");
 			}
 			part = System.nanoTime();
 			entity.setProperties(parseEntityProperties(properties));
@@ -110,47 +110,47 @@ public class RamlParser {
 		return entitySet;
 	}
 
-	private String getStringFromJson(JSONObject json, String objectName) throws GatewayMetadataFieldsException {
+	private String getStringFromJson(JSONObject json, String objectName) throws OdataMetadataFieldsException {
 		try {
 			return json.getString(objectName);
 		} catch (JSONException ex) {
-			throw new GatewayMetadataFieldsException(ex.getMessage());
+			throw new OdataMetadataFieldsException(ex.getMessage());
 		}
 	}
 
-	private Object getFieldFromJson(JSONObject json, String objectName) throws GatewayMetadataFieldsException {
+	private Object getFieldFromJson(JSONObject json, String objectName) throws OdataMetadataFieldsException {
 		try {
 			return json.get(objectName);
 		} catch (JSONException ex) {
-			throw new GatewayMetadataFieldsException(ex.getMessage());
+			throw new OdataMetadataFieldsException(ex.getMessage());
 		}
 	}
 
-	private int getIntegerFromJson(JSONObject json, String objectName) throws GatewayMetadataFieldsException {
+	private int getIntegerFromJson(JSONObject json, String objectName) throws OdataMetadataFieldsException {
 		try {
 			return json.getInt(objectName);
 		} catch (JSONException ex) {
-			throw new GatewayMetadataFieldsException(ex.getMessage());
+			throw new OdataMetadataFieldsException(ex.getMessage());
 		}
 	}
 
-	private Boolean getBooleanFromJson(JSONObject json, String objectName) throws GatewayMetadataFieldsException {
+	private Boolean getBooleanFromJson(JSONObject json, String objectName) throws OdataMetadataFieldsException {
 		try {
 			return json.getBoolean(objectName);
 		} catch (JSONException ex) {
-			throw new GatewayMetadataFieldsException(ex.getMessage());
+			throw new OdataMetadataFieldsException(ex.getMessage());
 		}
 	}
 
-	private JSONObject getJsonObjectFromJson(JSONObject json, String objectName) throws GatewayMetadataFieldsException {
+	private JSONObject getJsonObjectFromJson(JSONObject json, String objectName) throws OdataMetadataFieldsException {
 		try {
 			return json.getJSONObject(objectName);
 		} catch (JSONException ex) {
-			throw new GatewayMetadataFieldsException(ex.getMessage());
+			throw new OdataMetadataFieldsException(ex.getMessage());
 		}
 	}
 
-	private List<EntityDefinitionProperty> parseEntityProperties(JSONObject properties) throws GatewayMetadataFieldsException {
+	private List<EntityDefinitionProperty> parseEntityProperties(JSONObject properties) throws OdataMetadataFieldsException {
 		List<EntityDefinitionProperty> entityProperties = new ArrayList<EntityDefinitionProperty>();
 		if (properties != null) {
 			Iterator<String> keyIterator = properties.keys();
@@ -188,9 +188,9 @@ public class RamlParser {
 		return entityProperties;
 	}
 
-	private void checkFieldNotNull(String expected, Object actual) throws GatewayMetadataFieldsException {
+	private void checkFieldNotNull(String expected, Object actual) throws OdataMetadataFieldsException {
 		if (actual == null) {
-			throw new GatewayMetadataFieldsException(expected + " not found.");
+			throw new OdataMetadataFieldsException(expected + " not found.");
 		}
 	}
 

@@ -12,21 +12,22 @@ import java.util.regex.Pattern;
 import org.mule.api.MuleEvent;
 import org.mule.module.apikit.AbstractRouter;
 import org.mule.module.apikit.odata.ODataPayload;
+import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
-import org.mule.module.apikit.odata.metadata.GatewayMetadataManager;
+import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 
 public abstract class ODataRequestProcessor {
 
-	private GatewayMetadataManager gatewayMetadataManager;
+	protected OdataContext oDataContext;
 
-	public ODataRequestProcessor(GatewayMetadataManager gatewayMetadataManager) {
-		this.gatewayMetadataManager = gatewayMetadataManager;
+	public ODataRequestProcessor(OdataContext oDataContext) {
+		this.oDataContext = oDataContext;
 	}
 
 	public abstract ODataPayload process(MuleEvent event, AbstractRouter router, Format format) throws Exception;
 
-	protected GatewayMetadataManager getMetadataManager() {
-		return gatewayMetadataManager;
+	protected OdataMetadataManager getMetadataManager() {
+		return oDataContext.getOdataMetadataManager();
 	}
 
 	protected String getProtocol(MuleEvent event) {

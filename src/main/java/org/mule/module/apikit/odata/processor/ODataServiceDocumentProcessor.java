@@ -9,21 +9,26 @@ package org.mule.module.apikit.odata.processor;
 import org.mule.api.MuleEvent;
 import org.mule.module.apikit.AbstractRouter;
 import org.mule.module.apikit.odata.ODataPayload;
+import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.formatter.ServiceDocumentPayloadFormatter;
-import org.mule.module.apikit.odata.metadata.GatewayMetadataManager;
+import org.mule.module.apikit.odata.exception.ODataMethodNotAllowedException;
 
 public class ODataServiceDocumentProcessor extends ODataRequestProcessor {
 
-	public ODataServiceDocumentProcessor(GatewayMetadataManager metadataManager) {
-		super(metadataManager);
+	public ODataServiceDocumentProcessor(OdataContext odataContext) {
+		super(odataContext);
 	}
 
 	public ODataPayload process(MuleEvent event, AbstractRouter router, Format format) throws Exception {
-		String url = getUrl(event);
+		if ("GET".equalsIgnoreCase(super.oDataContext.getMethod())) {
+			String url = getUrl(event);
 
-		ODataPayload result = new ODataPayload();
-		result.setFormatter(new ServiceDocumentPayloadFormatter(getMetadataManager(), url));
-		return result;
+			ODataPayload result = new ODataPayload();
+			result.setFormatter(new ServiceDocumentPayloadFormatter(getMetadataManager(), url));
+			return result;
+		} else {
+			throw new ODataMethodNotAllowedException("GET");
+		}
 	}
 }
