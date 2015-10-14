@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mule.module.apikit.AbstractConfiguration;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataFormatException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.raml.model.Raml;
 import org.raml.parser.loader.ResourceLoader;
 import org.raml.parser.rule.ValidationResult;
@@ -45,12 +45,12 @@ public class RamlParserUtils {
 		return getRaml(conn.getInputStream());
 	}
 
-	private static void validateResults(List<ValidationResult> results) throws GatewayMetadataFormatException {
+	private static void validateResults(List<ValidationResult> results) throws OdataMetadataFormatException {
 		if (!results.isEmpty()) {
 			for (ValidationResult result : results) {
 				Logger.getLogger(RamlParser.class).error(result.toString());
 			}
-			throw new GatewayMetadataFormatException("RAML is invalid. See log list.");
+			throw new OdataMetadataFormatException("RAML is invalid. See log list.");
 		} else {
 			Logger.getLogger(RamlParser.class).info("RAML Validation ok");
 		}
@@ -60,12 +60,12 @@ public class RamlParserUtils {
 		return (one.getVersion().equals(two.getVersion()) && one.getUri().equals(two.getUri()) && one.getSchemas().equals(two.getSchemas()));
 	}
 
-	public static void validateRaml(String path) throws GatewayMetadataFormatException {
+	public static void validateRaml(String path) throws OdataMetadataFormatException {
 		List<ValidationResult> results = RamlValidationService.createDefault().validate(path);
 		validateResults(results);
 	}
 
-	public static void validateRaml(InputStream inputStream) throws GatewayMetadataFormatException {
+	public static void validateRaml(InputStream inputStream) throws OdataMetadataFormatException {
 		List<ValidationResult> results = RamlValidationService.createDefault().validate(inputStream);
 		validateResults(results);
 	}

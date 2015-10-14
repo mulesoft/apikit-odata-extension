@@ -12,10 +12,10 @@ import java.net.URL;
 
 import org.mule.module.apikit.AbstractConfiguration;
 import org.mule.module.apikit.odata.exception.ODataException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataEntityNotFoundException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataFieldsException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataFormatException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataResourceNotFound;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 import org.mule.module.apikit.odata.metadata.raml.RamlParser;
@@ -26,7 +26,7 @@ import org.raml.model.Raml;
  * 
  * @author arielsegura
  */
-public class GatewayMetadataManager {
+public class OdataMetadataManager {
 
 	private static EntityDefinitionSet entitySet;
 	static {
@@ -37,7 +37,7 @@ public class GatewayMetadataManager {
 	private RamlParser ramlParser;
 	private static Object lock;
 
-	public GatewayMetadataManager() {
+	public OdataMetadataManager() {
 		super();
 		ramlParser = new RamlParser();
 	}
@@ -62,8 +62,8 @@ public class GatewayMetadataManager {
 		return false;
 	}
 
-	private void performRefresh(Raml newRaml, boolean forceUpdate) throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound,
-			GatewayMetadataFormatException {
+	private void performRefresh(Raml newRaml, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
+			OdataMetadataFormatException {
 		synchronized (lock) {
 			if (update(newRaml, forceUpdate)) {
 				entitySet = ramlParser.getEntitiesFromRaml(newRaml);
@@ -72,8 +72,8 @@ public class GatewayMetadataManager {
 		}
 	}
 
-	public EntityDefinitionSet refreshMetadata(AbstractConfiguration newConf, boolean forceUpdate) throws GatewayMetadataFieldsException,
-			GatewayMetadataResourceNotFound, GatewayMetadataFormatException {
+	public EntityDefinitionSet refreshMetadata(AbstractConfiguration newConf, boolean forceUpdate) throws OdataMetadataFieldsException,
+			OdataMetadataResourceNotFound, OdataMetadataFormatException {
 
 		performRefresh(RamlParserUtils.getRaml(newConf), forceUpdate);
 
@@ -81,48 +81,48 @@ public class GatewayMetadataManager {
 
 	}
 
-	public EntityDefinitionSet refreshMetadata(String ramlPath, boolean forceUpdate) throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound,
-			GatewayMetadataFormatException {
+	public EntityDefinitionSet refreshMetadata(String ramlPath, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
+			OdataMetadataFormatException {
 
 		performRefresh(RamlParserUtils.getRaml(ramlPath), forceUpdate);
 
 		return entitySet;
 	}
 
-	public EntityDefinitionSet refreshMetadata(InputStream raml, boolean forceUpdate) throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound,
-			GatewayMetadataFormatException {
+	public EntityDefinitionSet refreshMetadata(InputStream raml, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
+			OdataMetadataFormatException {
 		performRefresh(RamlParserUtils.getRaml(raml), forceUpdate);
 		return entitySet;
 	}
 
-	public EntityDefinitionSet refreshMetadata(URL url, boolean forceUpdate) throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound,
-			GatewayMetadataFormatException, IOException {
+	public EntityDefinitionSet refreshMetadata(URL url, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
+			OdataMetadataFormatException, IOException {
 		performRefresh(RamlParserUtils.getRaml(url), forceUpdate);
 		return entitySet;
 	}
 
-	public EntityDefinitionSet refreshMetadata(Raml raml, boolean forceUpdate) throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound,
-			GatewayMetadataFormatException {
+	public EntityDefinitionSet refreshMetadata(Raml raml, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
+			OdataMetadataFormatException {
 
 		performRefresh(raml, forceUpdate);
 		return entitySet;
 	}
 
-	public EntityDefinitionSet getEntitySet() throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound, GatewayMetadataFormatException {
+	public EntityDefinitionSet getEntitySet() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		synchronized (lock) {
 			return entitySet;
 		}
 	}
 
-	public EntityDefinition getEntityByName(String entityName) throws GatewayMetadataEntityNotFoundException, GatewayMetadataFieldsException,
-			GatewayMetadataResourceNotFound, GatewayMetadataFormatException {
+	public EntityDefinition getEntityByName(String entityName) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
+			OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		synchronized (lock) {
 			for (EntityDefinition EntityDefinition : entitySet.toList()) {
 				if (EntityDefinition.getName().equalsIgnoreCase(entityName)) {
 					return EntityDefinition;
 				}
 			}
-			throw new GatewayMetadataEntityNotFoundException("Entity " + entityName + " not found.");
+			throw new OdataMetadataEntityNotFoundException("Entity " + entityName + " not found.");
 		}
 	}
 

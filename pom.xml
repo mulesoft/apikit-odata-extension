@@ -20,7 +20,7 @@
 	<!-- Properties -->
 	<properties>
 		<mule.version>3.7.0</mule.version>
-		<apikit.version>1.7.2-SNAPSHOT</apikit.version>
+		<apikit.version>1.8.0-BETA</apikit.version>
 		<apikit.spi.version>1.0.0</apikit.spi.version>
 		<licensePath>LICENSE_HEADER.txt</licensePath>
 	</properties>

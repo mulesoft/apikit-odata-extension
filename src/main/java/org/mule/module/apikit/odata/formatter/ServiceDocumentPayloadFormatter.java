@@ -13,8 +13,7 @@ import java.util.Arrays;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
-import org.mule.module.apikit.odata.metadata.GatewayMetadataManager;
+import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.util.Helper;
 import org.mule.module.apikit.odata.util.UriInfoImpl;
 import org.odata4j.edm.EdmDataServices;
@@ -23,10 +22,10 @@ import org.odata4j.format.FormatWriterFactory;
 
 public class ServiceDocumentPayloadFormatter implements ODataPayloadFormatter {
 	private final String url;
-	private GatewayMetadataManager gatewayMetadataManager;
+	private OdataMetadataManager odataMetadataManager;
 
-	public ServiceDocumentPayloadFormatter(GatewayMetadataManager gatewayMetadataManager, String url) {
-		this.gatewayMetadataManager = gatewayMetadataManager;
+	public ServiceDocumentPayloadFormatter(OdataMetadataManager odataMetadataManager, String url) {
+		this.odataMetadataManager = odataMetadataManager;
 		this.url = url;
 	}
 
@@ -36,7 +35,7 @@ public class ServiceDocumentPayloadFormatter implements ODataPayloadFormatter {
 		}
 		FormatWriter<EdmDataServices> fw = FormatWriterFactory.getFormatWriter(EdmDataServices.class, Arrays.asList(MediaType.valueOf(MediaType.WILDCARD)),
 				format.name(), null);
-		EdmDataServices ees = Helper.createMetadata(gatewayMetadataManager.getEntitySet());
+		EdmDataServices ees = Helper.createMetadata(odataMetadataManager.getEntitySet());
 		UriInfo uriInfo = new UriInfoImpl(url);
 		Writer w = new StringWriter();
 		fw.write(uriInfo, w, ees);

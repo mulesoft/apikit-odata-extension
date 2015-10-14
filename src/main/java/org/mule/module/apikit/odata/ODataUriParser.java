@@ -9,10 +9,11 @@ package org.mule.module.apikit.odata;
 import java.net.URLDecoder;
 import java.util.HashMap;
 
+import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.exception.ODataInvalidUriException;
-import org.mule.module.apikit.odata.metadata.GatewayMetadataManager;
+import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.processor.ODataApikitProcessor;
 import org.mule.module.apikit.odata.processor.ODataMetadataProcessor;
 import org.mule.module.apikit.odata.processor.ODataRequestProcessor;
@@ -25,14 +26,12 @@ public class ODataUriParser {
 
 	/**
 	 * Parses the URI and returns the right processor to handle the request
-	 * 
-	 * @param event
 	 * @return
 	 * @throws ODataInvalidUriException
 	 * @throws ODataInvalidFormatException
 	 */
 
-	public static ODataRequestProcessor parse(GatewayMetadataManager metadataManager, String path, String query) throws ODataException {
+	public static ODataRequestProcessor parse(OdataContext odataContext, String path, String query) throws ODataException {
 
 		path = path.replace(ODATA_SVC_URI_PREFIX, "");
 		query = decodeQuery(query);
@@ -40,12 +39,12 @@ public class ODataUriParser {
 		if (ODataUriHelper.allowedQuery(path, query)) {
 			// metadata
 			if (ODataUriHelper.isMetadata(path)) {
-				return new ODataMetadataProcessor(metadataManager);
+				return new ODataMetadataProcessor(odataContext);
 			}
 
 			// service document
 			if (ODataUriHelper.isServiceDocument(path)) {
-				return new ODataServiceDocumentProcessor(metadataManager);
+				return new ODataServiceDocumentProcessor(odataContext);
 			}
 
 			// resource request
@@ -58,7 +57,7 @@ public class ODataUriParser {
 				String querystring = handleQuerystring(query);
 
 				// parse keys
-				HashMap<String, Object> keys = ODataUriHelper.parseKeys(path, metadataManager.getEntityKeys(entity));
+				HashMap<String, Object> keys = ODataUriHelper.parseKeys(path, odataContext.getOdataMetadataManager().getEntityKeys(entity));
 
 				// check if $count is present
 				boolean count = ODataUriHelper.isCount(path);
@@ -77,7 +76,7 @@ public class ODataUriParser {
 					}
 				}
 
-				return new ODataApikitProcessor(metadataManager, entity, querystring, keys, count);
+				return new ODataApikitProcessor(odataContext, entity, querystring, keys, count);
 
 			} else {
 				String segment = ODataUriHelper.parseEntity(path);

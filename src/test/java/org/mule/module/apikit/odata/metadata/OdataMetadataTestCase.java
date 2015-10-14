@@ -12,17 +12,17 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataEntityNotFoundException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataFieldsException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataFormatException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataResourceNotFound;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 
-public class GatewayMetadataTestCase {
+public class OdataMetadataTestCase {
 
-	GatewayMetadataManager metadataManager;
+	OdataMetadataManager metadataManager;
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -31,21 +31,21 @@ public class GatewayMetadataTestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		metadataManager = new GatewayMetadataManager();
+		metadataManager = new OdataMetadataManager();
 		mockEntitySet = mockEntitySet();
 	}
 
 	@Test
-	public void retrieveEntityPositive() throws GatewayMetadataEntityNotFoundException, GatewayMetadataFieldsException, GatewayMetadataResourceNotFound,
-			GatewayMetadataFormatException {
+	public void retrieveEntityPositive() throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataResourceNotFound,
+			OdataMetadataFormatException {
 		metadataManager.refreshMetadata("org/mule/module/apikit/odata/metadata/raml/datagateway-definition.raml", true);
 		Assert.assertEquals(metadataManager.getEntityByName("gateways"), mockEntitySet.toList().get(0));
 	}
 
 	@Test
-	public void retrieveEntityNegative() throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound, GatewayMetadataFormatException,
-			GatewayMetadataEntityNotFoundException {
-		thrown.expect(GatewayMetadataEntityNotFoundException.class);
+	public void retrieveEntityNegative() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException,
+			OdataMetadataEntityNotFoundException {
+		thrown.expect(OdataMetadataEntityNotFoundException.class);
 		thrown.expectMessage("Entity bla not found.");
 		metadataManager.refreshMetadata("org/mule/module/apikit/odata/metadata/raml/datagateway-definition.raml", true);
 		metadataManager.getEntityByName("bla");

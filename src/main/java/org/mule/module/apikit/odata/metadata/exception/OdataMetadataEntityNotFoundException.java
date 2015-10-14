@@ -12,14 +12,14 @@ import org.mule.module.apikit.odata.exception.ODataException;
  * 
  * @author arielsegura
  */
-public class GatewayMetadataEntityNotFoundException extends ODataException {
+public class OdataMetadataEntityNotFoundException extends ODataException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -8973414438805066252L;
 
-	public GatewayMetadataEntityNotFoundException(String message) {
+	public OdataMetadataEntityNotFoundException(String message) {
 		super(message, 404);
 	}
 

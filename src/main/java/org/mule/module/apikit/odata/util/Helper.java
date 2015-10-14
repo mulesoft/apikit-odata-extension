@@ -20,7 +20,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mule.module.apikit.odata.exception.ODataInvalidFlowResponseException;
-import org.mule.module.apikit.odata.metadata.GatewayMetadataManager;
+import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
@@ -41,7 +41,7 @@ import org.odata4j.producer.Responses;
 
 public class Helper {
 
-	private static final GatewayMetadataManager gwMetadataManager = new GatewayMetadataManager();
+	private static final OdataMetadataManager gwMetadataManager = new OdataMetadataManager();
 
 	public static EntitiesResponse convertEntriesToOEntries(List<Entry> outputEntries, String entitySetName, EntityDefinitionSet metadata1) {
 

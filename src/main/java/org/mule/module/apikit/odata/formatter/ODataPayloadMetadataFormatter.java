@@ -9,21 +9,21 @@ package org.mule.module.apikit.odata.formatter;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import org.mule.module.apikit.odata.metadata.GatewayMetadataManager;
+import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.util.Helper;
 import org.odata4j.edm.EdmDataServices;
 import org.odata4j.format.xml.EdmxFormatWriter;
 
 public class ODataPayloadMetadataFormatter implements ODataPayloadFormatter {
-	private GatewayMetadataManager gatewayMetadataManager;
+	private OdataMetadataManager odataMetadataManager;
 
-	public ODataPayloadMetadataFormatter(GatewayMetadataManager gatewayMetadataManager) {
-		this.gatewayMetadataManager = gatewayMetadataManager;
+	public ODataPayloadMetadataFormatter(OdataMetadataManager odataMetadataManager) {
+		this.odataMetadataManager = odataMetadataManager;
 	}
 
 	public String format(Format format) throws Exception {
 		Writer w = new StringWriter();
-		EdmDataServices ees = Helper.createMetadata(gatewayMetadataManager.getEntitySet());
+		EdmDataServices ees = Helper.createMetadata(odataMetadataManager.getEntitySet());
 		EdmxFormatWriter.write(ees, w);
 		return w.toString();
 	}

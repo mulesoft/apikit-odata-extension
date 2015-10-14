@@ -13,21 +13,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.apikit.AbstractRouter;
 import org.mule.module.apikit.odata.ODataPayload;
+import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ODataInvalidFlowResponseException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.formatter.ODataApiKitFormatter;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
-import org.mule.module.apikit.odata.metadata.GatewayMetadataManager;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataEntityNotFoundException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataFieldsException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataFormatException;
-import org.mule.module.apikit.odata.metadata.exception.GatewayMetadataResourceNotFound;
+import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.model.Entry;
@@ -44,8 +44,8 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 	// TODO this attr is not used in project
 	private Map<String, Object> keys;
 
-	public ODataApikitProcessor(GatewayMetadataManager metadataManager, String entity, String query, Map<String, Object> keys, boolean count) {
-		super(metadataManager);
+	public ODataApikitProcessor(OdataContext odataContext, String entity, String query, Map<String, Object> keys, boolean count) {
+		super(odataContext);
 		this.query = query;
 		this.entity = entity;
 		this.entityCount = count;
@@ -115,8 +115,6 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		String httpQueryString = this.query;
 		Map<String, String> httpQueryParams = Helper.queryToMap(query);
 
-		Logger.getLogger(getClass()).info("New httpRequest: " + httpRequest);
-		Logger.getLogger(getClass()).info("New httpRequestPath: " + httpRequestPath);
 		event.getMessage().setProperty("http.request", httpRequest, PropertyScope.INBOUND);
 		event.getMessage().setProperty("http.request.path", httpRequestPath, PropertyScope.INBOUND);
 		event.getMessage().setProperty("http.query.string", httpQueryString, PropertyScope.INBOUND);
@@ -140,10 +138,10 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		return entries;
 	}
 
-	private List<Entry> verifyFlowResponse(MuleEvent response) throws GatewayMetadataEntityNotFoundException, GatewayMetadataFieldsException,
-			GatewayMetadataResourceNotFound, GatewayMetadataFormatException, ODataInvalidFlowResponseException {
+	private List<Entry> verifyFlowResponse(MuleEvent response) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
+			OdataMetadataResourceNotFound, OdataMetadataFormatException, ODataInvalidFlowResponseException {
 		try {
-			GatewayMetadataManager metadataManager = getMetadataManager();
+			OdataMetadataManager metadataManager = getMetadataManager();
 			EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
 			List<Entry> entries;
 
