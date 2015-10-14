@@ -1,7 +1,7 @@
 #%RAML 0.8
 title: Auto-generated RAML for DataGateway
 version: 0.1
-traits: 
+traits:
 - orderby:
       queryParameters:
         parms:
@@ -42,44 +42,60 @@ traits:
         parms:
           description: Collection of filters
           type: string
-schemas: 
-- gateways: |
-    	{"additionalProperties":false,"properties":{"draft":{"fieldName": "draft","nullable":true,"description":"bla","type":"boolean","sample":12,"maxLength":5},"ch_full_domain":{"fieldName": "ch_full_domain","nullable":true,"description":"bla","type":"string","sample":12,"maxLength":5},"name":{"fieldName": "name","nullable":true,"description":"bla","type":"string","sample":12,"maxLength":45},"description":{"fieldName": "description","nullable":true,"description":"bla","type":"string","sample":12,"maxLength":45},"ch_domain":{"fieldName": "ch_domain","nullable":true,"description":"bla","type":"string","sample":12,"maxLength":5},"id":{"fieldName": "id","nullable":false,"description":"bla","type":"integer","sample":12,"maxLength":4,"key":true},"published":{"fieldName": "published","nullable":true,"description":"bla","type":"boolean","sample":12,"maxLength":5},"status":{"fieldName": "status","nullable":true,"description":"bla","type":"string","sample":12,"maxLength":255}},"required":["id","name","description","status","published","status","published","draft","ch_domain","ch_full_domain"],"remoteName":"gateways"}
-- users: |
-    	{"$schema":"http://json-schema.org/draft-04/schema#","additionalProperties":false,"type":"object","remoteName":"users"}
-/gateways: 
+schemas:
+  - gateways: |
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "additionalProperties": false,
+        "type": "object",
+        "edm.name": "gateways",
+        "edm.remoteName": "gateways",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "status",
+          "published",
+          "status",
+          "published",
+          "draft",
+          "ch_domain",
+          "ch_full_domain"
+        ]
+      }
+/gateways:
     displayName: gateways
     is: [orderby, top, skip, filter, expand, format, select, inlinecount]
-    get: 
+    get:
         description: Read
-    delete: 
+    delete:
         description: Delete
-    post: 
+    post:
         description: Create
-    /{gatewaysId}: 
+    /{gatewaysId}:
         displayName: gateways Id
         is: [orderby, top, skip, filter, expand, format, select, inlinecount]
-        get: 
+        get:
             description: Read
-        delete: 
+        delete:
             description: Delete
-        put: 
+        put:
             description: Update
-/users: 
+/users:
     displayName: users
     is: [orderby, top, skip, filter, expand, format, select, inlinecount]
-    get: 
+    get:
         description: Read
-    delete: 
+    delete:
         description: Delete
-    post: 
+    post:
         description: Create
-    /{usersId}: 
+    /{usersId}:
         displayName: users Id
         is: [orderby, top, skip, filter, expand, format, select, inlinecount]
-        get: 
+        get:
             description: Read
-        delete: 
+        delete:
             description: Delete
-        put: 
+        put:
             description: Update

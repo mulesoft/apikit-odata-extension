@@ -57,25 +57,22 @@ public class GatewayMetadataTestCase {
 
 		entityDefinition = new EntityDefinition("gateways", "gateways");
 		entityDefinition.setHasPrimaryKey(true);
-		// String name, String sample, String type, boolean nullable, int
-		// length,
-		// String description, boolean key
-		entityDefinition.addProperty(new EntityDefinitionProperty("id", "id", "12", "integer", false, 4, true));
-		entityDefinition.addProperty(new EntityDefinitionProperty("name", "name", "Ariel", "string", true, 45, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("description", "description", "Ariel", "string", true, 45, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("status", "status", "Ariel", "string", true, 255, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("published", "published", "Ariel", "boolean", true, 5, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("draft", "draft", "Ariel", "boolean", true, 5, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("ch_domain", "ch_domain", "Ariel", "string", true, 5, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("ch_full_domain", "ch_full_domain", "Ariel", "string", true, 5, false));
+		entityDefinition.addProperty(new EntityDefinitionProperty("id", "Edm.Int32", false, true, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("name", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("description", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("status", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("published", "Edm.Boolean", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("draft", "Edm.Boolean", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("ch_domain", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("ch_full_domain", "Edm.String", false, false, null, null, null, null, null, null, null));
 		newEntitySet.addEntity(entityDefinition);
 
 		entityDefinition = new EntityDefinition("users", "users");
 		entityDefinition.setHasPrimaryKey(true);
-		entityDefinition.addProperty(new EntityDefinitionProperty("id", "id", "1", "integer", false, 4, true));
-		entityDefinition.addProperty(new EntityDefinitionProperty("first_name", "first_name", "Marty", "string", true, 45, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("last_name", "last_name", "Mc Fly", "string", true, 45, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("email", "email", "Mc Fly", "string", true, 45, false));
+		entityDefinition.addProperty(new EntityDefinitionProperty("id", "Edm.Int32", false, true, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("first_name", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("last_name", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("email", "Edm.String", false, false, null, null, null, null, null, null, null));
 		newEntitySet.addEntity(entityDefinition);
 
 		return newEntitySet;

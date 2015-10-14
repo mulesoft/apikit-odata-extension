@@ -39,27 +39,26 @@ public class RamlParserTest {
 	private EntityDefinitionSet mockEntitySet() {
 		EntityDefinitionSet newEntitySet = new EntityDefinitionSet();
 		EntityDefinition entityDefinition;
-
 		entityDefinition = new EntityDefinition("gateways", "gateways");
 		entityDefinition.setHasPrimaryKey(true);
-		// String name, String sample, String type, boolean nullable, int length,
-		// String description, boolean key
-		entityDefinition.addProperty(new EntityDefinitionProperty("id", "id", "12", "integer", false, 4, true));
-		entityDefinition.addProperty(new EntityDefinitionProperty("name", "name", "Ariel", "string", true, 45, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("description", "description", "Ariel", "string", true, 45, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("status", "status", "Ariel", "string", true, 255, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("published", "published", "Ariel", "boolean", true, 5, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("draft", "draft", "Ariel", "boolean", true, 5, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("ch_domain", "ch_domain", "Ariel", "string", true, 5, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("ch_full_domain", "ch_full_domain", "Ariel", "string", true, 5, false));
+		
+		entityDefinition.addProperty(new EntityDefinitionProperty("id", "Edm.Int32", false, true, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("name", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("description", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("status", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("published", "Edm.Boolean", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("draft", "Edm.Boolean", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("ch_domain", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("ch_full_domain", "Edm.String", false, false, null, null, null, null, null, null, null));
+		
 		newEntitySet.addEntity(entityDefinition);
 
 		entityDefinition = new EntityDefinition("users", "users");
 		entityDefinition.setHasPrimaryKey(true);
-		entityDefinition.addProperty(new EntityDefinitionProperty("id", "id", "1", "integer", false, 4, true));
-		entityDefinition.addProperty(new EntityDefinitionProperty("first_name", "first_name", "Marty", "string", true, 45, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("last_name", "last_name", "Mc Fly", "string", true, 45, false));
-		entityDefinition.addProperty(new EntityDefinitionProperty("email", "email", "Mc Fly", "string", true, 45, false));
+		entityDefinition.addProperty(new EntityDefinitionProperty("id", "Edm.Int32", false, true, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("first_name", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("last_name", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("email", "Edm.String", false, false, null, null, null, null, null, null, null));
 		newEntitySet.addEntity(entityDefinition);
 
 		return newEntitySet;
@@ -68,7 +67,7 @@ public class RamlParserTest {
 	@Test
 	public void incompleteSchemaTest() throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound, GatewayMetadataFormatException {
 		thrown.expect(GatewayMetadataFieldsException.class);
-		thrown.expectMessage("JSONObject[\"nullable\"] not found.");
+		thrown.expectMessage("Property \"nullable\" is missing in field \"draft\" in entity \"gateways\"");
 		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/incomplete-schema.raml");
 	}
 
@@ -101,8 +100,9 @@ public class RamlParserTest {
 
 	@Test
 	public void schemasMultipleKey() throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound, GatewayMetadataFormatException {
+		
 		thrown.expect(GatewayMetadataFormatException.class);
-		thrown.expectMessage("Duplicate key \"remoteName\"");
+		thrown.expectMessage("Duplicate key \"edm.remoteName\"");
 		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/schemas-multiple-keys.raml");
 	}
 
@@ -116,21 +116,14 @@ public class RamlParserTest {
 	@Test
 	public void invalidKeyValue() throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound, GatewayMetadataFormatException {
 		thrown.expect(GatewayMetadataFieldsException.class);
-		thrown.expectMessage("JSONObject[\"key\"] is not a Boolean.");
+		thrown.expectMessage("Property \"key\" in field \"draft\" must be a boolean.");
 		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/invalid-key-value.raml");
-	}
-
-	@Test
-	public void invalidLengthValue() throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound, GatewayMetadataFormatException {
-		thrown.expect(GatewayMetadataFieldsException.class);
-		thrown.expectMessage("JSONObject[\"maxLength\"] is not an int.");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/invalid-length-value.raml");
 	}
 
 	@Test
 	public void invalidNullableValue() throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound, GatewayMetadataFormatException {
 		thrown.expect(GatewayMetadataFieldsException.class);
-		thrown.expectMessage("JSONObject[\"nullable\"] is not a Boolean.");
+		thrown.expectMessage("Property \"nullable\" in field \"draft\" must be a boolean.");
 		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/invalid-nullable-value.raml");
 	}
 
