@@ -30,13 +30,22 @@ import org.raml.parser.visitor.RamlDocumentBuilder;
  * @author arielsegura
  */
 public class RamlParser {
-
-	private static final String FIELD_NAME_PROPERTY_TEXT = "fieldName";
-	private static final String SAMPLE_PROPERTY_TEXT = "sample";
-	private static final String TYPE_PROPERTY_TEXT = "type";
-	private static final String NULLABLE_PROPERTY_TEXT = "nullable";
-	private static final String LENGTH_PROPERTY_TEXT = "maxLength";
-	private static final String KEY_PROPERTY_TEXT = "key";
+	
+	private static final String NAMESPACE = "edm";
+	
+	private static final String REMOTE_NAME = "remoteName";
+	private static final String NAME_PROPERTY = "name";
+	private static final String TYPE_PROPERTY = "type";
+	private static final String NULLABLE_PROPERTY = "nullable";
+	private static final String KEY_PROPERTY = "key";
+	private static final String READ_ONLY_PROPERTY = "readOnly";
+	private static final String DEFAULT_VALUE_PROPERTY = "defaultValue";
+	private static final String MAX_LENGTH_PROPERTY = "maxLength";
+	private static final String FIXED_LENGTH_PROPERTY = "fixedLength";
+	private static final String COLLATION_PROPERTY = "collation";
+	private static final String UNICODE_PROPERTY = "unicode";
+	private static final String PRECISION_PROPERTY = "precision";
+	private static final String SCALE_PROPERTY = "scale";
 
 	public EntityDefinitionSet getEntitiesFromRaml(String path) throws GatewayMetadataFieldsException, GatewayMetadataResourceNotFound,
 			GatewayMetadataFormatException {
@@ -82,8 +91,8 @@ public class RamlParser {
 			}
 			Logger.getLogger(getClass()).info("Schema to JSON in " + (System.nanoTime() - part) / 1000000 + " ms!");
 
-			String remoteName = getStringFromJson(jsonSchema, "remoteName");
-			checkFieldNotNull("Remote Name", remoteName);
+			String remoteName = getStringFromJson(jsonSchema, NAMESPACE + "." + REMOTE_NAME);
+			notNull("\"remoteName\" not found in entity \"" + entityName + "\"", remoteName);
 
 			EntityDefinition entity = new EntityDefinition(entityName, remoteName);
 
@@ -92,7 +101,7 @@ public class RamlParser {
 				throw new GatewayMetadataResourceNotFound("Properties not found in entity " + entityName + ".");
 			}
 			part = System.nanoTime();
-			entity.setProperties(parseEntityProperties(properties));
+			entity.setProperties(parseEntityProperties(properties, entity));
 			// TODO See if it's possible to avoid this for
 			for (EntityDefinitionProperty property : entity.getProperties()) {
 				if (property.isKey()) {
@@ -150,48 +159,64 @@ public class RamlParser {
 		}
 	}
 
-	private List<EntityDefinitionProperty> parseEntityProperties(JSONObject properties) throws GatewayMetadataFieldsException {
+	private List<EntityDefinitionProperty> parseEntityProperties(JSONObject properties, EntityDefinition entity) throws GatewayMetadataFieldsException {
 		List<EntityDefinitionProperty> entityProperties = new ArrayList<EntityDefinitionProperty>();
 		if (properties != null) {
 			Iterator<String> keyIterator = properties.keys();
 			while (keyIterator.hasNext()) {
 				String item = keyIterator.next();
-				String propertyName = item;
-				JSONObject property = getJsonObjectFromJson(properties, propertyName);
+				String field = item;
+				JSONObject property = getJsonObjectFromJson(properties, field);
 				Logger.getLogger(getClass()).debug("Parsing \n" + property.toString());
 
-				String sample = String.valueOf(getFieldFromJson(property, SAMPLE_PROPERTY_TEXT));
-				checkFieldNotNull("Sample", sample);
+				String name = getString(property, NAME_PROPERTY);
+				String type = getString(property, TYPE_PROPERTY);
+				Boolean nullable = getBoolean(property, NULLABLE_PROPERTY, field);
+				Boolean key = getBoolean(property, KEY_PROPERTY, field);
+				String defaultValue = getString(property, DEFAULT_VALUE_PROPERTY);
+				String maxLength = getString(property, MAX_LENGTH_PROPERTY);
+				Boolean fixedLength = getBoolean(property, FIXED_LENGTH_PROPERTY, field);
+				String collation = getString(property, COLLATION_PROPERTY);
+				Boolean unicode = getBoolean(property, UNICODE_PROPERTY, field);
+				String precision = getString(property, PRECISION_PROPERTY);
+				String scale = getString(property, SCALE_PROPERTY);
 
-				String fieldName = String.valueOf(getFieldFromJson(property, FIELD_NAME_PROPERTY_TEXT));
-				checkFieldNotNull("Field name", fieldName);
+				notNull("Property \"name\" is missing in field \"" + field + "\" in entity \"" + entity.getName() + "\"", name);
+				notNull("Property \"type\" is missing in field \"" + field + "\" in entity \"" + entity.getName() + "\"", type);
+				notNull("Property \"key\" is missing in field \"" + field + "\" in entity \"" + entity.getName() + "\"", key);
+				notNull("Property \"nullable\" is missing in field \"" + field + "\" in entity \"" + entity.getName() + "\"", nullable);
 
-				String type = String.valueOf(getFieldFromJson(property, TYPE_PROPERTY_TEXT));
-				checkFieldNotNull("Type", type);
-
-				Boolean nullable = getBooleanFromJson(property, NULLABLE_PROPERTY_TEXT);
-				checkFieldNotNull("Nullable", nullable);
-
-				Integer length = getIntegerFromJson(property, LENGTH_PROPERTY_TEXT);
-				checkFieldNotNull("Length", length);
-
-				Boolean key = false;
-				if (property.has(KEY_PROPERTY_TEXT)) {
-					key = getBooleanFromJson(property, KEY_PROPERTY_TEXT);
-					checkFieldNotNull("Key", key);
-				}
-				EntityDefinitionProperty newEntityProperty = new EntityDefinitionProperty(propertyName, fieldName, sample, type, nullable, length, key);
+				EntityDefinitionProperty newEntityProperty = new EntityDefinitionProperty(name, type, nullable, key, defaultValue, maxLength, fixedLength, collation, unicode, precision, scale);
 				entityProperties.add(newEntityProperty);
+
 			}
 		}
 		Collections.sort(entityProperties);
 		return entityProperties;
 	}
 
-	private void checkFieldNotNull(String expected, Object actual) throws GatewayMetadataFieldsException {
+	private void notNull(String message, Object actual) throws GatewayMetadataFieldsException {
 		if (actual == null) {
-			throw new GatewayMetadataFieldsException(expected + " not found.");
+			throw new GatewayMetadataFieldsException(message);
 		}
+	}
+	
+	private String getString(JSONObject property, String propertyName) {
+		try { 
+			return String.valueOf(property.get(NAMESPACE + "." + propertyName));
+		} catch (JSONException e){
+			return null;
+		}
+	}
+	
+	private Boolean getBoolean(JSONObject property, String propertyName, String field) throws GatewayMetadataFieldsException {
+		String str = getString(property, propertyName);
+		if (str == null) {
+			return null;
+		} else if (str.equals("true") || str.equals("false")) {
+			return Boolean.valueOf(str);
+		}
+		throw new GatewayMetadataFieldsException("Property \"" + propertyName + "\" in field \"" + field + "\" must be a boolean.");
 	}
 
 }

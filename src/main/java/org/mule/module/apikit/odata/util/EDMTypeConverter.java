@@ -16,16 +16,57 @@ import org.odata4j.edm.EdmSimpleType;
 import org.odata4j.edm.EdmType;
 
 public class EDMTypeConverter {
-
+	
+	public static final String EDM_STRING = "Edm.String";
+	public static final String EDM_DATETIME = "Edm.DateTime";
+	public static final String EDM_BOOLEAN = "Edm.Boolean";
+	public static final String EDM_DECIMAL = "Edm.Decimal";
+	public static final String EDM_DOUBLE = "Edm.Double";
+	public static final String EDM_SINGLE = "Edm.Single";
+	public static final String EDM_INT16 = "Edm.Int16";
+	public static final String EDM_INT32 = "Edm.Int32";
+	public static final String EDM_INT64 = "Edm.Int64";
+	public static final String EDM_TIME = "Edm.Time";
+	public static final String EDM_DATETIMEOFFSET = "Edm.DateTimeOffset";
+	public static final String EDM_BINARY = "Edm.Binary";
+	public static final String EDM_BYTE = "Edm.Byte";
+	public static final String EDM_GUID = "Edm.Guid";
+	public static final String EDM_SBYTE = "Edm.SByte";
+	
 	public static EdmType convert(String type) {
-		if (type.equals("string"))
-			return EdmSimpleType.STRING;
-		if (type.equals("integer"))
-			return EdmSimpleType.INT32;
-		if (EdmSimpleType.getSimple(type) != null) {
-			return EdmSimpleType.getSimple(type);
-		}
 
+		if (type.equals(EDM_STRING)) {
+		  return EdmSimpleType.STRING;
+		} else if (type.equals(EDM_DATETIME)) {
+		  return EdmSimpleType.DATETIME;
+		} else if (type.equals(EDM_BOOLEAN)) {
+		  return EdmSimpleType.BOOLEAN;
+		} else if (type.equals(EDM_DECIMAL)) {
+		  return EdmSimpleType.DECIMAL;
+		} else if (type.equals(EDM_DOUBLE)) {
+		  return EdmSimpleType.DOUBLE;
+		} else if (type.equals(EDM_SINGLE)) {
+		  return EdmSimpleType.SINGLE;
+		} else if (type.equals(EDM_INT16)) {
+		  return EdmSimpleType.INT16;
+		} else if (type.equals(EDM_INT32)) {
+		  return EdmSimpleType.INT32;
+		} else if (type.equals(EDM_INT64)) {
+		  return EdmSimpleType.INT64;
+		} else if (type.equals(EDM_TIME)) {
+		  return EdmSimpleType.TIME;
+		} else if (type.equals(EDM_DATETIMEOFFSET)) {
+		  return EdmSimpleType.DATETIMEOFFSET;
+		} else if (type.equals(EDM_BINARY)) {
+		  return EdmSimpleType.BINARY;
+		} else if (type.equals(EDM_BYTE)) {
+		  return EdmSimpleType.BYTE;
+		} else if (type.equals(EDM_GUID)) {
+		  return EdmSimpleType.GUID;
+		} else if (type.equals(EDM_SBYTE)) {
+		  return EdmSimpleType.SBYTE;
+		}
+		
 		return EdmSimpleType.STRING;
 	}
 

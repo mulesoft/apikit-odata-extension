@@ -95,8 +95,33 @@ public class Helper {
 
 				for (EntityDefinitionProperty propertyMetadata : entityMetadata.getProperties()) {
 					Builder builder = EdmProperty.newBuilder(propertyMetadata.getName()).setType(EDMTypeConverter.convert(propertyMetadata.getType()));
+					
 					builder.setNullable(propertyMetadata.isNullable());
+					
+					if (propertyMetadata.getDefaultValue() != null) {
+					  builder.setDefaultValue(propertyMetadata.getDefaultValue());
+					}
+					if (propertyMetadata.getMaxLength() != null) {
+					  builder.setMaxLength(Integer.parseInt(propertyMetadata.getMaxLength()));
+					}
+					if (propertyMetadata.isFixedLength() != null) {
+					  builder.setFixedLength(propertyMetadata.isFixedLength());
+					}
+					if (propertyMetadata.getCollation() != null) {
+					  builder.setCollation(propertyMetadata.getCollation());
+					}
+					if (propertyMetadata.isUnicode() != null) {
+					  builder.setUnicode(propertyMetadata.isUnicode());
+					}
+					if (propertyMetadata.getPrecision() != null) {
+					  builder.setPrecision(Integer.parseInt(propertyMetadata.getPrecision()));
+					}
+					if (propertyMetadata.getScale() != null) {
+					  builder.setScale(Integer.parseInt(propertyMetadata.getScale()));
+					}
+					
 					properties.add(builder);
+					
 					if (propertyMetadata.isKey()) {
 						keys.add(propertyMetadata.getName());
 					}

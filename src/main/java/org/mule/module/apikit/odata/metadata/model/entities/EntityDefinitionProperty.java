@@ -7,35 +7,35 @@
 package org.mule.module.apikit.odata.metadata.model.entities;
 
 /**
- * 
+ *
  * @author arielsegura
  */
 public class EntityDefinitionProperty implements Comparable<EntityDefinitionProperty> {
-
+	
 	private String name;
-	private String fieldName;
-	private String sample;
 	private String type;
 	private boolean nullable;
-	private int length;
 	private boolean key;
+	private String defaultValue;
+	private String maxLength;
+	private Boolean fixedLength;
+	private String collation;
+	private Boolean unicode;
+	private String precision;
+	private String scale;
 
-	public String getFieldName() {
-		return fieldName;
-	}
-
-	public void setFieldName(String fieldName) {
-		this.fieldName = fieldName;
-	}
-
-	public EntityDefinitionProperty(String name, String fieldName, String sample, String type, boolean nullable, int length, boolean key) {
-		this.name = (name != null ? name : "");
-		this.fieldName = fieldName;
-		this.sample = (sample != null ? sample : "");
-		this.type = (type != null ? type : "");
+	public EntityDefinitionProperty(String name, String type, boolean nullable, boolean key, String defaultValue, String maxLength, Boolean fixedLength, String collation, Boolean unicode, String precision, String scale) {
+		this.name = name;
+		this.type = type;
 		this.nullable = nullable;
-		this.length = length;
 		this.key = key;
+		this.defaultValue = defaultValue;
+		this.maxLength = maxLength;
+		this.fixedLength = fixedLength;
+		this.collation = collation;
+		this.unicode = unicode;
+		this.precision = precision;
+		this.scale = scale;
 	}
 
 	public String toString() {
@@ -44,63 +44,106 @@ public class EntityDefinitionProperty implements Comparable<EntityDefinitionProp
 
 	public String toJsonString() {
 		StringBuilder ret = new StringBuilder("{");
-		ret.append("\"name\":\"" + this.name + "\",");
-		ret.append("\"sample\":\"" + this.sample + "\",");
-		ret.append("\"type\":\"" + this.type + "\",");
-		ret.append("\"length\":\"" + this.length + "\",");
-		ret.append("\"fieldName\":\"" + this.fieldName + "\",");
-		ret.append("\"key\":\"" + this.key + "\",");
-		ret.append("\"nullable\":\"" + this.nullable + "\"");
+		
+		ret.append("\"name:\"" + this.name + "\",");
+		ret.append("\"type:\"" + this.type + "\",");
+		ret.append("\"nullable:\"" + this.nullable + "\",");
+		ret.append("\"key:\"" + this.key + "\",");
+		
+		if (this.defaultValue != null) {
+			ret.append("\"defaultValue:\"" + this.defaultValue + "\",");
+		}
+		if (this.maxLength != null) {
+			ret.append("\"maxLength:\"" + this.maxLength + "\",");
+		}
+		if (this.fixedLength != null) {
+			ret.append("\"fixedLength:\"" + this.fixedLength + "\",");
+		}
+		if (this.collation != null) {
+			ret.append("\"collation:\"" + this.collation + "\",");
+		}
+		if (this.unicode != null) {
+			ret.append("\"unicode:\"" + this.unicode + "\",");
+		}
+		if (this.precision != null) {
+			ret.append("\"precision:\"" + this.precision + "\",");
+		}
+		if (this.scale != null) {
+			ret.append("\"scale:\"" + this.scale + "\",");
+		}
+
 		ret.append("}");
 		return ret.toString();
 	}
 
+	// getters
 	public String getName() {
-		return name;
+		return this.name;
 	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public String getType() {
-		return type;
+		return this.type;
 	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
 	public boolean isNullable() {
-		return nullable;
+		return this.nullable;
 	}
-
-	public void setNullable(boolean nullable) {
-		this.nullable = nullable;
-	}
-
-	public int getLength() {
-		return length;
-	}
-
-	public void setLength(int length) {
-		this.length = length;
-	}
-
 	public boolean isKey() {
-		return key;
+		return this.key;
+	}
+	public String getDefaultValue() {
+		return this.defaultValue;
+	}
+	public String getMaxLength() {
+		return this.maxLength;
+	}
+	public Boolean isFixedLength() {
+		return this.fixedLength;
+	}
+	public String getCollation() {
+		return this.collation;
+	}
+	public Boolean isUnicode() {
+		return this.unicode;
+	}
+	public String getPrecision() {
+		return this.precision;
+	}
+	public String getScale() {
+		return this.scale;
 	}
 
-	public void setKey(boolean key) {
-		this.key = key;
+	// setters
+	public void setName(String value){
+		this.name = value;
 	}
-
-	public String getSample() {
-		return sample;
+	public void setType(String value){
+		this.type = value;
 	}
-
-	public void setSample(String sample) {
-		this.sample = sample;
+	public void setNullable(Boolean value){
+		this.nullable = value;
+	}
+	public void setKey(Boolean value){
+		this.key = value;
+	}
+	public void setDefaultValue(String value){
+		this.defaultValue = value;
+	}
+	public void setMaxLength(String value){
+		this.maxLength = value;
+	}
+	public void setFixedLength(Boolean value){
+		this.fixedLength = value;
+	}
+	public void setCollation(String value){
+		this.collation = value;
+	}
+	public void setUnicode(Boolean value){
+		this.unicode = value;
+	}
+	public void setPrecision(String value){
+		this.precision = value;
+	}
+	public void setScale(String value){
+		this.scale = value;
 	}
 
 	@Override
@@ -108,9 +151,7 @@ public class EntityDefinitionProperty implements Comparable<EntityDefinitionProp
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (key ? 1231 : 1237);
-		result = prime * result + length;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + (nullable ? 1231 : 1237);
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
@@ -125,8 +166,6 @@ public class EntityDefinitionProperty implements Comparable<EntityDefinitionProp
 			return false;
 		EntityDefinitionProperty other = (EntityDefinitionProperty) obj;
 		if (key != other.key)
-			return false;
-		if (length != other.length)
 			return false;
 		if (name == null) {
 			if (other.name != null)

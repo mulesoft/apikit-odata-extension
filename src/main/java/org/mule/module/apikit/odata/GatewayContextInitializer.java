@@ -64,7 +64,7 @@ public class GatewayContextInitializer {
 
 		for (EntityDefinitionProperty property : properties) {
 			Logger.getLogger(getClass()).debug("Adding field of \n" + property.toString());
-			ret.add(property.getFieldName());
+			ret.add(property.getName());
 		}
 
 		return ret;
