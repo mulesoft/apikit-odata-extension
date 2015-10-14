@@ -39,7 +39,7 @@ public class RamlParserTest {
 	private EntityDefinitionSet mockEntitySet() {
 		EntityDefinitionSet newEntitySet = new EntityDefinitionSet();
 		EntityDefinition entityDefinition;
-		entityDefinition = new EntityDefinition("Odatas", "Odatas");
+		entityDefinition = new EntityDefinition("gateways", "gateways");
 		entityDefinition.setHasPrimaryKey(true);
 		
 		entityDefinition.addProperty(new EntityDefinitionProperty("id", "Edm.Int32", false, true, null, null, null, null, null, null, null));
@@ -67,7 +67,7 @@ public class RamlParserTest {
 	@Test
 	public void incompleteSchemaTest() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFieldsException.class);
-		thrown.expectMessage("Property \"nullable\" is missing in field \"draft\" in entity \"Odatas\"");
+		thrown.expectMessage("Property \"nullable\" is missing in field \"draft\" in entity \"gateways\"");
 		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/incomplete-schema.raml");
 	}
 
@@ -128,7 +128,7 @@ public class RamlParserTest {
 
 	@Test
 	public void testPositive() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
-		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml("org/mule/module/apikit/odata/metadata/raml/dataOdata-definition.raml");
+		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml("org/mule/module/apikit/odata/metadata/raml/datagateway-definition.raml");
 		EntityDefinition entityDefinition = entitySet.toList().get(0);
 		for (int i = 0; i < mockEntitySet.toList().get(0).getProperties().size(); i++) {
 			EntityDefinitionProperty expectedProperty = mockEntitySet.toList().get(0).getProperties().get(i);
