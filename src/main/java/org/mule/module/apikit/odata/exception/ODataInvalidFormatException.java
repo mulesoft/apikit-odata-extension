@@ -17,4 +17,8 @@ public class ODataInvalidFormatException extends ODataException {
 		super(message, 415);
 	}
 
+	public ODataInvalidFormatException(String message, Throwable cause) {
+		super(message, cause, 415);
+	}
+
 }

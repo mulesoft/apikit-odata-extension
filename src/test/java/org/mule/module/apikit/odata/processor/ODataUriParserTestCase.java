@@ -21,7 +21,7 @@ public class ODataUriParserTestCase {
 				+ "  <content type=\"application/xml\">" + "    <m:properties>" + "      <d:OrderID>20000</d:OrderID>" + "      <d:ShipName>ship-name-1</d:ShipName>"
 				+ "      <d:ShipAddress>ship-address-1</d:ShipAddress>" + "    </m:properties>" + "  </content>" + "</entry>";
 
-		String actual = XmlBodyToJSonConverter.convertXMLPayloadIfRequired(true, xml);
+		String actual = BodyToJSonConverter.convertPayload(true, xml).toString();
 
 		String expected = "{\"OrderID\":20000,\"ShipAddress\":\"ship-address-1\",\"ShipName\":\"ship-name-1\"}";
 
@@ -32,7 +32,7 @@ public class ODataUriParserTestCase {
 	public void sendingJSONAsBodyReturnsSameJSON() throws ODataInvalidFormatException {
 		String input = "{\"OrderID\":20000,\"ShipAddress\":\"ship-address-1\",\"ShipName\":\"ship-name-1\"}";
 
-		String actual = XmlBodyToJSonConverter.convertXMLPayloadIfRequired(false, input);
+		String actual = BodyToJSonConverter.convertPayload(false, input).toString();
 
 		String expected = "{\"OrderID\":20000,\"ShipAddress\":\"ship-address-1\",\"ShipName\":\"ship-name-1\"}";
 
@@ -48,7 +48,7 @@ public class ODataUriParserTestCase {
 					+ "  <content type=\"application/xml\">" + "    <m:properties>" + "      <d:OrderID>20000</d:OrderID>" + "      <d:ShipName>ship-name-1</d:ShipName>"
 					+ "      <d:ShipAddress>ship-address-1</d:ShipAddress>" + "    </m:properties>" + "  </content>" + "</entry>";
 
-			XmlBodyToJSonConverter.convertXMLPayloadIfRequired(false, xml);
+			BodyToJSonConverter.convertPayload(false, xml);
 			fail("Exception expected");
 		} catch (ODataInvalidFormatException e) {
 		}
@@ -59,7 +59,7 @@ public class ODataUriParserTestCase {
 		try {
 			String input = "{\"OrderID\":20000,\"ShipAddress\":\"ship-address-1\",\"ShipName\":\"ship-name-1\"}";
 
-			XmlBodyToJSonConverter.convertXMLPayloadIfRequired(true, input);
+			BodyToJSonConverter.convertPayload(true, input);
 			fail("Exception expected");
 		} catch (ODataInvalidFormatException e) {
 		}

@@ -15,8 +15,8 @@ public class ODataException extends Exception {
 		this.httpStatus = httpStatus;
 	}
 
-	public ODataException(Throwable cause, int httpStatus) {
-		super(cause);
+	public ODataException(String message,Throwable cause, int httpStatus) {
+		super(message, cause);
 		this.httpStatus = httpStatus;
 	}
 

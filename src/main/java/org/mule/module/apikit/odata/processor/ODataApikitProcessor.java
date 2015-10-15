@@ -127,8 +127,14 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		if (Arrays.asList(methodsWithBody).contains(httpMethod.toUpperCase())) {
 			String payloadAsString = event.getMessage().getPayloadAsString();
 			boolean isXml = !format.equals(Format.Json);
-			payloadAsString = XmlBodyToJSonConverter.convertXMLPayloadIfRequired(isXml, payloadAsString);
-			event.getMessage().setPayload(payloadAsString);
+			event.getMessage().setPayload(BodyToJsonConverter.convertPayload(isXml, payloadAsString));
+			// Setting again encoding and mimetype. For some reason encoding is set to null and mimetype to */* after setPayload
+			event.getMessage().getDataType().setEncoding(event.getEncoding());
+			if (isXml) {
+				event.getMessage().getDataType().setMimeType("application/xml");
+			} else {
+				event.getMessage().getDataType().setMimeType("application/json");
+			}
 		}
 
 		MuleEvent response = router.process(event);
