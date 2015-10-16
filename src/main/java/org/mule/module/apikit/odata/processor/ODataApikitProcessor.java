@@ -19,6 +19,8 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.module.apikit.AbstractRouter;
 import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
+import org.mule.module.apikit.odata.exception.ClientErrorException;
+import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFlowResponseException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.formatter.ODataApiKitFormatter;
@@ -141,7 +143,13 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 	}
 
 	private List<Entry> verifyFlowResponse(MuleEvent response) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
-			OdataMetadataResourceNotFound, OdataMetadataFormatException, ODataInvalidFlowResponseException {
+			OdataMetadataResourceNotFound, OdataMetadataFormatException, ODataInvalidFlowResponseException, ClientErrorException {
+		int httpStatus = response.getMessage().getOutboundProperty("http.status");
+		if(httpStatus >= 400){
+			// If there was an error, it makes no sense to return a list of entry
+			// just raise an exception
+			throw new ClientErrorException(response.getMessage().getPayload().toString(), httpStatus);
+		}
 		try {
 			OdataMetadataManager metadataManager = getMetadataManager();
 			EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
@@ -152,7 +160,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 
 			if (payload instanceof NullPayload) {
 				entries = new ArrayList<Entry>();
-			} else if (message != null) {
+			} else if (message != null ) {
 				entries = Helper.transformJsonToEntryList(message);
 			} else {
 				throw new ODataInvalidFlowResponseException("The payload of the response should be a valid json.");
