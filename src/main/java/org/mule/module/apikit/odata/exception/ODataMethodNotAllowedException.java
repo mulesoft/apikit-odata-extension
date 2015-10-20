@@ -12,6 +12,6 @@ package org.mule.module.apikit.odata.exception;
 public class ODataMethodNotAllowedException extends ODataException {
 
     public ODataMethodNotAllowedException(String method) {
-        super("Method not allowed. Try with "+method, 400);
+        super("Method not allowed. Try with "+method, 405);
     }
 }
