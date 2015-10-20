@@ -6,15 +6,19 @@
  */
 package org.mule.module.apikit.odata.exception;
 
-public class ODataInvalidUriException extends ODataBadRequestException {
+import org.mule.transport.http.HttpConstants;
 
-	/**
+/**
+ * Created by arielsegura on 10/1/15.
+ */
+public class ODataInternalServerErrorException extends ODataException {
+
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 2615177524761296511L;
+	private static final long serialVersionUID = 5891700784326574919L;
 
-	public ODataInvalidUriException(String message) {
-		super(message);
-	}
-
+	public ODataInternalServerErrorException(String message) {
+        super(message, HttpConstants.SC_INTERNAL_SERVER_ERROR);
+    }
 }

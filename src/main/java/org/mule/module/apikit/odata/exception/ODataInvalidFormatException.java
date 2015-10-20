@@ -6,7 +6,7 @@
  */
 package org.mule.module.apikit.odata.exception;
 
-public class ODataInvalidFormatException extends ODataException {
+public class ODataInvalidFormatException extends ODataUnsupportedMediaTypeException {
 
 	/**
 	 * 
@@ -14,11 +14,11 @@ public class ODataInvalidFormatException extends ODataException {
 	private static final long serialVersionUID = 2615177524761296514L;
 
 	public ODataInvalidFormatException(String message) {
-		super(message, 415);
+		super(message);
 	}
 
 	public ODataInvalidFormatException(String message, Throwable cause) {
-		super(message, cause, 415);
+		super(message, cause);
 	}
 
 }

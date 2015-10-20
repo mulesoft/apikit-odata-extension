@@ -6,9 +6,11 @@
  */
 package org.mule.module.apikit.odata.exception;
 
+import org.mule.transport.http.HttpConstants;
+
 public class ODataException extends Exception {
 	private static final long serialVersionUID = 2615177524761296514L;
-	private int httpStatus = 400;
+	private int httpStatus = HttpConstants.SC_BAD_REQUEST;
 
 	public ODataException(String message, int httpStatus) {
 		super(message);

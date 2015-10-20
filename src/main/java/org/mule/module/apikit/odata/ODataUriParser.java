@@ -13,6 +13,7 @@ import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.exception.ODataInvalidUriException;
+import org.mule.module.apikit.odata.exception.ODataNotFoundException;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.processor.ODataApikitProcessor;
 import org.mule.module.apikit.odata.processor.ODataMetadataProcessor;
@@ -80,7 +81,7 @@ public class ODataUriParser {
 
 			} else {
 				String segment = ODataUriHelper.parseEntity(path);
-				throw new ODataInvalidUriException("Resource not found for the segment '" + segment + "'.");
+				throw new ODataNotFoundException("Resource not found for the segment '" + segment + "'.");
 			}
 		} else {
 			throw new ODataInvalidUriException("Unsupported query.");

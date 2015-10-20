@@ -6,6 +6,8 @@
  */
 package org.mule.module.apikit.odata.error;
 
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 import org.mule.api.MuleEvent;
 import org.mule.module.apikit.odata.ODataFormatHandler;
 import org.mule.module.apikit.odata.exception.ODataException;
@@ -29,11 +31,11 @@ public class ODataErrorHandler {
 			event.getMessage().setOutboundProperty("Content-Type", "application/xml");
 			event.getMessage().setPayload(ATOM_ERROR_ENVELOPE.replace(ERROR_MSG_PLACEHOLDER, ex.getMessage()));
 		}
-
+		
 		if (ex instanceof ODataException) {
-			event.getMessage().setOutboundProperty("http.status", ((ODataException) ex).getHttpStatus());
+			event.getMessage().setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, ((ODataException) ex).getHttpStatus());
 		} else {
-			event.getMessage().setOutboundProperty("http.status", 500);
+			event.getMessage().setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_INTERNAL_SERVER_ERROR);
 		}
 
 		return event;

@@ -7,6 +7,7 @@
 package org.mule.module.apikit.odata.metadata.exception;
 
 import org.mule.module.apikit.odata.exception.ODataException;
+import org.mule.transport.http.HttpConstants;
 
 /**
  * 
@@ -20,7 +21,7 @@ public class OdataMetadataEntityNotFoundException extends ODataException {
 	private static final long serialVersionUID = -8973414438805066252L;
 
 	public OdataMetadataEntityNotFoundException(String message) {
-		super(message, 404);
+		super(message, HttpConstants.SC_NOT_FOUND);
 	}
 
 }

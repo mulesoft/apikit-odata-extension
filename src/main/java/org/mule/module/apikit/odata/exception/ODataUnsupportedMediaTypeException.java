@@ -11,9 +11,13 @@ import org.mule.transport.http.HttpConstants;
 /**
  * Created by arielsegura on 10/1/15.
  */
-public class ODataMethodNotAllowedException extends ODataException {
+public class ODataUnsupportedMediaTypeException extends ODataException {
 
-    public ODataMethodNotAllowedException(String method) {
-        super("Method not allowed. Try with " + method, HttpConstants.SC_METHOD_NOT_ALLOWED);
+    public ODataUnsupportedMediaTypeException(String message) {
+        super(message, HttpConstants.SC_UNSUPPORTED_MEDIA_TYPE);
+    }
+    
+    public ODataUnsupportedMediaTypeException(String message, Throwable cause) {
+        super(message, cause, HttpConstants.SC_UNSUPPORTED_MEDIA_TYPE);
     }
 }

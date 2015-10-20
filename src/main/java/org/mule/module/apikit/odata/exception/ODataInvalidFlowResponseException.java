@@ -6,7 +6,7 @@
  */
 package org.mule.module.apikit.odata.exception;
 
-public class ODataInvalidFlowResponseException extends ODataException {
+public class ODataInvalidFlowResponseException extends ODataInternalServerErrorException {
 
 	/**
 	 * 
@@ -14,7 +14,7 @@ public class ODataInvalidFlowResponseException extends ODataException {
 	private static final long serialVersionUID = 2615177524761296514L;
 
 	public ODataInvalidFlowResponseException(String message) {
-		super(message, 500);
+		super(message);
 	}
 
 }
