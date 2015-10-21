@@ -6,6 +6,8 @@
  */
 package org.mule.module.apikit.odata;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -72,7 +74,7 @@ public class ODataService implements Service {
 	}
 
 	protected static MuleEvent processODataRequest(MuleEvent event, Router router, OdataContext oDataContext) throws MuleException {
-		Format format = null;
+		List<Format> formats = null;
 
 		try {
 
@@ -89,16 +91,16 @@ public class ODataService implements Service {
 			ODataRequestProcessor odataRequestProcessor = ODataUriParser.parse(oDataContext, path, query);
 
 			// Validate format
-			format = ODataFormatHandler.getFormat(event);
+			formats = ODataFormatHandler.getFormats(event);
 
 			// Request processor
-			ODataPayload odataPayload = odataRequestProcessor.process(event, router, format);
+			ODataPayload odataPayload = odataRequestProcessor.process(event, router, formats);
 
 			// Response transformer
-			return ODataResponseTransformer.transform(event, odataPayload, format);
+			return ODataResponseTransformer.transform(event, odataPayload, formats);
 
 		} catch (Exception ex) {
-			return ODataErrorHandler.handle(event, ex, format);
+			return ODataErrorHandler.handle(event, ex, formats);
 		}
 	}
 

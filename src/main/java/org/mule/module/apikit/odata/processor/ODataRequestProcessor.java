@@ -6,6 +6,7 @@
  */
 package org.mule.module.apikit.odata.processor;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,7 +25,7 @@ public abstract class ODataRequestProcessor {
 		this.oDataContext = oDataContext;
 	}
 
-	public abstract ODataPayload process(MuleEvent event, AbstractRouter router, Format format) throws Exception;
+	public abstract ODataPayload process(MuleEvent event, AbstractRouter router, List<Format> formats) throws Exception;
 
 	protected OdataMetadataManager getMetadataManager() {
 		return oDataContext.getOdataMetadataManager();

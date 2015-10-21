@@ -6,6 +6,8 @@
  */
 package org.mule.module.apikit.odata.processor;
 
+import java.util.List;
+
 import org.mule.api.MuleEvent;
 import org.mule.module.apikit.AbstractRouter;
 import org.mule.module.apikit.odata.ODataPayload;
@@ -19,7 +21,7 @@ public class ODataMetadataProcessor extends ODataRequestProcessor {
 		super(odataContext);
 	}
 
-	public ODataPayload process(MuleEvent event, AbstractRouter router, Format format) throws Exception
+	public ODataPayload process(MuleEvent event, AbstractRouter router, List<Format> formats) throws Exception
 	{
 		if("GET".equalsIgnoreCase(super.oDataContext.getMethod())){
 			ODataPayload oDataPayload = new ODataPayload();

@@ -8,6 +8,9 @@ package org.mule.module.apikit.odata.error;
 
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
+
+import java.util.List;
+
 import org.mule.api.MuleEvent;
 import org.mule.module.apikit.odata.ODataFormatHandler;
 import org.mule.module.apikit.odata.exception.ODataException;
@@ -23,8 +26,8 @@ public class ODataErrorHandler {
 		return handle(event, ex, null);
 	}
 
-	public static MuleEvent handle(MuleEvent event, Exception ex, Format format) {
-		if (isJsonFormat(format, event)) {
+	public static MuleEvent handle(MuleEvent event, Exception ex, List<Format> formats) {
+		if (isJsonFormat(formats, event)) {
 			event.getMessage().setOutboundProperty("Content-Type", "application/json");
 			event.getMessage().setPayload(JSON_ERROR_ENVELOPE.replace(ERROR_MSG_PLACEHOLDER, ex.getMessage().replace('"', '\'')));
 		} else {
@@ -41,14 +44,12 @@ public class ODataErrorHandler {
 		return event;
 	}
 
-	private static boolean isJsonFormat(Format format, MuleEvent event) {
+	private static boolean isJsonFormat(List<Format> formats, MuleEvent event) {
 		try {
-			if (format != null) {
-				return Format.Json.equals(format);
-			} else {
-				format = ODataFormatHandler.getFormat(event);
-				return Format.Json.equals(format);
+			if (formats == null) {
+				formats = ODataFormatHandler.getFormats(event);
 			}
+			return formats.contains(Format.Json) && !formats.contains(Format.Atom);
 		} catch (ODataException e) {
 			// do nothing, resort to default atom value...
 		}

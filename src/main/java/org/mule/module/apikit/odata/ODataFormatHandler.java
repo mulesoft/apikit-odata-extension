@@ -7,7 +7,9 @@
 package org.mule.module.apikit.odata;
 
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.mule.api.MuleEvent;
 import org.mule.module.apikit.odata.exception.ODataException;
@@ -34,36 +36,59 @@ public class ODataFormatHandler {
 	 * @throws ODataInvalidUriException
 	 * @throws ODataInvalidFormatException
 	 */
-	public static Format getFormat(MuleEvent event) throws ODataException {
+	public static List<Format> getFormats(MuleEvent event) throws ODataException {
+		
+		List<Format> formats = new ArrayList<Format>();
+		
 		String acceptHeader = getAcceptHeader(event);
 		String formatQueryParam = getFormatQueryParam(event);
 
 		if (formatQueryParam != null) {
 			if (Arrays.asList(xmlFormatTypes).contains(formatQueryParam)) {
-				return Format.Atom;
+				formats.add(Format.Atom);
+				return formats;
 			} else if (Arrays.asList(jsonFormatTypes).contains(formatQueryParam)) {
-				return Format.Json;
+				formats.add(Format.Json);
+				return formats;
 			} else {
 				throw new ODataInvalidFormatException("Unsupported media type requested.");
 			}
 		}
 
 		if (acceptHeader != null) {
+			
+			boolean unsupportedMediaType = true;
+			
 			if (containsAnyOf(acceptHeader, xmlMimeTypes)) {
-				return Format.Atom;
-			} else if (containsAnyOf(acceptHeader, jsonMimeTypes)) {
-				return Format.Json;
-			} else if (containsAnyOf(acceptHeader, plainMimeTypes)) {
-				return Format.Plain;
-			} else if (containsAnyOf(acceptHeader, defaultMimeTypes)) {
-				return Format.Default;
-			} else {
+				formats.add(Format.Atom);
+				unsupportedMediaType = false;
+			}
+			
+			if (containsAnyOf(acceptHeader, jsonMimeTypes)) {
+				formats.add(Format.Json);
+				unsupportedMediaType = false;
+			}
+			
+			if (containsAnyOf(acceptHeader, plainMimeTypes)) {
+				formats.add(Format.Plain);
+				unsupportedMediaType = false;
+			}
+			
+			if (containsAnyOf(acceptHeader, defaultMimeTypes)) {
+				formats.add(Format.Default);
+				unsupportedMediaType = false;
+			}
+			
+			if (unsupportedMediaType) {
 				throw new ODataInvalidFormatException("Unsupported media type requested.");
 			}
+			
+			return formats;
 		}
-
-		// default response if none of the above is specified
-		return Format.Default;
+		
+		// if none specified, return default format
+		formats.add(Format.Default);
+		return formats;
 	}
 
 	private static boolean containsAnyOf(String value, String[] array) {

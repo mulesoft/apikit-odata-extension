@@ -6,18 +6,24 @@
  */
 package org.mule.module.apikit.odata;
 
+import java.util.List;
+
 import org.mule.api.MuleEvent;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 
 public class ODataResponseTransformer {
-	public static MuleEvent transform(MuleEvent event, ODataPayload payload, Format format) throws Exception {
+	public static MuleEvent transform(MuleEvent event, ODataPayload payload, List<Format> formats) throws Exception {
 		if (payload.getContent() != null) {
 			event.getMessage().setOutboundProperty("Content-Type", "text/plain");
 			event.getMessage().setPayload(payload.getContent());
 		} else {
-			String formatted = payload.getFormatter().format(format);
+			
+			boolean isJson = formats.contains(Format.Json) && !formats.contains(Format.Atom);
+			
+			String formatted = payload.getFormatter().format(isJson ? Format.Json : Format.Atom);
 			event.getMessage().setPayload(formatted);
-			if (format == Format.Json) {
+			
+			if (isJson) {
 				event.getMessage().setOutboundProperty("Content-Type", "application/json");
 			} else {
 				event.getMessage().setOutboundProperty("Content-Type", "application/xml");

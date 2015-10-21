@@ -82,17 +82,17 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 	}
 
 	@Override
-	public ODataPayload process(MuleEvent event, AbstractRouter router, Format format) throws Exception {
+	public ODataPayload process(MuleEvent event, AbstractRouter router, List<Format> formats) throws Exception {
 		String oDataURL = getCompleteUrl(event);
 
 		// truncate the URL at the entity
 		oDataURL = oDataURL.substring(0, oDataURL.indexOf(entity));
 
-		List<Entry> entries = processEntityRequest(event, router, format);
+		List<Entry> entries = processEntityRequest(event, router, formats);
 		ODataPayload oDataPayload;
 
 		if (isEntityCount()) {
-			if (format.equals(Format.Plain) || format.equals(Format.Default)) {
+			if (formats.contains(Format.Plain) || formats.contains(Format.Default)) {
 				String count = String.valueOf(entries.size());
 				oDataPayload = new ODataPayload(count);
 			} else {
@@ -106,7 +106,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		return oDataPayload;
 	}
 
-	public List<Entry> processEntityRequest(MuleEvent event, AbstractRouter router, Format format) throws Exception {
+	public List<Entry> processEntityRequest(MuleEvent event, AbstractRouter router, List<Format> formats) throws Exception {
 		List<Entry> entries = new ArrayList<Entry>();
 
 		String uri = event.getMessage().getInboundProperty("http.request.path");
@@ -128,7 +128,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 
 		if (Arrays.asList(methodsWithBody).contains(httpMethod.toUpperCase())) {
 			String payloadAsString = event.getMessage().getPayloadAsString();
-			boolean isXml = !format.equals(Format.Json);
+			boolean isXml = !formats.contains(Format.Json);
 			event.getMessage().setPayload(BodyToJsonConverter.convertPayload(isXml, payloadAsString));
 			// Setting again encoding and mimetype. For some reason encoding is set to null and mimetype to */* after setPayload
 			event.getMessage().getDataType().setEncoding(event.getEncoding());
