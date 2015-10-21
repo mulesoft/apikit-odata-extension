@@ -23,21 +23,20 @@ import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsExcept
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 import org.mule.module.apikit.odata.processor.ODataRequestProcessor;
-import org.mule.module.apikit.spi.Service;
+import org.mule.module.apikit.spi.RouterService;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
 
-public class ODataService implements Service {
+public class ODataRouterService implements RouterService {
 
 	private static final String ODATA_SVC_URI_PREFIX = "odata.svc";
 	private static final String CONTEXT_INITIALIZED = "contextInitialized";
 
 	public boolean isExecutable(MuleEvent event) {
 		return (event.getMessage().getOutboundProperty(CONTEXT_INITIALIZED) == null);
-//		return true;
 	}
 
 	public MuleEvent processBlockingRequest(MuleEvent event, AbstractRequestResponseMessageProcessor abstractRouter) throws MuleException {
-		Logger.getLogger(ODataService.class).info("Handling odata enabled request.");
+		Logger.getLogger(ODataRouterService.class).info("Handling odata enabled request.");
 
 		Router router = (Router) abstractRouter;
 		OdataContext oDataContext = null;
@@ -47,7 +46,7 @@ public class ODataService implements Service {
 			try {
 				oDataContext = initializeModel(event, router);
 			} catch (ODataException e) {
-				Logger.getLogger(ODataService.class).error(e);
+				Logger.getLogger(ODataRouterService.class).error(e);
 				return ODataErrorHandler.handle(event, e);
 			}
 
@@ -57,7 +56,7 @@ public class ODataService implements Service {
 		String path = event.getMessage().getInboundProperty("http.relative.path");
 	
 		if (path.contains(ODATA_SVC_URI_PREFIX)) {
-			return ODataService.processODataRequest(event, router, oDataContext);
+			return ODataRouterService.processODataRequest(event, router, oDataContext);
 		} else {
 			event.getMessage().removeProperty(CONTEXT_INITIALIZED, PropertyScope.OUTBOUND);
 			return router.processBlockingRequest(event);
@@ -66,7 +65,7 @@ public class ODataService implements Service {
 
 	protected static OdataContext initializeModel(MuleEvent event, Router router) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
 			OdataMetadataFormatException, OdataMetadataEntityNotFoundException {
-		Logger.getLogger(ODataService.class).info("Init model.");
+		Logger.getLogger(ODataRouterService.class).info("Init model.");
 		OdataContextInitializer contextInitializer = new OdataContextInitializer();
 		return contextInitializer.initializeContext(event, router.getConfig());
 	}
