@@ -6,6 +6,9 @@
  */
 package org.mule.module.apikit.odata.error;
 
+import org.mule.api.MuleException;
+import org.mule.module.apikit.exception.*;
+import org.mule.module.apikit.odata.exception.*;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
@@ -13,7 +16,6 @@ import java.util.List;
 
 import org.mule.api.MuleEvent;
 import org.mule.module.apikit.odata.ODataFormatHandler;
-import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 
 public class ODataErrorHandler {
@@ -27,13 +29,19 @@ public class ODataErrorHandler {
 	}
 
 	public static MuleEvent handle(MuleEvent event, Exception ex, List<Format> formats) {
+		if (ex instanceof MuleException) {
+			// Exception thrown by APIkit
+			ex = processMuleException((MuleException) ex);
+		}
+		
 		if (isJsonFormat(formats, event)) {
 			event.getMessage().setOutboundProperty("Content-Type", "application/json");
-			event.getMessage().setPayload(JSON_ERROR_ENVELOPE.replace(ERROR_MSG_PLACEHOLDER, ex.getMessage().replace('"', '\'')));
+			event.getMessage().setPayload(JSON_ERROR_ENVELOPE.replace(ERROR_MSG_PLACEHOLDER, (ex.getMessage() != null) ? ex.getMessage().replace('"', '\'') : ""));
 		} else {
 			event.getMessage().setOutboundProperty("Content-Type", "application/xml");
-			event.getMessage().setPayload(ATOM_ERROR_ENVELOPE.replace(ERROR_MSG_PLACEHOLDER, ex.getMessage()));
+			event.getMessage().setPayload(ATOM_ERROR_ENVELOPE.replace(ERROR_MSG_PLACEHOLDER, (ex.getMessage() != null) ? ex.getMessage() : ex.getClass().getName()));
 		}
+
 		
 		if (ex instanceof ODataException) {
 			event.getMessage().setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, ((ODataException) ex).getHttpStatus());
@@ -42,6 +50,27 @@ public class ODataErrorHandler {
 		}
 
 		return event;
+	}
+
+	/**
+	 * This method takes a MuleException thrown by APIKit and returns an odata exception
+	 * @param ex
+	 * @return
+	 */
+	private static ODataException processMuleException(MuleException ex){
+		if (ex instanceof MethodNotAllowedException) {
+			return new ODataMethodNotAllowedException();
+		} else if (ex instanceof BadRequestException) {
+			return new ODataBadRequestException(ex.getMessage());
+		} else if (ex instanceof NotAcceptableException) {
+			return new ODataNotAcceptableException();
+		} else if (ex instanceof NotFoundException) {
+			return new ODataNotFoundException(ex.getMessage());
+		} else if (ex instanceof UnsupportedMediaTypeException) {
+			return new ODataUnsupportedMediaTypeException(ex.getMessage());
+		} else {
+			return new ODataInternalServerErrorException(ex);
+		}
 	}
 
 	private static boolean isJsonFormat(List<Format> formats, MuleEvent event) {

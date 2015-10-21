@@ -9,14 +9,11 @@ package org.mule.module.apikit.odata.exception;
 import org.mule.transport.http.HttpConstants;
 
 /**
- * Created by arielsegura on 10/1/15.
+ * Created by arielsegura on 10/21/15.
  */
-public class ODataMethodNotAllowedException extends ODataException {
-
-    public ODataMethodNotAllowedException(String method) {
-        super("Method not allowed. Try with " + method, HttpConstants.SC_METHOD_NOT_ALLOWED);
-    }
-    public ODataMethodNotAllowedException() {
-        super("Method not allowed. ", HttpConstants.SC_METHOD_NOT_ALLOWED);
+public class ODataNotAcceptableException extends ODataException  {
+    public ODataNotAcceptableException() {
+        super("Not acceptable", HttpConstants.SC_NOT_ACCEPTABLE);
     }
 }
+

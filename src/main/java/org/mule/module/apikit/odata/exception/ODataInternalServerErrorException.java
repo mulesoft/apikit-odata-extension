@@ -21,4 +21,7 @@ public class ODataInternalServerErrorException extends ODataException {
 	public ODataInternalServerErrorException(String message) {
         super(message, HttpConstants.SC_INTERNAL_SERVER_ERROR);
     }
+    public ODataInternalServerErrorException(Exception ex) {
+        super(ex.getMessage(), ex, HttpConstants.SC_INTERNAL_SERVER_ERROR);
+    }
 }
