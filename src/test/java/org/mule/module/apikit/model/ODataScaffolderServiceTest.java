@@ -35,57 +35,56 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
  */
 public class ODataScaffolderServiceTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-    
-    public ODataScaffolderService scaffolder;
-    public String RESOURCES_PATH = "src/test/resources/";
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
-    @Before
-    public void setUp() throws Exception {
-    	scaffolder = new ODataScaffolderService();
-    }
-    
-    private File getFile(String path) {
-    	try {
+	public ODataScaffolderService scaffolder;
+	public String RESOURCES_PATH = "src/test/resources/";
+
+	@Before
+	public void setUp() throws Exception {
+		scaffolder = new ODataScaffolderService();
+	}
+
+	private File getFile(String path) {
+		try {
 			System.out.println((new File("src/test/resources")).getCanonicalPath());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		File file = new File(( RESOURCES_PATH + path ).replace("/", File.separator));
+		File file = new File((RESOURCES_PATH + path).replace("/", File.separator));
 		return file;
-    }
+	}
 
-    @Test
-    public void scaffoldPositive() {
-    	
-    	
-    	List<File> ramlFiles = new ArrayList<File>();
-    	
-    	File modelJson = getFile("valid/api/model.json");
-    	File appDir = getFile("valid/app");
-    	File domainDir = getFile("valid/domain");
-    			
-    	ramlFiles.add(modelJson);
-    	
-    	scaffolder.executeScaffolder(ramlFiles, appDir, domainDir);
-    }
+	@Test
+	public void scaffoldPositive() {
+
+		List<File> ramlFiles = new ArrayList<File>();
+
+		File modelJson = getFile("valid/api/model.json");
+		File appDir = getFile("valid/app");
+		File domainDir = getFile("valid/domain");
+
+		ramlFiles.add(modelJson);
+
+		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir);
+	}
 
 	@Test
 	public void scaffoldNegative() {
-		
+
 		List<File> ramlFiles = new ArrayList<File>();
-    	
+
 		File modelJson = getFile("invalid/api/model.json");
-    	File appDir = getFile("invalid/app");
-    	File domainDir = getFile("invalid/domain");
-    			
-    	ramlFiles.add(modelJson);
-    	
-    	thrown.expect(RuntimeException.class);
-    	scaffolder.executeScaffolder(ramlFiles, appDir, domainDir);
-		
+		File appDir = getFile("invalid/app");
+		File domainDir = getFile("invalid/domain");
+
+		ramlFiles.add(modelJson);
+
+		thrown.expect(RuntimeException.class);
+		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir);
+
 	}
 
 }
