@@ -1,0 +1,41 @@
+{
+  "entities": [
+    {
+      "entity": {
+        "name": "Employee",
+        "remoteName": "Employee",
+        "properties": [
+          {
+            "field": {
+              "name": "id",
+              "type": "Edm.Int32",
+              "nullable": false,
+              "key": true,
+              "description": "This is the employee ID",
+              "sample": "1"
+            }
+          },
+          {
+            "field": {
+              "name": "name",
+              "type": "Edm.String",
+              "nullable": false,
+              "key": false,
+              "sample": "John Doe",
+              "maxLength": 2,
+              "fixedLength": false
+            }
+          },
+          {
+            "field": {
+              "name": "age",
+              "type": "Edm.Int32",
+              "nullable": true,
+              "key": false
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
