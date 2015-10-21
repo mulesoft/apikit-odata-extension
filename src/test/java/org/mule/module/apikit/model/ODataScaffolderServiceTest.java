@@ -57,19 +57,19 @@ public class ODataScaffolderServiceTest {
 		return file;
 	}
 
-	@Test
-	public void scaffoldPositive() {
-
-		List<File> ramlFiles = new ArrayList<File>();
-
-		File modelJson = getFile("valid/api/model.json");
-		File appDir = getFile("valid/app");
-		File domainDir = getFile("valid/domain");
-
-		ramlFiles.add(modelJson);
-
-		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir);
-	}
+//	@Test
+//	public void scaffoldPositive() {
+//
+//		List<File> ramlFiles = new ArrayList<File>();
+//
+//		File modelJson = getFile("valid/api/model.json");
+//		File appDir = getFile("valid/app");
+//		File domainDir = getFile("valid/domain");
+//
+//		ramlFiles.add(modelJson);
+//
+//		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir);
+//	}
 
 	@Test
 	public void scaffoldNegative() {
