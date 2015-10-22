@@ -229,10 +229,6 @@
                             "sample": {
                               "type": "string"
                             },
-                            "maxLength": {
-                              "type": "integer",
-                              "minimum": 1
-                            },
                             "nullable": {
                               "type": "boolean"
                             },
