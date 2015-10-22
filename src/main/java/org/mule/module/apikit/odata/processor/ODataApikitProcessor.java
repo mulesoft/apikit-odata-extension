@@ -133,6 +133,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 			// Setting again encoding and mimetype. For some reason encoding is set to null and mimetype to */* after setPayload
 			event.getMessage().getDataType().setEncoding(event.getEncoding());
 			event.getMessage().getDataType().setMimeType("application/json");
+			event.getMessage().setProperty("content-type", "application/json", PropertyScope.INBOUND);
 		}
 
 		MuleEvent response = router.process(event);
