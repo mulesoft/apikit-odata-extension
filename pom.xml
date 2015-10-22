@@ -21,7 +21,7 @@
 	<properties>
 		<mule.version>3.7.0</mule.version>
 		<apikit.version>2.0.0-BETA</apikit.version>
-		<apikit.spi.version>1.0.0</apikit.spi.version>
+		<apikit.spi.version>2.0.0-BETA</apikit.spi.version>
 		<licensePath>LICENSE_HEADER.txt</licensePath>
 	</properties>
 
