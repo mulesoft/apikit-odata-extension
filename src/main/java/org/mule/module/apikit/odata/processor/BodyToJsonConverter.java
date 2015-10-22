@@ -18,12 +18,12 @@ import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
  * LICENSE.txt file.
  */
 public class BodyToJsonConverter {
-	public static JSONObject convertPayload(boolean bodyIsInXML, String payloadAsString) throws ODataInvalidFormatException {
+	public static String convertPayload(boolean bodyIsInXML, String payloadAsString) throws ODataInvalidFormatException {
 		JSONObject ret = null;
 		if (bodyIsInXML){
-			return adaptBodyToJson(payloadAsString);
+			return adaptBodyToJson(payloadAsString).toString();
 		} else {
-			return buildJson(payloadAsString);
+			return buildJson(payloadAsString).toString();
 		}
 	}
 
