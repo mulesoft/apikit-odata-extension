@@ -28,7 +28,7 @@ public class BodyToJsonConverter {
 	}
 
 	private static ODataInvalidFormatException createInvalidFormatException(JSONException e) {
-		return new ODataInvalidFormatException("Check your JSON Format", e);
+		return new ODataInvalidFormatException("Wrong body", e);
 	}
 
 	private static JSONObject buildJson(String payloadAsString) throws ODataInvalidFormatException {
@@ -49,9 +49,12 @@ public class BodyToJsonConverter {
 	private static JSONObject adaptBodyToJson(String body) throws ODataInvalidFormatException {
 		try {
 			JSONObject jsonObject = XML.toJSONObject(removeXmlStringNamespaceAndPreamble(body));
-			JSONObject entry = (JSONObject) jsonObject.get("entry");
-			JSONObject content = (JSONObject) entry.get("content");
-			JSONObject properties = (JSONObject) content.get("properties");
+			JSONObject entry = jsonObject.getJSONObject("entry");
+			JSONObject content = entry.getJSONObject("content");
+			JSONObject properties = content.getJSONObject("properties");
+			if(properties == null){
+				throw new JSONException("Properties not found. Check your body. ");
+			}
 			return properties;
 		} catch (JSONException e) {
 			throw createInvalidFormatException(e);
