@@ -9,7 +9,6 @@ package org.mule.module.apikit.odata.util;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.util.Date;
-import java.util.List;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
@@ -18,9 +17,6 @@ import org.odata4j.core.OProperty;
 import org.odata4j.core.UnsignedByte;
 import org.odata4j.edm.EdmSimpleType;
 import org.odata4j.edm.EdmType;
-
-import com.joestelmach.natty.DateGroup;
-import com.joestelmach.natty.Parser;
 
 public class EDMTypeConverter {
 	
@@ -119,14 +115,14 @@ public class EDMTypeConverter {
 			}		
 		} else if (type.equals(EdmSimpleType.DATETIME)) {
 			if (value!=null && value!=org.json.JSONObject.NULL) {
-				return OProperties.datetime(name, parseDate(String.valueOf(value)));
+				return OProperties.datetime(name, DateParser.parse(String.valueOf(value)));
 			} else {
 				LocalDateTime date = null;
 				return OProperties.datetime(name, date);
 			}		
 		} else if (type.equals(EdmSimpleType.DATETIMEOFFSET)) {
 			if (value!=null && value!=org.json.JSONObject.NULL) {
-				Date d = parseDate(String.valueOf(value));
+				Date d = DateParser.parse(String.valueOf(value));
 				if (d!=null && value!=org.json.JSONObject.NULL) {
 					return OProperties.datetimeOffset(name, new DateTime(d));
 				} else {
@@ -165,7 +161,7 @@ public class EDMTypeConverter {
 			}	
 		} else if (type.equals(EdmSimpleType.TIME)) {
 			if (value!=null && value!=org.json.JSONObject.NULL) {
-				Date d = parseDate(String.valueOf(value));
+				Date d = DateParser.parse(String.valueOf(value));
 				if (d!=null) {
 					return OProperties.time(name, d);
 				} else {
@@ -185,15 +181,4 @@ public class EDMTypeConverter {
 		}
 	}
 	
-	private static Date parseDate(String value) {
-		Parser parser = new Parser();
-		List<DateGroup> groups = parser.parse(value);
-		for(DateGroup group:groups) {
-		  List<Date> dates = group.getDates();
-		  if (dates.size() > 0) {
-		  	return dates.get(0);
-		  } 
-		}
-		return null;
-	}
 }
