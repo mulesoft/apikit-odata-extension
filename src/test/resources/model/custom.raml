@@ -92,12 +92,16 @@ schemas:
       application/json:
         schema: |
           {
+            "$schema": "http://json-schema.org/draft-04/schema#",
             "type": "object",
             "properties": {
               "MyField" : {
                 "type": "number"
               }
             },
+            "required": [
+              "MyField"
+            ],
             "additionalProperties": false
           }
     responses:
@@ -172,12 +176,16 @@ schemas:
         application/json:
           schema: |
             {
+              "$schema": "http://json-schema.org/draft-04/schema#",
               "type": "object",
               "properties": {
                 "MyField" : {
                   "type": "number"
                 }
               },
+              "required": [
+                "MyField"
+              ],
               "additionalProperties": false
             }
       responses:

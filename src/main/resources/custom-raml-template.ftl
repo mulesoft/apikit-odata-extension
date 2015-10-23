@@ -99,6 +99,7 @@ schemas:
       application/json:
         schema: |
           {
+            "$schema": "http://json-schema.org/draft-04/schema#",
             "type": "object",
             "properties": {
               <#list resource.properties as property>
@@ -109,6 +110,12 @@ schemas:
               </#list>
 
             },
+            "required": [
+              <#list resource.properties as property>
+              "${property.name}"<#sep>,
+              </#list>
+
+            ],
             "additionalProperties": false
           }
     responses:
@@ -191,6 +198,7 @@ schemas:
         application/json:
           schema: |
             {
+              "$schema": "http://json-schema.org/draft-04/schema#",
               "type": "object",
               "properties": {
                 <#list resource.properties as property>
@@ -201,6 +209,12 @@ schemas:
                 </#list>
 
               },
+              "required": [
+                <#list resource.properties as property>
+                "${property.name}"<#sep>,
+                </#list>
+
+              ],
               "additionalProperties": false
             }
       responses:
