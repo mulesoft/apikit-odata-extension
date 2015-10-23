@@ -7,13 +7,20 @@
 package org.mule.module.apikit.odata.util;
 
 import java.math.BigDecimal;
+import java.sql.Time;
 import java.util.Date;
+import java.util.List;
 
+import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.odata4j.core.OProperties;
 import org.odata4j.core.OProperty;
 import org.odata4j.core.UnsignedByte;
 import org.odata4j.edm.EdmSimpleType;
 import org.odata4j.edm.EdmType;
+
+import com.joestelmach.natty.DateGroup;
+import com.joestelmach.natty.Parser;
 
 public class EDMTypeConverter {
 	
@@ -71,36 +78,119 @@ public class EDMTypeConverter {
 	}
 
 	public static OProperty getOProperty(String name, Object value, EdmType type) {
-		if (type.equals(EdmSimpleType.STRING)) {
-			return OProperties.string(name, String.valueOf(value));
-		} else if (type.equals(EdmSimpleType.INT16)) {
-			return OProperties.int16(name, Short.valueOf(String.valueOf(value)));
+		if (type.equals(EdmSimpleType.INT16)) {
+			if (value!=null) {
+				return OProperties.int16(name, Short.valueOf(String.valueOf(value)));
+			} else {
+				return OProperties.int16(name, null);
+			}
 		} else if (type.equals(EdmSimpleType.INT32)) {
-			return OProperties.int32(name, Integer.valueOf(String.valueOf(value)));
+			if (value!=null) {
+				return OProperties.int32(name, Integer.valueOf(String.valueOf(value)));
+			} else {
+				return OProperties.int32(name, null);
+			}
 		} else if (type.equals(EdmSimpleType.INT64)) {
-			return OProperties.int64(name, Long.valueOf(String.valueOf(value)));
+			if (value!=null) {
+				return OProperties.int64(name, Long.valueOf(String.valueOf(value)));
+			} else {
+				return OProperties.int64(name, null);
+			}	
 		} else if (type.equals(EdmSimpleType.BINARY)) {
-			return OProperties.binary(name, String.valueOf(value).getBytes());
+			if (value!=null) {
+				return OProperties.binary(name, String.valueOf(value).getBytes());
+			} else {
+				return OProperties.binary(name, new byte[0]);
+			}	
 		} else if (type.equals(EdmSimpleType.BOOLEAN)) {
-			return OProperties.boolean_(name, Boolean.valueOf(String.valueOf(value)));
+			if (value!=null) {
+				return OProperties.boolean_(name, Boolean.valueOf(String.valueOf(value)));
+			} else {
+				return OProperties.boolean_(name, null);
+			}	
 		} else if (type.equals(EdmSimpleType.BYTE)) {
-			return OProperties.byte_(name, UnsignedByte.parseUnsignedByte(String.valueOf(value)));
+			if (value!=null) {
+				return OProperties.byte_(name, UnsignedByte.parseUnsignedByte(String.valueOf(value)));
+			} else {
+				return OProperties.byte_(name, null);
+			}		
 		} else if (type.equals(EdmSimpleType.DATETIME)) {
-			return OProperties.datetime(name, new Date(String.valueOf(value)));
+			if (value!=null) {
+				return OProperties.datetime(name, parseDate(String.valueOf(value)));
+			} else {
+				LocalDateTime date = null;
+				return OProperties.datetime(name, date);
+			}		
 		} else if (type.equals(EdmSimpleType.DATETIMEOFFSET)) {
-			return OProperties.datetime(name, new Date(String.valueOf(value)));
+			if (value!=null) {
+				Date d = parseDate(String.valueOf(value));
+				if (d!=null) {
+					return OProperties.datetimeOffset(name, new DateTime(d));
+				} else {
+					DateTime date = null;
+					return OProperties.datetimeOffset(name, date);
+				}			
+			} else {
+				DateTime date = null;
+				return OProperties.datetimeOffset(name, date);
+			}					
 		} else if (type.equals(EdmSimpleType.DECIMAL)) {
-			return OProperties.decimal(name, BigDecimal.valueOf(Long.valueOf(String.valueOf(value))));
+			if (value!=null) {
+				return OProperties.decimal(name, BigDecimal.valueOf(Double.valueOf(String.valueOf(value))));
+			} else {
+				BigDecimal bd = null;
+				return OProperties.decimal(name, bd);
+			}	
 		} else if (type.equals(EdmSimpleType.DOUBLE)) {
-			return OProperties.double_(name, Double.valueOf(String.valueOf(value)));
+			if (value!=null) {
+				return OProperties.double_(name, Double.valueOf(String.valueOf(value)));
+			} else {
+				return OProperties.double_(name, null);
+			}	
 		} else if (type.equals(EdmSimpleType.SINGLE)) {
-			return OProperties.single(name, Float.valueOf(String.valueOf(value)));
+			if (value!=null) {
+				return OProperties.single(name, Float.valueOf(String.valueOf(value)));
+			} else {
+				return OProperties.single(name, null);
+			}	
 		} else if (type.equals(EdmSimpleType.SBYTE)) {
-			return OProperties.sbyte_(name, Byte.valueOf(String.valueOf(value)));
+			if (value!=null) {
+				return OProperties.sbyte_(name, Byte.valueOf(String.valueOf(value)));
+			} else {
+				byte b = 0;
+				return OProperties.sbyte_(name, b);
+			}	
 		} else if (type.equals(EdmSimpleType.TIME)) {
-			return OProperties.time(name, new Date(String.valueOf(value)));
+			if (value!=null) {
+				Date d = parseDate(String.valueOf(value));
+				if (d!=null) {
+					return OProperties.time(name, d);
+				} else {
+					Time t = null;
+					return OProperties.time(name, t);
+				}			
+			} else {
+				Time t = null;
+				return OProperties.time(name, t);
+			}		
 		} else {
-			return OProperties.string(name, String.valueOf(value));
+			if (value!=null) {
+				return OProperties.string(name, String.valueOf(value));
+			} else {
+				return OProperties.string(name, null);
+			}
 		}
+	}
+	
+	private static Date parseDate(String value) {
+		Parser parser = new Parser();
+		List<DateGroup> groups = parser.parse(value);
+		for(DateGroup group:groups) {
+		  List<Date> dates = group.getDates();
+		  if (dates.size() > 0) {
+		  	return dates.get(0);
+		  } 
+		}
+		return null;
 	}
 }

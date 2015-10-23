@@ -19,7 +19,6 @@ import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.error.ODataErrorHandler;
 import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
-import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
@@ -43,19 +42,25 @@ public class ODataRouterService implements RouterService {
 		Router router = (Router) abstractRouter;
 		OdataContext oDataContext = null;
 
+		String path = event.getMessage().getInboundProperty("http.relative.path");
+		
 		if (event.getMessage().getOutboundProperty(CONTEXT_INITIALIZED) == null) {
-
 			try {
 				oDataContext = initializeModel(event, router);
-			} catch (ODataException e) {
-				Logger.getLogger(ODataRouterService.class).error(e);
-				return ODataErrorHandler.handle(event, e);
+			} catch (OdataMetadataEntityNotFoundException ome) {
+				if (path.contains(ODATA_SVC_URI_PREFIX)) {
+					Logger.getLogger(ODataRouterService.class).error(ome);
+					return ODataErrorHandler.handle(event, ome);
+				} else {
+					Logger.getLogger(ODataRouterService.class).error(ome);
+				}
+			} catch (ODataException oe) {
+				Logger.getLogger(ODataRouterService.class).error(oe);
+				return ODataErrorHandler.handle(event, oe);
 			}
 
 			event.getMessage().setProperty(CONTEXT_INITIALIZED, true, PropertyScope.OUTBOUND);
 		}
-
-		String path = event.getMessage().getInboundProperty("http.relative.path");
 	
 		if (path.contains(ODATA_SVC_URI_PREFIX)) {
 			return ODataRouterService.processODataRequest(event, router, oDataContext);
@@ -82,9 +87,6 @@ public class ODataRouterService implements RouterService {
 			HttpRestRequest request = new HttpRestRequest(event, config);
 			String path = request.getResourcePath();
 			String query = event.getMessage().getInboundProperty("http.query.string");
-
-			// Metadata manager setup
-			OdataMetadataManager odataMetadataManager = oDataContext.getOdataMetadataManager();
 
 			// URIParser
 			ODataRequestProcessor odataRequestProcessor = ODataUriParser.parse(oDataContext, path, query);
