@@ -52,9 +52,6 @@ public class BodyToJsonConverter {
 			JSONObject entry = jsonObject.getJSONObject("entry");
 			JSONObject content = entry.getJSONObject("content");
 			JSONObject properties = content.getJSONObject("properties");
-			if(properties == null){
-				throw new JSONException("Properties not found. Check your body. ");
-			}
 			return properties;
 		} catch (JSONException e) {
 			throw createInvalidFormatException(e);
