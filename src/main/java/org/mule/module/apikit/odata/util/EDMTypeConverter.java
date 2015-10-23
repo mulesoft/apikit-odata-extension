@@ -77,54 +77,57 @@ public class EDMTypeConverter {
 		return EdmSimpleType.STRING;
 	}
 
+	/*
+	 * Sorry man, this class sucks but it was either this or a million smaller builder classes.
+	 */
 	public static OProperty getOProperty(String name, Object value, EdmType type) {
 		if (type.equals(EdmSimpleType.INT16)) {
-			if (value!=null) {
+			if (value!=null && value!=org.json.JSONObject.NULL) {
 				return OProperties.int16(name, Short.valueOf(String.valueOf(value)));
 			} else {
 				return OProperties.int16(name, null);
 			}
 		} else if (type.equals(EdmSimpleType.INT32)) {
-			if (value!=null) {
+			if (value!=null && value!=org.json.JSONObject.NULL) {
 				return OProperties.int32(name, Integer.valueOf(String.valueOf(value)));
 			} else {
 				return OProperties.int32(name, null);
 			}
 		} else if (type.equals(EdmSimpleType.INT64)) {
-			if (value!=null) {
+			if (value!=null && value!=org.json.JSONObject.NULL) {
 				return OProperties.int64(name, Long.valueOf(String.valueOf(value)));
 			} else {
 				return OProperties.int64(name, null);
 			}	
 		} else if (type.equals(EdmSimpleType.BINARY)) {
-			if (value!=null) {
+			if (value!=null && value!=org.json.JSONObject.NULL) {
 				return OProperties.binary(name, String.valueOf(value).getBytes());
 			} else {
 				return OProperties.binary(name, new byte[0]);
 			}	
 		} else if (type.equals(EdmSimpleType.BOOLEAN)) {
-			if (value!=null) {
+			if (value!=null && value!=org.json.JSONObject.NULL) {
 				return OProperties.boolean_(name, Boolean.valueOf(String.valueOf(value)));
 			} else {
 				return OProperties.boolean_(name, null);
 			}	
 		} else if (type.equals(EdmSimpleType.BYTE)) {
-			if (value!=null) {
+			if (value!=null && value!=org.json.JSONObject.NULL) {
 				return OProperties.byte_(name, UnsignedByte.parseUnsignedByte(String.valueOf(value)));
 			} else {
 				return OProperties.byte_(name, null);
 			}		
 		} else if (type.equals(EdmSimpleType.DATETIME)) {
-			if (value!=null) {
+			if (value!=null && value!=org.json.JSONObject.NULL) {
 				return OProperties.datetime(name, parseDate(String.valueOf(value)));
 			} else {
 				LocalDateTime date = null;
 				return OProperties.datetime(name, date);
 			}		
 		} else if (type.equals(EdmSimpleType.DATETIMEOFFSET)) {
-			if (value!=null) {
+			if (value!=null && value!=org.json.JSONObject.NULL) {
 				Date d = parseDate(String.valueOf(value));
-				if (d!=null) {
+				if (d!=null && value!=org.json.JSONObject.NULL) {
 					return OProperties.datetimeOffset(name, new DateTime(d));
 				} else {
 					DateTime date = null;
@@ -135,33 +138,33 @@ public class EDMTypeConverter {
 				return OProperties.datetimeOffset(name, date);
 			}					
 		} else if (type.equals(EdmSimpleType.DECIMAL)) {
-			if (value!=null) {
+			if (value!=null && value!=org.json.JSONObject.NULL) {
 				return OProperties.decimal(name, BigDecimal.valueOf(Double.valueOf(String.valueOf(value))));
 			} else {
 				BigDecimal bd = null;
 				return OProperties.decimal(name, bd);
 			}	
 		} else if (type.equals(EdmSimpleType.DOUBLE)) {
-			if (value!=null) {
+			if (value!=null && value!=org.json.JSONObject.NULL) {
 				return OProperties.double_(name, Double.valueOf(String.valueOf(value)));
 			} else {
 				return OProperties.double_(name, null);
 			}	
 		} else if (type.equals(EdmSimpleType.SINGLE)) {
-			if (value!=null) {
+			if (value!=null && value!=org.json.JSONObject.NULL) {
 				return OProperties.single(name, Float.valueOf(String.valueOf(value)));
 			} else {
 				return OProperties.single(name, null);
 			}	
 		} else if (type.equals(EdmSimpleType.SBYTE)) {
-			if (value!=null) {
+			if (value!=null && value!=org.json.JSONObject.NULL) {
 				return OProperties.sbyte_(name, Byte.valueOf(String.valueOf(value)));
 			} else {
 				byte b = 0;
 				return OProperties.sbyte_(name, b);
 			}	
 		} else if (type.equals(EdmSimpleType.TIME)) {
-			if (value!=null) {
+			if (value!=null && value!=org.json.JSONObject.NULL) {
 				Date d = parseDate(String.valueOf(value));
 				if (d!=null) {
 					return OProperties.time(name, d);
@@ -174,7 +177,7 @@ public class EDMTypeConverter {
 				return OProperties.time(name, t);
 			}		
 		} else {
-			if (value!=null) {
+			if (value!=null && value!=org.json.JSONObject.NULL) {
 				return OProperties.string(name, String.valueOf(value));
 			} else {
 				return OProperties.string(name, null);
