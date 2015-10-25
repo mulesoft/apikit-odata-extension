@@ -1,0 +1,10 @@
+{
+  "entities": [
+    {
+      "entity": {
+        "name": "MyEntity",
+        "remoteName": "RemoteEntity"
+      }
+    }
+  ]
+}

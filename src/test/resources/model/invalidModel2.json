@@ -1,0 +1,23 @@
+{
+  "entities": [
+    {
+      "entity": {
+        "name": "MyEntity",
+        "properties": [
+          {
+            "field": {
+              "name": "MyField",
+              "type": "Edm.Decimal",
+              "nullable": false,
+              "key": true,
+              "description": "This is my field",
+              "precision": 2,
+              "scale": 2,
+              "sample": "22"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

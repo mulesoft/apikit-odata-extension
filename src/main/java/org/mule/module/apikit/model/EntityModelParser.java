@@ -9,7 +9,6 @@ package org.mule.module.apikit.model;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +21,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.github.fge.jsonschema.core.report.ProcessingMessage;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
@@ -61,12 +59,7 @@ public class EntityModelParser {
 		report = validateJson(obj);
 
 		if (!report.isSuccess()) {
-			String msg = "";
-			Iterator<ProcessingMessage> iterator = report.iterator();
-			while (iterator.hasNext()) {
-				ProcessingMessage message = iterator.next();
-				msg += message.getMessage();
-			}
+			String msg = ValidationErrorsHandler.handle(report);
 			throw new EntityModelParsingException(msg);
 		}
 
@@ -211,4 +204,5 @@ public class EntityModelParser {
 		}
 		return ret;
 	}
+	
 }

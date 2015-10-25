@@ -1,0 +1,45 @@
+{
+  "entities": [
+    {
+      "entity": {
+        "name": "MyEntity",
+        "remoteName": "RemoteEntity",
+        "properties": [
+          {
+            "field": {
+              "name": "MyField1",
+              "type": "Edm.Decimal",
+              "nullable": false,
+              "key": true,
+              "description": "This is my field",
+              "precision": 2,
+              "scale": 2,
+              "sample": "22"
+            }
+          },
+          {
+            "field": {
+              "name": "MyField2",
+              "type": "Edm.Decimal",
+              "key": true,
+              "description": "This is my field",
+              "precision": 2,
+              "scale": 2,
+              "sample": "22"
+            }
+          },
+          {
+            "field": {
+              "name": "MyField2",
+              "type": "Edm.String",
+              "nullable": false,
+              "key": true,
+              "description": "This is my field",
+              "maxLength": 22
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
