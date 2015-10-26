@@ -100,6 +100,7 @@ schemas:
       application/json:
         schema: |
           {
+            "$schema": "http://json-schema.org/draft-04/schema#",
             "type": "object",
             "properties": {
               "id" : {
@@ -114,6 +115,11 @@ schemas:
                 "type": "integer"
               }
             },
+            "required": [
+              "id",
+              "name",
+              "age"
+            ],
             "additionalProperties": false
           }
     responses:
@@ -204,6 +210,7 @@ schemas:
         application/json:
           schema: |
             {
+              "$schema": "http://json-schema.org/draft-04/schema#",
               "type": "object",
               "properties": {
                 "id" : {
@@ -218,6 +225,11 @@ schemas:
                   "type": "integer"
                 }
               },
+              "required": [
+                "name"
+                ,
+                "age"
+              ],
               "additionalProperties": false
             }
       responses:

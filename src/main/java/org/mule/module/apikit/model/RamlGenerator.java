@@ -146,10 +146,15 @@ public class RamlGenerator {
 			Map<String, String> property = new HashMap<String, String>();
 			property.put("name", (String) entityProperty.get("name"));
 			property.put("type", EntityModelParser.getSchemaTypeFromEdmType((String) entityProperty.get("type")));
+			property.put("isKey", String.valueOf(isKey(entity, property.get("name"))));
 			// add to list
 			properties.add(property);
 		}
 		// return properties list
 		return properties;
+	}
+
+	private boolean isKey(Map<String, Object> entity, String field) {
+		return ((List<String>) entity.get("keys")).contains(field);
 	}
 }
