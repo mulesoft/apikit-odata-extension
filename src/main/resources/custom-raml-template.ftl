@@ -212,14 +212,12 @@ schemas:
               "required": [
                 <#list resource.properties as property>
                 <#if property.isKey == "false">
-                "${property.name}"
-                <#if property_has_next>
-                <#if resource.properties[property_index+1].isKey == "false">
-                ,
+                "${property.name}"<#if property_has_next><#if resource.properties[property_index+1].isKey == "false">,
                 </#if>
                 </#if>
                 </#if>
                 </#list>
+
               ],
               "additionalProperties": false
             }
