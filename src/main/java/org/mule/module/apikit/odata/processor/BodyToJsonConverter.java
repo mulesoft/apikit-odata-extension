@@ -19,7 +19,6 @@ import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
  */
 public class BodyToJsonConverter {
 	public static String convertPayload(boolean bodyIsInXML, String payloadAsString) throws ODataInvalidFormatException {
-		JSONObject ret = null;
 		if (bodyIsInXML){
 			return adaptBodyToJson(payloadAsString).toString();
 		} else {
