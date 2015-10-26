@@ -128,6 +128,9 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 
 		if (Arrays.asList(methodsWithBody).contains(httpMethod.toUpperCase())) {
 			String payloadAsString = event.getMessage().getPayloadAsString();
+			if(event.getMessage().getPayload() instanceof NullPayload){
+				payloadAsString = "";
+			}
 			boolean isXml = !formats.contains(Format.Json);
 			event.getMessage().setPayload(BodyToJsonConverter.convertPayload(isXml, payloadAsString));
 			// Setting again encoding and mimetype. For some reason encoding is set to null and mimetype to */* after setPayload

@@ -23,20 +23,12 @@ public class BodyToJsonConverter {
 		if (bodyIsInXML){
 			return adaptBodyToJson(payloadAsString).toString();
 		} else {
-			return buildJson(payloadAsString).toString();
+			return payloadAsString;
 		}
 	}
 
 	private static ODataInvalidFormatException createInvalidFormatException(JSONException e) {
 		return new ODataInvalidFormatException("Wrong body", e);
-	}
-
-	private static JSONObject buildJson(String payloadAsString) throws ODataInvalidFormatException {
-		try {
-			return new JSONObject(payloadAsString);
-		} catch (JSONException e) {
-			throw createInvalidFormatException(e);
-		}
 	}
 
 	public static String removeXmlStringNamespaceAndPreamble(String xmlString) {

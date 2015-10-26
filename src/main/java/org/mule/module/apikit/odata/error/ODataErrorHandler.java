@@ -29,22 +29,23 @@ public class ODataErrorHandler {
 	}
 
 	public static MuleEvent handle(MuleEvent event, Exception ex, List<Format> formats) {
+		Exception exceptionToBeThrown = ex;
 		if (ex instanceof MuleException) {
 			// Exception thrown by APIkit
-			ex = processMuleException((MuleException) ex);
+			exceptionToBeThrown = processMuleException((MuleException) ex);
 		}
 		
 		if (isJsonFormat(formats, event)) {
 			event.getMessage().setOutboundProperty("Content-Type", "application/json");
-			event.getMessage().setPayload(JSON_ERROR_ENVELOPE.replace(ERROR_MSG_PLACEHOLDER, (ex.getMessage() != null) ? ex.getMessage().replace('"', '\'') : ""));
+			event.getMessage().setPayload(JSON_ERROR_ENVELOPE.replace(ERROR_MSG_PLACEHOLDER, (exceptionToBeThrown.getMessage() != null) ? exceptionToBeThrown.getMessage().replace('"', '\'') : ""));
 		} else {
 			event.getMessage().setOutboundProperty("Content-Type", "application/xml");
-			event.getMessage().setPayload(ATOM_ERROR_ENVELOPE.replace(ERROR_MSG_PLACEHOLDER, (ex.getMessage() != null) ? ex.getMessage() : ex.getClass().getName()));
+			event.getMessage().setPayload(ATOM_ERROR_ENVELOPE.replace(ERROR_MSG_PLACEHOLDER, (exceptionToBeThrown.getMessage() != null) ? exceptionToBeThrown.getMessage() : exceptionToBeThrown.getClass().getName()));
 		}
 
 		
-		if (ex instanceof ODataException) {
-			event.getMessage().setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, ((ODataException) ex).getHttpStatus());
+		if (exceptionToBeThrown instanceof ODataException) {
+			event.getMessage().setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, ((ODataException) exceptionToBeThrown).getHttpStatus());
 		} else {
 			event.getMessage().setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_INTERNAL_SERVER_ERROR);
 		}
@@ -61,7 +62,7 @@ public class ODataErrorHandler {
 		if (ex instanceof MethodNotAllowedException) {
 			return new ODataMethodNotAllowedException();
 		} else if (ex instanceof BadRequestException) {
-			return new ODataBadRequestException(ex.getMessage());
+			return new ODataBadRequestException();
 		} else if (ex instanceof NotAcceptableException) {
 			return new ODataNotAcceptableException();
 		} else if (ex instanceof NotFoundException) {
