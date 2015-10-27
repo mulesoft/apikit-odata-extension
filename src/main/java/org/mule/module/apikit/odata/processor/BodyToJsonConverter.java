@@ -9,6 +9,7 @@ package org.mule.module.apikit.odata.processor;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
+import org.mule.module.apikit.odata.exception.ODataBadRequestException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 
 /*
@@ -18,7 +19,7 @@ import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
  * LICENSE.txt file.
  */
 public class BodyToJsonConverter {
-	public static String convertPayload(boolean bodyIsInXML, String payloadAsString) throws ODataInvalidFormatException {
+	public static String convertPayload(boolean bodyIsInXML, String payloadAsString) throws ODataInvalidFormatException, ODataBadRequestException  {
 		JSONObject ret = null;
 		if (bodyIsInXML){
 			return adaptBodyToJson(payloadAsString).toString();
@@ -28,7 +29,7 @@ public class BodyToJsonConverter {
 	}
 
 	private static ODataInvalidFormatException createInvalidFormatException(JSONException e) {
-		return new ODataInvalidFormatException("Wrong body", e);
+		return new ODataInvalidFormatException("Wrong XML body", e);
 	}
 
 	public static String removeXmlStringNamespaceAndPreamble(String xmlString) {
@@ -38,9 +39,12 @@ public class BodyToJsonConverter {
 		.replaceAll("(</)(\\w+:)(.*?>)", "$1$3"); /* remove closing tags prefix */
 	}
 
-	private static JSONObject adaptBodyToJson(String body) throws ODataInvalidFormatException {
+	private static JSONObject adaptBodyToJson(String body) throws ODataInvalidFormatException, ODataBadRequestException {
 		try {
 			JSONObject jsonObject = XML.toJSONObject(removeXmlStringNamespaceAndPreamble(body));
+			if(jsonObject.keySet().isEmpty()){
+				throw new ODataBadRequestException();
+			}
 			JSONObject entry = jsonObject.getJSONObject("entry");
 			JSONObject content = entry.getJSONObject("content");
 			JSONObject properties = content.getJSONObject("properties");
