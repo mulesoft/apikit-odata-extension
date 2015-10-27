@@ -27,14 +27,11 @@ public class BodyToJsonConverter {
 			}
 			return adaptBodyToJson(payloadAsString).toString();
 		} else {
-			if(!isValidJson(payloadAsString)){
-				throw new ODataInvalidFormatException("Invalid body.");
-			}
 			return payloadAsString;
 		}
 	}
 
-	private static boolean isValidJson(String payload){
+	private static boolean isValidJson(String payload) {
 		try{
 			new JSONObject(payload);
 			return true;

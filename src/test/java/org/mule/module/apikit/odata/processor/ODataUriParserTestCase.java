@@ -9,6 +9,7 @@ package org.mule.module.apikit.odata.processor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mule.module.apikit.odata.exception.ODataBadRequestException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
@@ -40,8 +41,9 @@ public class ODataUriParserTestCase {
 		assertEquals(expected, actual);
 	}
 
+	@Ignore // This test makes no sense since we are letting apikit validate the payload. 
 	@Test
-	public void sendingXMLAsBodyButJsonAsContentTypeThrowsException() throws ODataBadRequestException {
+	public void sendingXMLAsBodyButJsonAsContentTypeThrowsException() throws ODataInvalidFormatException {
 		try {
 			String xml = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>"
 					+ "<entry xmlns:d=\"http://schemas.microsoft.com/ado/2007/08/dataservices\" xmlns:m=\"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata\" xmlns=\"http://www.w3.org/2005/Atom\">"
@@ -51,7 +53,7 @@ public class ODataUriParserTestCase {
 
 			BodyToJsonConverter.convertPayload(false, xml);
 			fail("Exception expected");
-		} catch (ODataInvalidFormatException e) {
+		} catch (ODataBadRequestException e) {
 		}
 	}
 
