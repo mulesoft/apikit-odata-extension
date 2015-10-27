@@ -52,7 +52,7 @@ traits:
             required: false
 schemas:
   - MyEntity: |
-       {"$schema":"http://json-schema.org/draft-04/schema#","edm.remoteName":"RemoteEntity","additionalProperties":false,"properties":{"MyField":{"edm.precision":2,"edm.key":true,"edm.type":"Edm.Decimal","edm.nullable":false,"type":"number","edm.name":"MyField"}},"required":["MyField"],"type":"object","edm.name":"MyEntity"}
+       {"$schema":"http://json-schema.org/draft-04/schema#","edm.remoteName":"RemoteEntity","additionalProperties":false,"properties":{"MyField":{"edm.precision":2,"edm.key":true,"edm.type":"Edm.Decimal","edm.scale":2,"edm.nullable":false,"type":"number","edm.name":"MyField"}},"required":["MyField"],"type":"object","edm.name":"MyEntity"}
 
 /MyEntity: 
   displayName: MyEntity

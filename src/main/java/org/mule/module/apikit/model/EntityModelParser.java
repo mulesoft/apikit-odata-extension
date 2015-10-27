@@ -31,8 +31,7 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
  */
 public class EntityModelParser {
 
-	private static final String[] FIELD_PROPERTIES = { "name", "type", "nullable", "key", "defaultValue", "maxLength", "fixedLength", "collation", "unicode",
-			"precision" };
+	private static final String[] FIELD_PROPERTIES = { "name", "type", "nullable", "key", "defaultValue", "maxLength", "fixedLength", "collation", "unicode", "precision", "scale" };
 	private static final String DEFAULT_JSON_SCHEMA = "model-schema.json";
 
 	public EntityModelParser() {
