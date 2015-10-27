@@ -54,9 +54,7 @@ schemas:
   - Employee: |
        {"$schema":"http://json-schema.org/draft-04/schema#","edm.remoteName":"Employee","edm.name":"Employee","additionalProperties":false,"type":"object","properties":{"name":{"edm.nullable":false,"edm.maxLength":2,"edm.name":"name","type":"string","edm.type":"Edm.String","edm.fixedLength":false,"edm.key":false},"id":{"edm.nullable":false,"edm.name":"id","type":"integer","edm.type":"Edm.Int32","edm.key":true},"age":{"edm.nullable":true,"edm.name":"age","type":"integer","edm.type":"Edm.Int32","edm.key":false}},"required":["id","name","age"]}
 
-
-
-/Employee: 
+/Employee:
   displayName: Employee
   is: [orderby, top, skip, filter, expand, format, select, inlinecount]
   get:
