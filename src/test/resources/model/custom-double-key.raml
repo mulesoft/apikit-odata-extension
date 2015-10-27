@@ -56,7 +56,7 @@ schemas:
   - entityB: |
        {"$schema":"http://json-schema.org/draft-04/schema#","edm.remoteName":"entity_B","additionalProperties":false,"properties":{"id":{"edm.key":true,"edm.type":"Edm.Int32","edm.nullable":false,"type":"integer","edm.name":"id"},"description":{"edm.fixedLength":true,"edm.key":false,"edm.maxLength":200,"edm.type":"Edm.String","edm.nullable":true,"type":"string","edm.name":"description"},"name":{"edm.fixedLength":true,"edm.key":true,"edm.maxLength":200,"edm.type":"Edm.String","edm.nullable":false,"type":"string","edm.name":"name"}},"required":["id","description","name"],"type":"object","edm.name":"entityB"}
 
-/entityA: 
+/entityA:
   displayName: entityA
   is: [orderby, top, skip, filter, expand, format, select, inlinecount]
   get:
@@ -110,8 +110,7 @@ schemas:
               }
             },
             "required": [
-              "id",
-              "name"
+
             ],
             "additionalProperties": false
           }
@@ -206,9 +205,6 @@ schemas:
                   "type": "string"
                 }
               },
-              "required": [
-
-              ],
               "additionalProperties": false
             }
       responses:
@@ -216,7 +212,7 @@ schemas:
           body:
             application/json: ~
 
-/entityB: 
+/entityB:
   displayName: entityB
   is: [orderby, top, skip, filter, expand, format, select, inlinecount]
   get:
@@ -278,9 +274,7 @@ schemas:
               }
             },
             "required": [
-              "id",
-              "description",
-              "name"
+              "description"
             ],
             "additionalProperties": false
           }
@@ -387,9 +381,6 @@ schemas:
                   "type": "string"
                 }
               },
-              "required": [
-                "description"
-              ],
               "additionalProperties": false
             }
       responses:

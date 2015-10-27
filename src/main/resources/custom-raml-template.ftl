@@ -55,9 +55,18 @@ schemas:
   - ${schema.name}: |
        ${schema.json}
 </#list>
+<#function nonKeys properties>
+    <#local result = []>
+    <#list properties as prop>
+        <#if prop.isKey == "false">
+            <#local result = result + [prop]>
+        </#if>
+    </#list>
+    <#return result>
+</#function>
 <#list resources as resource>
 
-/${resource.name}: 
+/${resource.name}:
   displayName: ${resource.displayName}
   is: [orderby, top, skip, filter, expand, format, select, inlinecount]
   get:
@@ -111,7 +120,7 @@ schemas:
 
             },
             "required": [
-              <#list resource.properties as property>
+              <#list nonKeys(resource.properties) as property>
               "${property.name}"<#sep>,
               </#list>
 
@@ -209,16 +218,6 @@ schemas:
                 </#list>
 
               },
-              "required": [
-                <#list resource.properties as property>
-                <#if property.isKey == "false">
-                "${property.name}"<#if property_has_next><#if resource.properties[property_index+1].isKey == "false">,
-                </#if>
-                </#if>
-                </#if>
-                </#list>
-
-              ],
               "additionalProperties": false
             }
       responses:
