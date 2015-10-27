@@ -19,24 +19,15 @@ import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
  */
 public class BodyToJsonConverter {
 	public static String convertPayload(boolean bodyIsInXML, String payloadAsString) throws ODataInvalidFormatException {
-		JSONObject ret = null;
 		if (bodyIsInXML){
 			return adaptBodyToJson(payloadAsString).toString();
 		} else {
-			return buildJson(payloadAsString).toString();
+			return payloadAsString;
 		}
 	}
 
 	private static ODataInvalidFormatException createInvalidFormatException(JSONException e) {
 		return new ODataInvalidFormatException("Wrong body", e);
-	}
-
-	private static JSONObject buildJson(String payloadAsString) throws ODataInvalidFormatException {
-		try {
-			return new JSONObject(payloadAsString);
-		} catch (JSONException e) {
-			throw createInvalidFormatException(e);
-		}
 	}
 
 	public static String removeXmlStringNamespaceAndPreamble(String xmlString) {

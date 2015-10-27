@@ -41,12 +41,12 @@
                             },
                             "description": {
                               "type": "string",
-				              "minLength": 1,
+				              "minLength": 0,
 				  			  "maxLength": 100
                             },
                             "sample": {
                               "type": "string",
-				              "minLength": 1,
+				              "minLength": 0,
 				  			  "maxLength": 255
                             },
                             "nullable": {
@@ -95,12 +95,12 @@
                             },
                             "description": {
                               "type": "string",
-				              "minLength": 1,
+				              "minLength": 0,
 				  			  "maxLength": 150
                             },
                             "sample": {
                               "type": "string",
-				              "minLength": 1,
+				              "minLength": 0,
 				  			  "maxLength": 80
                             },
                             "nullable": {
@@ -143,12 +143,12 @@
                             },
                             "description": {
                               "type": "string",
-				              "minLength": 1,
+				              "minLength": 0,
 				  			  "maxLength": 150
                             },
                             "sample": {
                               "type": "string",
-				              "minLength": 1,
+				              "minLength": 0,
 				  			  "maxLength": 255
                             },
                             "nullable": {
@@ -192,12 +192,12 @@
                             },
                             "description": {
                               "type": "string",
-				              "minLength": 1,
+				              "minLength": 0,
 				  			  "maxLength": 150
                             },
                             "sample": {
                               "type": "string",
-				              "minLength": 1,
+				              "minLength": 0,
 				  			  "maxLength": 255
                             },
                             "nullable": {
@@ -260,12 +260,12 @@
                             },
                             "description": {
                               "type": "string",
-				              "minLength": 1,
+				              "minLength": 0,
 				  			  "maxLength": 100
                             },
                             "sample": {
                               "type": "string",
-				              "minLength": 1,
+				              "minLength": 0,
 				  			  "maxLength": 255
                             },
                             "nullable": {

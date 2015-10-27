@@ -20,7 +20,6 @@ import org.mule.module.apikit.AbstractRouter;
 import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ClientErrorException;
-import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFlowResponseException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.formatter.ODataApiKitFormatter;
@@ -128,6 +127,9 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 
 		if (Arrays.asList(methodsWithBody).contains(httpMethod.toUpperCase())) {
 			String payloadAsString = event.getMessage().getPayloadAsString();
+			if(event.getMessage().getPayload() instanceof NullPayload){
+				payloadAsString = "";
+			}
 			boolean isXml = !formats.contains(Format.Json);
 			event.getMessage().setPayload(BodyToJsonConverter.convertPayload(isXml, payloadAsString));
 			// Setting again encoding and mimetype. For some reason encoding is set to null and mimetype to */* after setPayload

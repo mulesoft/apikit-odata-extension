@@ -13,7 +13,11 @@ import org.mule.transport.http.HttpConstants;
  */
 public class ODataBadRequestException extends ODataException {
 
+
     public ODataBadRequestException(String message) {
         super(message, HttpConstants.SC_BAD_REQUEST);
+    }
+	public ODataBadRequestException() {
+        super("Bad request", HttpConstants.SC_BAD_REQUEST);
     }
 }
