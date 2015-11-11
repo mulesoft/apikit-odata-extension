@@ -157,6 +157,12 @@
 
     <repositories>
         <repository>
+            <id>jboss-releases</id>
+            <name>JBoss Repository</name>
+            <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
             <id>mulesoft-snapshots</id>
             <name>MuleSoft Snapshots Repository</name>
             <url>http://repository.mulesoft.org/snapshots/</url>
