@@ -55,7 +55,7 @@ public class ODataScaffolderServiceTest {
 
 		ramlFiles.add(modelJson);
 
-		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir);
+		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "3.7.0");
 	}
 
 	@Test
@@ -70,7 +70,7 @@ public class ODataScaffolderServiceTest {
 		ramlFiles.add(modelJson);
 
 		thrown.expect(RuntimeException.class);
-		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir);
+		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "3.7.0");
 
 	}
 
