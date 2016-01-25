@@ -44,51 +44,70 @@ public class EntityModelParserTest {
     }
 
     private List<Map<String, Object>> mockEntitySet() {
-	List<Map<String, Object>> newEntitySet = new ArrayList<Map<String, Object>>();
-	Map<String, Object> entityDefinition;
-
-	entityDefinition = new HashMap<String, Object>();
-	entityDefinition.put("name", "MyEntity");
-	entityDefinition.put("remoteName", "RemoteEntity");
-	newEntitySet.add(entityDefinition);
-
-	List<Map<String, Object>> properties = new ArrayList<Map<String, Object>>();
-	entityDefinition.put("properties", properties);
-
-	Map<String, Object> property;
-	property = new HashMap<String, Object>();
-	properties.add(property);
-	property.put("name", "MyField");
-	property.put("sample", "22");
-	property.put("type", "Edm.Decimal");
-	property.put("nullable", "false");
-	property.put("key", "true");
-	property.put("description", "This is my field");
-	property.put("precision", "2");
-	property.put("scale", "2");
-
-	return newEntitySet;
+		List<Map<String, Object>> newEntitySet = new ArrayList<Map<String, Object>>();
+		Map<String, Object> entityDefinition1;
+	
+		entityDefinition1 = new HashMap<String, Object>();
+		entityDefinition1.put("name", "MyEntity");
+		entityDefinition1.put("remoteName", "RemoteEntity");
+		newEntitySet.add(entityDefinition1);
+	
+		List<Map<String, Object>> properties1 = new ArrayList<Map<String, Object>>();
+		entityDefinition1.put("properties", properties1);
+	
+		Map<String, Object> property1;
+		property1 = new HashMap<String, Object>();
+		properties1.add(property1);
+		property1.put("name", "MyField");
+		property1.put("sample", "22");
+		property1.put("type", "Edm.Decimal");
+		property1.put("nullable", "false");
+		property1.put("key", "true");
+		property1.put("description", "This is my field");
+		property1.put("precision", "2");
+		property1.put("scale", "2");
+		
+		Map<String, Object> entityDefinition2;
+		
+		entityDefinition2 = new HashMap<String, Object>();
+		entityDefinition2.put("name", "MyEntity");
+		entityDefinition2.put("remoteName", "RemoteEntity");
+		newEntitySet.add(entityDefinition2);
+	
+		List<Map<String, Object>> properties2 = new ArrayList<Map<String, Object>>();
+		entityDefinition2.put("properties", properties2);
+	
+		Map<String, Object> property2;
+		property2 = new HashMap<String, Object>();
+		properties2.add(property2);
+		property2.put("name", "MyOtherField");
+		property2.put("sample", "bla");
+		property2.put("type", "Edm.String");
+		property2.put("nullable", "true");
+		property2.put("key", "false");
+		property2.put("description", "This is another field");
+		property2.put("maxLength", "255");
+		property2.put("fixedLength", "false");
+	
+		return newEntitySet;
     }
 
     @Test
-    public void testPositive() throws JSONException, FileNotFoundException,
-	    IOException, ProcessingException, EntityModelParsingException {
-	JSONObject obj = new JSONObject(
-		FileUtils.readFromFile("model/valid.json"));
-	List<Map<String, Object>> entities = new EntityModelParser()
-		.getEntities(obj);
-	Assert.assertEquals(mockEntitySet.get(0).get("name"), entities.get(0)
-		.get("name"));
-	Assert.assertEquals(mockEntitySet.get(0).get("remoteName"), entities
-		.get(0).get("remoteName"));
-	Assert.assertTrue(equalProp(mockEntitySet, entities, "name"));
-	Assert.assertTrue(equalProp(mockEntitySet, entities, "sample"));
-	Assert.assertTrue(equalProp(mockEntitySet, entities, "type"));
-	Assert.assertTrue(equalProp(mockEntitySet, entities, "nullable"));
-	Assert.assertTrue(equalProp(mockEntitySet, entities, "key"));
-	Assert.assertTrue(equalProp(mockEntitySet, entities, "description"));
-	Assert.assertTrue(equalProp(mockEntitySet, entities, "precision"));
-	Assert.assertTrue(equalProp(mockEntitySet, entities, "scale"));
+    public void testPositive() throws JSONException, FileNotFoundException, IOException, ProcessingException, EntityModelParsingException {
+    	
+    	JSONObject obj = new JSONObject(FileUtils.readFromFile("model/valid.json"));
+	
+    	List<Map<String, Object>> entities = new EntityModelParser().getEntities(obj);
+    	Assert.assertEquals(mockEntitySet.get(0).get("name"), entities.get(0).get("name"));
+    	Assert.assertEquals(mockEntitySet.get(0).get("remoteName"), entities.get(0).get("remoteName"));
+		Assert.assertTrue(equalProp(mockEntitySet, entities, "name"));
+		Assert.assertTrue(equalProp(mockEntitySet, entities, "sample"));
+		Assert.assertTrue(equalProp(mockEntitySet, entities, "type"));
+		Assert.assertTrue(equalProp(mockEntitySet, entities, "nullable"));
+		Assert.assertTrue(equalProp(mockEntitySet, entities, "key"));
+		Assert.assertTrue(equalProp(mockEntitySet, entities, "description"));
+		Assert.assertTrue(equalProp(mockEntitySet, entities, "precision"));
+		Assert.assertTrue(equalProp(mockEntitySet, entities, "scale"));
     }
 
     private boolean equalProp(List<Map<String, Object>> entityA,

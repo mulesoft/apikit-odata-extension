@@ -16,6 +16,18 @@
               "scale": 2,
               "sample": "22"
             }
+          },
+          {
+            "field": {
+              "name": "MyOtherField",
+              "type": "Edm.String",
+              "nullable": true,
+              "key": false,
+              "description": "This is another field",
+              "maxLength": 255,
+              "fixedLength": false,
+              "sample": "bla"
+            }
           }
         ]
       }

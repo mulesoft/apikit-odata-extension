@@ -52,7 +52,7 @@ traits:
             required: false
 schemas:
   - MyEntity: |
-       {"$schema":"http://json-schema.org/draft-04/schema#","edm.remoteName":"RemoteEntity","additionalProperties":false,"properties":{"MyField":{"edm.precision":2,"edm.key":true,"edm.type":"Edm.Decimal","edm.scale":2,"edm.nullable":false,"type":"number","edm.name":"MyField"}},"required":["MyField"],"type":"object","edm.name":"MyEntity"}
+       {"$schema":"http://json-schema.org/draft-04/schema#","edm.remoteName":"RemoteEntity","additionalProperties":false,"properties":{"MyOtherField":{"edm.fixedLength":false,"edm.key":false,"edm.maxLength":255,"edm.type":"Edm.String","edm.nullable":true,"type":"string","edm.name":"MyOtherField"},"MyField":{"edm.precision":2,"edm.key":true,"edm.type":"Edm.Decimal","edm.scale":2,"edm.nullable":false,"type":"number","edm.name":"MyField"}},"required":["MyField"],"type":"object","edm.name":"MyEntity"}
 
 /MyEntity:
   displayName: MyEntity
@@ -75,6 +75,10 @@ schemas:
                       "properties": {
                         "MyField" : {
                           "type": "number"
+                        },
+
+                        "MyOtherField" : {
+                          "type": "string"
                         }
                       },
                       "additionalProperties": false
@@ -97,10 +101,14 @@ schemas:
             "properties": {
               "MyField" : {
                 "type": "number"
+              },
+
+              "MyOtherField" : {
+                "type": "string"
               }
             },
             "required": [
-
+              "MyOtherField"
             ],
             "additionalProperties": false
           }
@@ -120,6 +128,10 @@ schemas:
                       "properties": {
                         "MyField" : {
                           "type": "number"
+                        },
+
+                        "MyOtherField" : {
+                          "type": "string"
                         }
                       },
                       "additionalProperties": false
@@ -153,6 +165,10 @@ schemas:
                         "properties": {
                           "MyField" : {
                             "type": "number"
+                          },
+
+                          "MyOtherField" : {
+                            "type": "string"
                           }
                         },
                         "additionalProperties": false
@@ -181,6 +197,10 @@ schemas:
               "properties": {
                 "MyField" : {
                   "type": "number"
+                },
+
+                "MyOtherField" : {
+                  "type": "string"
                 }
               },
               "additionalProperties": false

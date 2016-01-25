@@ -103,6 +103,10 @@ public class EntityModelParser {
 
 		for (int i = 0; i < properties.length(); i++) {
 			String name = (String) properties.getJSONObject(i).getJSONObject("field").get("name");
+			Boolean isNullable = (Boolean)properties.getJSONObject(i).getJSONObject("field").get("nullable");
+			if (isNullable) {
+				continue;
+			}
 			required.put(name);
 		}
 
