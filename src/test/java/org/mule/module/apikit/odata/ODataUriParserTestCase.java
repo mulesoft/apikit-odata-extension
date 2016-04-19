@@ -340,8 +340,8 @@ public class ODataUriParserTestCase {
 	// underscores and dashes
 	@Test
 	public void parseUppercaseLowercaseUnderscoreAndDashResourceRequest() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser
-				.parse(oDataContext, "/odata.svc/Weird-resource_NAME(just-A_key='bla',ANOTHER-strange_Key=2)/", "$format=json");
+		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/Weird-resource_NAME(just-A_key='bla',ANOTHER-strange_Key=2)/",
+				"$format=json");
 
 		assertTrue(processor instanceof ODataApikitProcessor);
 		ODataApikitProcessor apikitProcessor = (ODataApikitProcessor) processor;
@@ -711,7 +711,8 @@ public class ODataUriParserTestCase {
 
 	@Test
 	public void parseSingleEntityQueryFilter58() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users", "?$filter=concat(concat(City, ', '), Country) eq 'Berlin, Germany'");
+		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users",
+				"?$filter=concat(concat(City, ', '), Country) eq 'Berlin, Germany'");
 		assertTrue(processor instanceof ODataApikitProcessor);
 	}
 
@@ -1143,7 +1144,8 @@ public class ODataUriParserTestCase {
 
 	@Test
 	public void parseTrailingSlashSingleEntityQueryFilter130() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users/", "?$filter=concat(concat(City, ', '), Country) eq 'Berlin, Germany'");
+		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users/",
+				"?$filter=concat(concat(City, ', '), Country) eq 'Berlin, Germany'");
 		assertTrue(processor instanceof ODataApikitProcessor);
 	}
 
@@ -1336,7 +1338,8 @@ public class ODataUriParserTestCase {
 
 	@Test
 	public void parseSingleEntityQuerySelectFilter162() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users(1)", "?$select=Rating,Description,Price&$filter=day(BirthDate) eq 8");
+		ODataRequestProcessor processor = ODataUriParser
+				.parse(oDataContext, "/odata.svc/users(1)", "?$select=Rating,Description,Price&$filter=day(BirthDate) eq 8");
 		assertTrue(processor instanceof ODataApikitProcessor);
 	}
 
@@ -1372,7 +1375,8 @@ public class ODataUriParserTestCase {
 
 	@Test
 	public void parseSingleEntityQueryExpandFilter168() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users(1)", "?$expand=Categories/Suppliers&$filter=year(BirthDate) eq 1948");
+		ODataRequestProcessor processor = ODataUriParser
+				.parse(oDataContext, "/odata.svc/users(1)", "?$expand=Categories/Suppliers&$filter=year(BirthDate) eq 1948");
 		assertTrue(processor instanceof ODataApikitProcessor);
 	}
 
@@ -1570,8 +1574,8 @@ public class ODataUriParserTestCase {
 
 	@Test
 	public void parseSingleEntityQueryFilterExpand201() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser
-				.parse(oDataContext, "/odata.svc/users(1)", "?$filter=Price add 5 gt 10&$expand=Categories/Suppliers,Products");
+		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users(1)",
+				"?$filter=Price add 5 gt 10&$expand=Categories/Suppliers,Products");
 		assertTrue(processor instanceof ODataApikitProcessor);
 	}
 
@@ -1687,7 +1691,8 @@ public class ODataUriParserTestCase {
 
 	@Test
 	public void parseSingleEntityQueryFilterAndIgnoreParams220() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users(1)", "?$filter=substringof('Alfreds', CompanyName) eq true&ignore=bla");
+		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users(1)",
+				"?$filter=substringof('Alfreds', CompanyName) eq true&ignore=bla");
 		assertTrue(processor instanceof ODataApikitProcessor);
 	}
 
@@ -1706,8 +1711,8 @@ public class ODataUriParserTestCase {
 
 	@Test
 	public void parseSingleEntityQueryFilterAndIgnoreParams223() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser
-				.parse(oDataContext, "/odata.svc/users(1)", "?$filter=endswith(CompanyName, 'Futterkiste') eq true&ignore=bla");
+		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users(1)",
+				"?$filter=endswith(CompanyName, 'Futterkiste') eq true&ignore=bla");
 		assertTrue(processor instanceof ODataApikitProcessor);
 	}
 
@@ -1756,7 +1761,8 @@ public class ODataUriParserTestCase {
 
 	@Test
 	public void parseSingleEntityQueryFilterExpand231() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users(1)", "?$filter=indexof(CompanyName, 'lfreds') eq 1&$expand=Categories");
+		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users(1)",
+				"?$filter=indexof(CompanyName, 'lfreds') eq 1&$expand=Categories");
 		assertTrue(processor instanceof ODataApikitProcessor);
 	}
 
@@ -1768,7 +1774,8 @@ public class ODataUriParserTestCase {
 
 	@Test
 	public void parseSingleEntityQueryFilter233() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users(1)", "?$filter=replace(CompanyName, ' ', '') eq 'AlfredsFutterkiste'");
+		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users(1)",
+				"?$filter=replace(CompanyName, ' ', '') eq 'AlfredsFutterkiste'");
 		assertTrue(processor instanceof ODataApikitProcessor);
 	}
 
@@ -1880,7 +1887,8 @@ public class ODataUriParserTestCase {
 
 	@Test
 	public void parseSingleEntityQueryFilterAndIgnoreParams250() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users(1)", "?$filter=trim(CompanyName) eq 'Alfreds Futterkiste'&ignore=bla");
+		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users(1)",
+				"?$filter=trim(CompanyName) eq 'Alfreds Futterkiste'&ignore=bla");
 		assertTrue(processor instanceof ODataApikitProcessor);
 	}
 
@@ -2692,13 +2700,15 @@ public class ODataUriParserTestCase {
 
 	@Test
 	public void parseTrailingSlashSingleEntityQueryFilterFormat382() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users('juan')/", "?$filter=indexof(CompanyName, 'lfreds') eq 1&$format=atom");
+		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users('juan')/",
+				"?$filter=indexof(CompanyName, 'lfreds') eq 1&$format=atom");
 		assertTrue(processor instanceof ODataApikitProcessor);
 	}
 
 	@Test
 	public void parseTrailingSlashSingleEntityQueryFilterAndIgnoreParams383() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users('juan')/", "?$filter=indexof(CompanyName, 'lfreds') eq 1&ignore=bla");
+		ODataRequestProcessor processor = ODataUriParser
+				.parse(oDataContext, "/odata.svc/users('juan')/", "?$filter=indexof(CompanyName, 'lfreds') eq 1&ignore=bla");
 		assertTrue(processor instanceof ODataApikitProcessor);
 	}
 
@@ -2725,8 +2735,8 @@ public class ODataUriParserTestCase {
 
 	@Test
 	public void parseTrailingSlashSingleEntityQueryFilter387() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser
-				.parse(oDataContext, "/odata.svc/users('juan')/", "?$filter=substring(CompanyName, 1) eq 'lfreds Futterkiste'");
+		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users('juan')/",
+				"?$filter=substring(CompanyName, 1) eq 'lfreds Futterkiste'");
 		assertTrue(processor instanceof ODataApikitProcessor);
 	}
 
@@ -2759,7 +2769,8 @@ public class ODataUriParserTestCase {
 
 	@Test
 	public void parseTrailingSlashSingleEntityQueryFilterAndIgnoreParams392() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users('juan')/", "?$filter=substring(CompanyName, 1, 2) eq 'lf'&ignore=bla");
+		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/users('juan')/",
+				"?$filter=substring(CompanyName, 1, 2) eq 'lf'&ignore=bla");
 		assertTrue(processor instanceof ODataApikitProcessor);
 	}
 

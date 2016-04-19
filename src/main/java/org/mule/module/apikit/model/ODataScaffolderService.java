@@ -21,10 +21,16 @@ public class ODataScaffolderService implements ScaffolderService {
 
   private final static List<String> apiExtensions = Arrays.asList(".yaml", ".raml", ".yml");
   private final static List<String> appExtensions = Arrays.asList(".xml");
-  private final static List<String> dataModelExtensions = Arrays.asList(".json");
-	
+
+  private static final String LIBRARIES_FOLDER = "/libraries";
+  private static final String RESOURCES_FOLDER = "/resources";
+  
+  private static final String LIBRARIES_ODATA_RAML = "/libraries/odata.raml";
+  private static final String RESOURCES_COLLECTION_RAML = "/resources/collection.raml";
+  private static final String RESOURCES_MEMBER_RAML = "/resources/member.raml";
+  
 	public void executeScaffolder(List<File> ramlFiles, File appDir, File domainDir, String muleVersion) {
-		List<String> ramlsWithExtensionEnabledPaths = processDataModelFiles(ramlFiles, dataModelExtensions);
+		List<String> ramlsWithExtensionEnabledPaths = processDataModelFiles(ramlFiles);
 		List<String> ramlFilePaths = retrieveFilePaths(ramlFiles, apiExtensions);
 		ramlFilePaths.addAll(ramlsWithExtensionEnabledPaths);
 		List<String> muleXmlFiles = retrieveFilePaths(appDir, appExtensions);
@@ -67,10 +73,10 @@ public class ODataScaffolderService implements ScaffolderService {
 		return filePaths;
 	}
 
-	private boolean isModelJson(File file) {
+	private boolean isODataModel(File file) {
 		try {
 			String path = file.getCanonicalPath();
-			return path.contains("api" + File.separator + "model.json");
+			return path.contains("api" + File.separator + "odataModel.raml");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -85,25 +91,34 @@ public class ODataScaffolderService implements ScaffolderService {
 		return false;
 	}
 
-	private List<String> processDataModelFiles(List<File> files, List<String> extensions) {
+	private List<String> processDataModelFiles(List<File> files) {
 		List<String> ramlFilePaths = new ArrayList<String>();
 		if (files != null) {
 			for (File file : files) {
-				if (isModelJson(file)) {
-					ramlFilePaths.add(generateRamlFromDataModel(file).getAbsolutePath());
+				if (isODataModel(file)) {
+					ramlFilePaths.addAll(generateRamlFilesFromODataModel(file));
 				}
 			}
 		}
 		return ramlFilePaths;
 	}
 
-	private File generateRamlFromDataModel(File model) {
+	private List<String> generateRamlFilesFromODataModel(File model) {
+		
+		List<String> ramlFiles = new ArrayList<String>();
+		ramlFiles.add(generateApiRamlFromODataModel(model).getAbsolutePath());
+		ramlFiles.addAll(copyRamlTemplateFiles(model));
+		
+		return ramlFiles;
+	}
+
+	private File generateApiRamlFromODataModel(File model) {
 		RamlGenerator ramlGenerator = new RamlGenerator();
 		File raml = null;
 
 		try {
 			String ramlContents = ramlGenerator.generate(new FileInputStream(model));
-			String path = model.getCanonicalPath().replace("model.json", "api.raml");
+			String path = model.getCanonicalPath().replace("odataModel.raml", "api.raml");
 			raml = FileUtils.stringToFile(path, ramlContents);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -115,4 +130,23 @@ public class ODataScaffolderService implements ScaffolderService {
 		return raml;
 	}
 
+	private List<String> copyRamlTemplateFiles(File model) {
+		List<String> ramlFiles = new ArrayList<String>();
+
+		try {
+			FileUtils.createFolder(model.getParentFile().getAbsolutePath() + LIBRARIES_FOLDER);
+			ramlFiles.add(FileUtils.exportResource(LIBRARIES_ODATA_RAML, model.getParentFile().getAbsolutePath() + LIBRARIES_ODATA_RAML));
+			
+			FileUtils.createFolder(model.getParentFile().getAbsolutePath() + RESOURCES_FOLDER);
+			ramlFiles.add(FileUtils.exportResource(RESOURCES_COLLECTION_RAML, model.getParentFile().getAbsolutePath() + RESOURCES_COLLECTION_RAML));
+			ramlFiles.add(FileUtils.exportResource(RESOURCES_MEMBER_RAML, model.getParentFile().getAbsolutePath() + RESOURCES_MEMBER_RAML));
+		} catch (Exception e) {
+			e.printStackTrace();
+			SystemStreamLog log = new SystemStreamLog();
+			log.error("Error: " + e.getMessage());
+			throw new RuntimeException("Error: " + e.getMessage());
+		}
+
+		return ramlFiles;
+	}
 }

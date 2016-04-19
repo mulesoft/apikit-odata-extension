@@ -13,6 +13,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mule.module.apikit.odata.exception.ODataBadRequestException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 public class ODataUriParserTestCase {
 	@Test
@@ -27,7 +28,7 @@ public class ODataUriParserTestCase {
 
 		String expected = "{\"OrderID\":20000,\"ShipAddress\":\"ship-address-1\",\"ShipName\":\"ship-name-1\"}";
 
-		assertEquals(expected, actual);
+		JSONAssert.assertEquals(expected, actual, false);
 	}
 
 	@Test

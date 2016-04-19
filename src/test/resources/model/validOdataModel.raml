@@ -1,0 +1,26 @@
+#%RAML 1.0 Library
+uses:
+  odata: !include libraries/odata.raml
+
+types:
+  Employee:
+    properties:
+      id:
+        type: integer
+        (odata.key): true
+      name:
+        type: string
+        (odata.nullable): false
+      age:
+        type: integer
+  Customer:
+    properties:
+      id:
+        type: integer
+        (odata.key): true
+      name:
+        type: string
+        (odata.nullable): false    
+      address:
+        type: string
+        (odata.nullable): false  

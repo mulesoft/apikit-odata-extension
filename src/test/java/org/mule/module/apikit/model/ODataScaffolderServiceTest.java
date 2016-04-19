@@ -49,11 +49,11 @@ public class ODataScaffolderServiceTest {
 
 		List<File> ramlFiles = new ArrayList<File>();
 
-		File modelJson = getFile("valid/api/model.json");
+		File model = getFile("valid/api/odataModel.raml");
 		File appDir = getFile("valid/app");
 		File domainDir = getFile("valid/domain");
 
-		ramlFiles.add(modelJson);
+		ramlFiles.add(model);
 
 		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "3.7.0");
 	}
@@ -63,7 +63,7 @@ public class ODataScaffolderServiceTest {
 
 		List<File> ramlFiles = new ArrayList<File>();
 
-		File modelJson = getFile("invalid/api/model.json");
+		File modelJson = getFile("invalid/api/odataModel.raml");
 		File appDir = getFile("invalid/app");
 		File domainDir = getFile("invalid/domain");
 
