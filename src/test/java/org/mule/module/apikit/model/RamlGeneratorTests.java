@@ -17,7 +17,6 @@ import java.net.URL;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -46,45 +45,39 @@ public class RamlGeneratorTests {
 		Assert.assertEquals(readFromFile("model/custom-double-key.raml"), new RamlGenerator().generate(("model/valid-doublekey-OdataModel.raml")));
 	}
 
-	@Ignore
 	@Test
 	public void invalidModel1Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		thrown.expectMessage("there are entities with empty names, please fix the model.");
+		thrown.expectMessage("there are entities with empty names, please fix the model");
 		new RamlGenerator().generate("model/invalidOdataModel1.raml");
 	}
 
-	@Ignore
 	@Test
 	public void invalidModel2Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		thrown.expectMessage("object has missing required properties ([\"remoteName\"])");
+		thrown.expectMessage("the entity named 'MyEntity' is missing the remote field definition");
 		new RamlGenerator().generate("model/invalidOdataModel2.raml");
 	}
 
-	@Ignore
 	@Test
 	public void invalidModel3Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		thrown.expectMessage("some of the properties are invalid and cannot be matched against the schema.");
+		thrown.expectMessage("the field 'MyField' is missing the 'nullable' required property");
 		new RamlGenerator().generate("model/invalidOdataModel3.raml");
 	}
 
-	@Ignore
 	@Test
 	public void invalidModel4Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		thrown.expectMessage("object has missing required properties ([\"properties\"])");
+		thrown.expectMessage("a field name is missing");
 		new RamlGenerator().generate("model/invalidOdataModel4.raml");
 	}
 
-	@Ignore
 	@Test
 	public void invalidModel5Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		thrown.expectMessage("object has missing required properties ([\"entity\"])");
+		thrown.expectMessage("no types definition where found, please check the model");
 		new RamlGenerator().generate("model/invalidOdataModel5.raml");
 	}
 
-	@Ignore
 	@Test
 	public void invalidModel6Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		thrown.expectMessage("object has missing required properties ([\"entity\"])");
+		thrown.expectMessage("the entity named 'MyEntity' has no properties defined");
 		new RamlGenerator().generate("model/invalidOdataModel6.raml");
 	}
 

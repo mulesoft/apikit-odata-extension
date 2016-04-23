@@ -4,23 +4,32 @@ uses:
 
 types:
   Employee:
+    (odata.remote): myEntity
     properties:
       id:
-        type: integer
+        type: decimal
         (odata.key): true
+        (odata.nullable): false
       name:
         type: string
+        (odata.key): false
         (odata.nullable): false
       age:
         type: integer
+        (odata.key): false
+        (odata.nullable): false
   Customer:
+    (odata.remote): myEntity
     properties:
       id:
-        type: integer
+        type: decimal
         (odata.key): true
+        (odata.nullable): false
       name:
         type: string
+        (odata.key): false
         (odata.nullable): false    
       address:
         type: string
-        (odata.nullable): false  
+        (odata.key): false
+        (odata.nullable): false 

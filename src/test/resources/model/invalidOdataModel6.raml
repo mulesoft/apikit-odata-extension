@@ -4,12 +4,13 @@ uses:
 
 types:
   MyEntity:
-    properties:
+    (odata.remote): myEntity  
+    propertie
       MyField:
         type: decimal
         (odata.key): true
-		(odata.nullable): false,
-		(odata.precision): 2,
-		(odata.scale): 2
+        (odata.nullable): false
+        (odata.precision): 2
+        (odata.scale): 2
   ThisIsNotWorking
         
