@@ -6,10 +6,6 @@
  */
 package org.mule.module.apikit.odata.metadata;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
 import org.mule.module.apikit.AbstractConfiguration;
 import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
@@ -20,7 +16,7 @@ import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 import org.mule.module.apikit.odata.metadata.raml.RamlParser;
 import org.mule.module.apikit.odata.metadata.raml.RamlParserUtils;
-import org.raml.model.Raml;
+import org.mule.raml.interfaces.model.IRaml;
 
 /**
  * 
@@ -33,7 +29,7 @@ public class OdataMetadataManager {
 		entitySet = new EntityDefinitionSet();
 		lock = new Object();
 	}
-	private static Raml raml;
+	private static IRaml raml;
 	private RamlParser ramlParser;
 	private static Object lock;
 
@@ -47,7 +43,7 @@ public class OdataMetadataManager {
 	 * 
 	 * @return
 	 */
-	private boolean update(Raml newRaml, boolean forceUpdate) {
+	private boolean update(IRaml newRaml, boolean forceUpdate) {
 		if (forceUpdate)
 			return true;
 		if (raml == null)
@@ -62,7 +58,7 @@ public class OdataMetadataManager {
 		return false;
 	}
 
-	private void performRefresh(Raml newRaml, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
+	private void performRefresh(IRaml newRaml, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
 			OdataMetadataFormatException {
 		synchronized (lock) {
 			if (update(newRaml, forceUpdate)) {
@@ -89,19 +85,7 @@ public class OdataMetadataManager {
 		return entitySet;
 	}
 
-	public EntityDefinitionSet refreshMetadata(InputStream raml, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
-			OdataMetadataFormatException {
-		performRefresh(RamlParserUtils.getRaml(raml), forceUpdate);
-		return entitySet;
-	}
-
-	public EntityDefinitionSet refreshMetadata(URL url, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
-			OdataMetadataFormatException, IOException {
-		performRefresh(RamlParserUtils.getRaml(url), forceUpdate);
-		return entitySet;
-	}
-
-	public EntityDefinitionSet refreshMetadata(Raml raml, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
+	public EntityDefinitionSet refreshMetadata(IRaml raml, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
 			OdataMetadataFormatException {
 
 		performRefresh(raml, forceUpdate);

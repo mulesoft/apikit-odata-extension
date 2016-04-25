@@ -6,43 +6,26 @@
  */
 package org.mule.module.apikit.odata.metadata.raml;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mule.module.apikit.AbstractConfiguration;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
-import org.raml.model.Raml;
-import org.raml.parser.loader.ResourceLoader;
+import org.mule.module.apikit.parser.ParserWrapper;
+import org.mule.module.apikit.parser.ParserWrapperV2;
+import org.mule.raml.interfaces.model.IRaml;
 import org.raml.parser.rule.ValidationResult;
-import org.raml.parser.visitor.RamlDocumentBuilder;
 import org.raml.parser.visitor.RamlValidationService;
 
 public class RamlParserUtils {
-	public static Raml getRaml(AbstractConfiguration config) {
-		ResourceLoader loader = config.getRamlResourceLoader();
-		RamlDocumentBuilder builder = new RamlDocumentBuilder(loader);
-		return builder.build(config.getRaml());
+	public static IRaml getRaml(AbstractConfiguration config) {
+		return config.getApi();
 	}
 
-	public static Raml getRaml(String ramlPath) {
-		RamlDocumentBuilder builder = new RamlDocumentBuilder();
-		return builder.build(ramlPath);
-	}
-
-	public static Raml getRaml(InputStream ramlInput) {
-		RamlDocumentBuilder builder = new RamlDocumentBuilder();
-		return builder.build(ramlInput);
-	}
-
-	public static Raml getRaml(URL url) throws IOException {
-		HttpURLConnection conn;
-		conn = (HttpURLConnection) url.openConnection();
-		conn.setRequestMethod("GET");
-		return getRaml(conn.getInputStream());
+	public static IRaml getRaml(String ramlPath) {
+		ParserWrapper parser = new ParserWrapperV2(ramlPath, null);
+		return parser.build();
 	}
 
 	private static void validateResults(List<ValidationResult> results) throws OdataMetadataFormatException {
@@ -56,7 +39,7 @@ public class RamlParserUtils {
 		}
 	}
 
-	public static boolean equalsRaml(Raml one, Raml two) {
+	public static boolean equalsRaml(IRaml one, IRaml two) {
 		return (one.getVersion().equals(two.getVersion()) && one.getUri().equals(two.getUri()) && one.getSchemas().equals(two.getSchemas()));
 	}
 

@@ -6,7 +6,6 @@
  */
 package org.mule.module.apikit.odata.metadata.raml;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -22,8 +21,7 @@ import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotF
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
-import org.raml.model.Raml;
-import org.raml.parser.visitor.RamlDocumentBuilder;
+import org.mule.raml.interfaces.model.IRaml;
 
 /**
  * 
@@ -50,16 +48,10 @@ public class RamlParser {
 	public EntityDefinitionSet getEntitiesFromRaml(String path) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
 			OdataMetadataFormatException {
 		RamlParserUtils.validateRaml(path);
-		return getEntitiesFromRaml(new RamlDocumentBuilder().build(path));
+		return getEntitiesFromRaml(RamlParserUtils.getRaml(path));
 	}
 
-	public EntityDefinitionSet getEntitiesFromRaml(InputStream inputStream) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
-			OdataMetadataFormatException {
-		RamlParserUtils.validateRaml(inputStream);
-		return getEntitiesFromRaml(new RamlDocumentBuilder().build(inputStream));
-	}
-
-	public EntityDefinitionSet getEntitiesFromRaml(Raml raml) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
+	public EntityDefinitionSet getEntitiesFromRaml(IRaml raml) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
 			OdataMetadataFormatException {
 		Logger.getLogger(getClass()).info("Loading entities from RAML...");
 		Long initTime = System.nanoTime();
