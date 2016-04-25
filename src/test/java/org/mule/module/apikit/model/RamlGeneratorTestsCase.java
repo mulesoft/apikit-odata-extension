@@ -30,7 +30,7 @@ import freemarker.template.TemplateException;
  * 
  * @author arielsegura
  */
-public class RamlGeneratorTests {
+public class RamlGeneratorTestsCase {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();

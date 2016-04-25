@@ -16,7 +16,7 @@ import org.mule.module.apikit.odata.exception.ClientErrorException;
 import org.mule.module.apikit.odata.exception.ODataBadRequestException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 
-public class ODataApikitProcessorTest {
+public class ODataApikitProcessorTestCase {
 	
 	@Test
 	public void testCheckResponseHttpStatusPositive() throws ODataInvalidFormatException, ODataBadRequestException, ClientErrorException {

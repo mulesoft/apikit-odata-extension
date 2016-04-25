@@ -30,7 +30,7 @@ public class ODataUriParserTestCase {
 	@BeforeClass
 	public static void setUp() throws ODataException {
 		OdataMetadataManager odataMetadataManager = new OdataMetadataManager();
-		odataMetadataManager.refreshMetadata("src/test/resources/org/mule/module/apikit/odata/odata-multiple.raml", true);
+		odataMetadataManager.refreshMetadata("src/test/resources/org/mule/module/apikit/odata/api-mk.raml", true);
 		oDataContext = new OdataContext(odataMetadataManager, "GET");
 	}
 

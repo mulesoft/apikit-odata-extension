@@ -22,7 +22,7 @@ import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsExcept
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 
-public class HelperTest {
+public class HelperTestCase {
 
 	@Before
 	public void setUp() throws Exception {

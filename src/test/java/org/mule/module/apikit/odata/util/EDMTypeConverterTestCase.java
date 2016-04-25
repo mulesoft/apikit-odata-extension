@@ -24,7 +24,7 @@ import org.odata4j.core.OProperty;
 import org.odata4j.core.UnsignedByte;
 import org.odata4j.edm.EdmSimpleType;
 
-public class EDMTypeConverterTest {
+public class EDMTypeConverterTestCase {
 
 	@Test
 	public void dataStringConversionTest() throws ODataInvalidFormatException {

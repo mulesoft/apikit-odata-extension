@@ -14,7 +14,7 @@ import java.util.Date;
 
 import org.junit.Test;
 
-public class DateParserTest {
+public class DateParserTestCase {
 
 	@Test
 	public void dateParserTest1() throws ParseException {

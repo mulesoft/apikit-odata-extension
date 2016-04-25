@@ -1,214 +1,97 @@
-#%RAML 0.8
+#%RAML 1.0
 title: Auto-generated RAML for DataGateway
 version: 0.1
-traits:
-- orderby:
-      queryParameters:
-        parms:
-          description: The number of pages to return
+mediaType:  application/json
+uses:
+  - odata: !include libraries/odata.raml
+
+resourceTypes:
+  - collection: !include resources/collection.raml
+  - member: !include resources/member.raml
+
+types:
+  gateways:
+    (odata.remote): gateways
+    properties:
+        draft:
+          type: boolean
+          (odata.sample): 12
+          (odata.key): false
+          (odata.nullable): false
+          required: true
+        ch_full_domain:
+          (odata.nullable): false
           type: string
-- top:
-      queryParameters:
-        parms:
-          description: The number of pages to return
-          type: number
-- skip:
-      queryParameters:
-        parms:
-          description: The number of pages to return
-          type: number
-- filter:
-      queryParameters:
-        parms:
-          description: Collection of filters
-          type: array
-- expand:
-      queryParameters:
-        parms:
-          description: Collection of filters
+          (odata.sample): "bla"
+          (odata.key): false
+          required: true
+        name:
+          (odata.nullable): false
           type: string
-- format:
-      queryParameters:
-        parms:
-          description: Collection of filters
+          (odata.sample): "bla"
+          (odata.key): false
+          required: true
+        description:
+          (odata.nullable): false
           type: string
-- select:
-      queryParameters:
-        parms:
-          description: Collection of filters
+          (odata.sample): "bla"
+          (odata.key): false
+          required: true
+        ch_domain:
+          (odata.nullable): false
           type: string
-- inlinecount:
-      queryParameters:
-        parms:
-          description: Collection of filters
+          (odata.sample): "bla"
+          (odata.key): false
+          required: true
+        id:
+          (odata.nullable): false
+          type: integer
+          (odata.sample): 12
+          (odata.key): true
+          required: true
+        published:
+          (odata.nullable): false
+          type: boolean
+          (odata.sample): 12
+          (odata.key): false
+          required: true
+        status:
+          (odata.nullable): false
           type: string
-schemas:
-  - gateways: |
-      	{
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "additionalProperties": false,
-          "type": "object",
-          "edm.name": "gateways",
-          "edm.remoteName": "gateways",
-          "properties": {
-            "draft": {
-              "edm.name": "draft",
-              "type": "boolean",
-              "edm.type": "Edm.Boolean",
-              "edm.sample": 12,
-              "edm.key": false
-            },
-            "ch_full_domain": {
-              "edm.name": "ch_full_domain",
-              "edm.nullable": true,
-              "type": "string",
-              "edm.type": "Edm.String",
-              "edm.sample": "bla",
-              "edm.key": false
-            },
-            "name": {
-              "edm.name": "name",
-              "edm.nullable": true,
-              "type": "string",
-              "edm.type": "Edm.String",
-              "edm.sample": "bla",
-              "edm.key": false
-            },
-            "description": {
-              "edm.name": "description",
-              "edm.nullable": true,
-              "type": "string",
-              "edm.type": "Edm.String",
-              "edm.sample": "bla",
-              "edm.key": false
-            },
-            "ch_domain": {
-              "edm.name": "ch_domain",
-              "edm.nullable": true,
-              "type": "string",
-              "edm.type": "Edm.String",
-              "edm.sample": "bla",
-              "edm.key": false
-            },
-            "id": {
-              "edm.name": "id",
-              "edm.nullable": false,
-              "type": "integer",
-              "edm.type": "Edm.Int32",
-              "edm.sample": 12,
-              "edm.key": true
-            },
-            "published": {
-              "edm.name": "published",
-              "edm.nullable": true,
-              "type": "boolean",
-              "edm.type": "Edm.Boolean",
-              "edm.sample": 12,
-              "edm.key": false
-            },
-            "status": {
-              "edm.name": "status",
-              "edm.nullable": true,
-              "type": "string",
-              "edm.type": "Edm.String",
-              "edm.sample": "bla",
-              "edm.key": false
-            }
-          },
-          "required": [
-            "id",
-            "name",
-            "description",
-            "status",
-            "published",
-            "status",
-            "published",
-            "draft",
-            "ch_domain",
-            "ch_full_domain"
-          ]
-        }
-  - users: |
-      	{
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "additionalProperties": false,
-          "type": "object",
-          "edm.name": "users",
-          "edm.remoteName": "users",
-          "properties": {
-            "last_name": {
-              "edm.name": "last_name",
-              "edm.nullable": true,
-              "type": "string",
-              "edm.type": "Edm.String",
-              "edm.sample": 12,
-              "edm.key": false
-            },
-            "id": {
-              "edm.name": "id",
-              "edm.nullable": false,
-              "type": "integer",
-              "edm.type": "Edm.Int32",
-              "edm.sample": 12,
-              "key": true
-            },
-            "first_name": {
-              "edm.name": "first_name",
-              "edm.nullable": true,
-              "type": "string",
-              "edm.type": "Edm.String",
-              "edm.sample": 12,
-              "edm.key": false
-            },
-            "email": {
-              "edm.name": "email",
-              "edm.nullable": true,
-              "type": "string",
-              "edm.type": "Edm.String",
-              "edm.sample": 12,
-              "edm.key": false
-            }
-          },
-          "required": [
-            "id",
-            "first_name",
-            "last_name",
-            "email"
-          ]
-        }
+          (odata.sample): "bla"
+          (odata.key): false
+          required: true
+  users:
+    (odata.remote): users
+    properties:
+      last_name:
+        (odata.nullable): false
+        type: string
+        (odata.sample): 12
+        (odata.key): false
+      id:
+        (odata.nullable): false
+        type: integer
+        (odata.sample): 12
+        (odata.key): true
+      first_name:
+        (odata.nullable): false
+        type: string
+        (odata.sample): 12
+        (odata.key): false
+      email:
+        (odata.nullable): false
+        type: string
+        (odata.sample): 12
+        (odata.key): false
 /gateways:
     displayName: gateways
-    is: [orderby, top, skip, filter, expand, format, select, inlinecount]
-    get:
-        description: Read
-    delete:
-        description: Delete
-    post:
-        description: Create
+    type: { collection: { model: model.gateways } }
     /{gatewaysId}:
         displayName: gateways Id
-        is: [orderby, top, skip, filter, expand, format, select, inlinecount]
-        get:
-            description: Read
-        delete:
-            description: Delete
-        put:
-            description: Update
+        type: { member: { model: model.gateways } }
 /users:
     displayName: users
-    is: [orderby, top, skip, filter, expand, format, select, inlinecount]
-    get:
-        description: Read
-    delete:
-        description: Delete
-    post:
-        description: Create
+    type: { collection: { model: model.users } }
     /{usersId}:
-        displayName: users Id
-        is: [orderby, top, skip, filter, expand, format, select, inlinecount]
-        get:
-            description: Read
-        delete:
-            description: Delete
-        put:
-            description: Update
+        type: { member: { model: model.users } }

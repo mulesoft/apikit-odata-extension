@@ -23,7 +23,7 @@ import org.mule.module.apikit.model.exception.EntityModelParsingException;
  * 
  * @author arielsegura
  */
-public class EntityModelParserTest {
+public class EntityModelParserTestCase {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();

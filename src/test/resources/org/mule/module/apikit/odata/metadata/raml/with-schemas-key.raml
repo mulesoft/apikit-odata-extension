@@ -1,83 +1,97 @@
-#%RAML 0.8
+#%RAML 1.0
 title: Auto-generated RAML for DataGateway
 version: 0.1
-traits: 
-- orderby:
-      queryParameters:
-        parms:
-          description: The number of pages to return
+mediaType:  application/json
+uses:
+  - odata: !include libraries/odata.raml
+
+resourceTypes:
+  - collection: !include resources/collection.raml
+  - member: !include resources/member.raml
+types:
+  gateways:
+    (odata.remote): gateways
+    properties:
+        draft:
+          type: boolean
+          (odata.sample): 12
+          (odata.key): false
+          (odata.nullable): false
+          required: true
+        ch_full_domain:
+          (odata.nullable): false
           type: string
-- top:
-      queryParameters:
-        parms:
-          description: The number of pages to return
-          type: number
-- skip:
-      queryParameters:
-        parms:
-          description: The number of pages to return
-          type: number
-- filter:
-      queryParameters:
-        parms:
-          description: Collection of filters
-          type: array
-- expand:
-      queryParameters:
-        parms:
-          description: Collection of filters
+          (odata.sample): "bla"
+          (odata.key): false
+          required: true
+        name:
+          (odata.nullable): false
           type: string
-- format:
-      queryParameters:
-        parms:
-          description: Collection of filters
+          (odata.sample): "bla"
+          (odata.key): false
+          required: true
+        description:
+          (odata.nullable): false
           type: string
-- select:
-      queryParameters:
-        parms:
-          description: Collection of filters
+          (odata.sample): "bla"
+          (odata.key): false
+          required: true
+        ch_domain:
+          (odata.nullable): false
           type: string
-- inlinecount:
-      queryParameters:
-        parms:
-          description: Collection of filters
+          (odata.sample): "bla"
+          (odata.key): false
+          required: true
+        id:
+          (odata.nullable): false
+          type: integer
+          (odata.sample): 12
+          (odata.key): true
+          required: true
+        published:
+          (odata.nullable): false
+          type: boolean
+          (odata.sample): 12
+          (odata.key): false
+          required: true
+        status:
+          (odata.nullable): false
           type: string
-schemas: 
- - gateways: |
-     {}
-/gateways: 
+          (odata.sample): "bla"
+          (odata.key): false
+          required: true
+  users:
+    (odata.remote): users
+    properties:
+      last_name:
+        (odata.nullable): false
+        type: string
+        (odata.sample): 12
+        (odata.key): false
+      id:
+        (odata.nullable): false
+        type: integer
+        (odata.sample): 12
+        (odata.key): true
+      first_name:
+        (odata.nullable): false
+        type: string
+        (odata.sample): 12
+        (odata.key): false
+      email:
+        (odata.nullable): false
+        type: string
+        (odata.sample): 12
+        (odata.key): false
+/gateways:
     displayName: gateways
-    is: [orderby, top, skip, filter, expand, format, select, inlinecount]
-    get: 
-        description: Read
-    delete: 
-        description: Delete
-    post: 
-        description: Create
-    /{gatewaysId}: 
+    type: { collection: { model: model.gateways } }
+    /{gatewaysId}:
         displayName: gateways Id
-        is: [orderby, top, skip, filter, expand, format, select, inlinecount]
-        get: 
-            description: Read
-        delete: 
-            description: Delete
-        put: 
-            description: Update
-/users: 
+        type: { member: { model: model.gateways } }
+/users:
     displayName: users
-    is: [orderby, top, skip, filter, expand, format, select, inlinecount]
-    get: 
-        description: Read
-    delete: 
-        description: Delete
-    post: 
-        description: Create
-    /{usersId}: 
-        displayName: users Id
-        is: [orderby, top, skip, filter, expand, format, select, inlinecount]
-        get: 
-            description: Read
-        delete: 
-            description: Delete
-        put: 
-            description: Update
+    type: { collection: { model: model.users } }
+    /{usersId}:
+        type: { member: { model: model.users } }
+

@@ -4,11 +4,11 @@ version: 0.1
 mediaType:  application/json
 
 uses:
-  model: !include odataModel.raml
+  - model: !include odataModel.raml
 
 resourceTypes:
-  collection: !include resources/collection.raml
-  member: !include resources/member.raml
+  - collection: !include resources/collection.raml
+  - member: !include resources/member.raml
 
 /orders:
   displayName: orders

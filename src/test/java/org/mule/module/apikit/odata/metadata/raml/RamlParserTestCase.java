@@ -22,7 +22,7 @@ import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
  * 
  * @author arielsegura
  */
-public class RamlParserTest {
+public class RamlParserTestCase {
 
 	RamlParser ramlParser;
 	@Rule

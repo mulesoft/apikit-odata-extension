@@ -20,7 +20,7 @@ import org.junit.rules.ExpectedException;
  * 
  * @author arielsegura
  */
-public class ODataScaffolderServiceTest {
+public class ODataScaffolderServiceTestCase {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -55,7 +55,7 @@ public class ODataScaffolderServiceTest {
 
 		ramlFiles.add(model);
 
-		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "3.7.0");
+		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "3.8.0");
 	}
 
 	@Test
@@ -70,7 +70,7 @@ public class ODataScaffolderServiceTest {
 		ramlFiles.add(modelJson);
 
 		thrown.expect(RuntimeException.class);
-		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "3.7.0");
+		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "3.8.0");
 
 	}
 
