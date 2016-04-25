@@ -1,0 +1,39 @@
+#%RAML 1.0 Library
+uses:
+  odata: !include libraries/odata.raml
+
+types:
+  order:
+    (odata.remote): Orders 
+    properties:
+      OrderID:
+        type: integer
+        (odata.key): true
+        (odata.nullable): false    
+      ShipName:
+        type: string
+        (odata.nullable): false
+        (odata.key): false
+      ShipAddress:
+        type: string
+        (odata.nullable): true
+        (odata.key): false        
+  customer:
+    (odata.remote): Customers 
+    properties:
+      CustomerID:
+        type: integer
+        (odata.key): true
+        (odata.nullable): false    
+      CompanyName:
+        type: string
+        (odata.nullable): true
+        (odata.key): false
+      ContactName:
+        type: string
+        (odata.nullable): true
+        (odata.key): false          
+      ContactTitle:
+        type: string
+        (odata.nullable): true
+        (odata.key): false        
