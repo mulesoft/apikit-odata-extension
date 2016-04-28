@@ -23,9 +23,10 @@ public class ODataScaffolderService implements ScaffolderService {
   private final static List<String> appExtensions = Arrays.asList(".xml");
   private final static List<String> dataModelExtensions = Arrays.asList(".json");
 	
-	public void executeScaffolder(List<File> ramlFiles, File appDir, File domainDir) {
-		List<String> ramlFilePaths = processDataModelFiles(ramlFiles, dataModelExtensions);
-		ramlFilePaths.addAll(retrieveFilePaths(ramlFiles, apiExtensions));
+	public void executeScaffolder(List<File> ramlFiles, File appDir, File domainDir, String muleVersion) {
+		List<String> ramlsWithExtensionEnabledPaths = processDataModelFiles(ramlFiles, dataModelExtensions);
+		List<String> ramlFilePaths = retrieveFilePaths(ramlFiles, apiExtensions);
+		ramlFilePaths.addAll(ramlsWithExtensionEnabledPaths);
 		List<String> muleXmlFiles = retrieveFilePaths(appDir, appExtensions);
 		SystemStreamLog log = new SystemStreamLog();
 		String domain = null;
@@ -40,7 +41,7 @@ public class ODataScaffolderService implements ScaffolderService {
 		}
 		Scaffolder scaffolder;
 		try {
-			scaffolder = Scaffolder.createScaffolder(log, appDir, ramlFilePaths, muleXmlFiles, domain);
+			scaffolder = Scaffolder.createScaffolder(log, appDir, ramlFilePaths, muleXmlFiles, domain, muleVersion, ramlsWithExtensionEnabledPaths);
 		} catch (Exception e) {
 			throw new RuntimeException("Error executing scaffolder", e);
 		}

@@ -19,14 +19,13 @@ import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
  * LICENSE.txt file.
  */
 public class BodyToJsonConverter {
-	public static String convertPayload(boolean bodyIsInXML, String payloadAsString) throws ODataInvalidFormatException, ODataBadRequestException  {
-		JSONObject ret = null;
-		if (bodyIsInXML){
-			if(isValidJson(payloadAsString)){
-				throw new ODataInvalidFormatException("Invalid body.");
-			}
+	public static String convertPayload(boolean isXMLFormat, String payloadAsString) throws ODataInvalidFormatException, ODataBadRequestException  {
+		if (isXMLFormat){
 			return adaptBodyToJson(payloadAsString).toString();
 		} else {
+			if(!isValidJson(payloadAsString)){
+				throw new ODataInvalidFormatException("Invalid format.");
+			}
 			return payloadAsString;
 		}
 	}
@@ -47,7 +46,7 @@ public class BodyToJsonConverter {
 		.replaceAll("(</)(\\w+:)(.*?>)", "$1$3"); /* remove closing tags prefix */
 	}
 
-	private static JSONObject adaptBodyToJson(String body) throws ODataBadRequestException {
+	private static JSONObject adaptBodyToJson(String body) throws ODataInvalidFormatException {
 		try {
 			JSONObject jsonObject = XML.toJSONObject(removeXmlStringNamespaceAndPreamble(body));
 			JSONObject entry = jsonObject.getJSONObject("entry");
@@ -55,7 +54,7 @@ public class BodyToJsonConverter {
 			JSONObject properties = content.getJSONObject("properties");
 			return properties;
 		} catch (JSONException e) {
-			throw new ODataBadRequestException();
+			throw new ODataInvalidFormatException("Invalid format.");
 		}
 	}
 }

@@ -130,8 +130,8 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 			if(event.getMessage().getPayload() instanceof NullPayload){
 				payloadAsString = "";
 			}
-			boolean isXml = !formats.contains(Format.Json);
-			event.getMessage().setPayload(BodyToJsonConverter.convertPayload(isXml, payloadAsString));
+			boolean isXMLFormat = !formats.contains(Format.Json);
+			event.getMessage().setPayload(BodyToJsonConverter.convertPayload(isXMLFormat, payloadAsString));
 			// Setting again encoding and mimetype. For some reason encoding is set to null and mimetype to */* after setPayload
 			event.getMessage().getDataType().setEncoding(event.getEncoding());
 			event.getMessage().getDataType().setMimeType("application/json");
@@ -147,12 +147,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 
 	private List<Entry> verifyFlowResponse(MuleEvent response) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
 			OdataMetadataResourceNotFound, OdataMetadataFormatException, ODataInvalidFlowResponseException, ClientErrorException {
-		int httpStatus = response.getMessage().getOutboundProperty("http.status");
-		if(httpStatus >= 400){
-			// If there was an error, it makes no sense to return a list of entry
-			// just raise an exception
-			throw new ClientErrorException(response.getMessage().getPayload().toString(), httpStatus);
-		}
+		checkResponseHttpStatus(response.getMessage().getOutboundProperty("http.status"));
 		try {
 			OdataMetadataManager metadataManager = getMetadataManager();
 			EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
@@ -186,6 +181,22 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 			return entries;
 		} catch (MuleException me) {
 			throw new ODataInvalidFlowResponseException(me.getMessage());
+		}
+	}
+
+	protected static void checkResponseHttpStatus(Object status) throws ClientErrorException {
+		int httpStatus = 0;
+		
+		try {
+ 			httpStatus = Integer.valueOf(status.toString());
+		} catch (Exception e) {
+			// do nothing...
+		}		
+		
+		if(httpStatus >= 400){
+			// If there was an error, it makes no sense to return a list of entry
+			// just raise an exception
+			throw new ClientErrorException("The flow ended with an error status (" + httpStatus + ")", httpStatus);
 		}
 	}
 
