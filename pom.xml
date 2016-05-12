@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.mule.modules</groupId>
 	<artifactId>mule-module-apikit-odata</artifactId>
-	<version>0.9.1-HF1</version>
+	<version>0.9.2-HF1</version>
 	<description>Module for creating API's using the OData service</description>
 
     <!-- Organization -->
