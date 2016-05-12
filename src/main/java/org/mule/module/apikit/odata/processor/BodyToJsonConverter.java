@@ -12,6 +12,8 @@ import org.json.XML;
 import org.mule.module.apikit.odata.exception.ODataBadRequestException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 
+import java.util.Iterator;
+
 /*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
@@ -52,6 +54,16 @@ public class BodyToJsonConverter {
 			JSONObject entry = jsonObject.getJSONObject("entry");
 			JSONObject content = entry.getJSONObject("content");
 			JSONObject properties = content.getJSONObject("properties");
+			Iterator<String> keyIterator = properties.keys();
+			while(keyIterator.hasNext()){
+				String key = keyIterator.next();
+				try {
+					JSONObject object = properties.getJSONObject(key);
+					properties.put(key, object.get("content"));
+				} catch (JSONException ex){
+					// not a json object? it's ok
+				}
+			}
 			return properties;
 		} catch (JSONException e) {
 			throw new ODataInvalidFormatException("Invalid format.");
