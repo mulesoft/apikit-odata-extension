@@ -147,6 +147,8 @@ public class RamlGenerator {
 			property.put("name", (String) entityProperty.get("name"));
 			property.put("type", EntityModelParser.getSchemaTypeFromEdmType((String) entityProperty.get("type")));
 			property.put("isKey", String.valueOf(isKey(entity, property.get("name"))));
+			String nullable = property.get("nullable");
+			property.put("isNullable", nullable == null ? "false" : nullable);
 			// add to list
 			properties.add(property);
 		}

@@ -1,6 +1,6 @@
-#%RAML ${ramlVersion}
-title: ${title}
-version: ${version}
+#%RAML 0.8
+title: Auto-generated RAML
+version: 0.1
 traits:
   - orderby:
         queryParameters:
@@ -51,23 +51,11 @@ traits:
             type: string
             required: false
 schemas:
-<#list schemas as schema>
-  - ${schema.name}: |
-       ${schema.json}
-</#list>
-<#function nonKeys properties>
-    <#local result = []>
-    <#list properties as prop>
-        <#if prop.isKey == "false">
-            <#local result = result + [prop]>
-        </#if>
-    </#list>
-    <#return result>
-</#function>
-<#list resources as resource>
+  - MyEntity: |
+       {"$schema":"http://json-schema.org/draft-04/schema#","edm.remoteName":"RemoteEntity","additionalProperties":false,"properties":{"NullableField":{"edm.precision":2,"edm.key":false,"edm.type":"Edm.Decimal","edm.scale":2,"edm.nullable":true,"type":"number","edm.name":"NullableField"},"MyField":{"edm.precision":2,"edm.key":true,"edm.type":"Edm.Decimal","edm.scale":2,"edm.nullable":false,"type":"number","edm.name":"MyField"}},"required":["MyField","NullableField"],"type":"object","edm.name":"MyEntity"}
 
-/${resource.name}:
-  displayName: ${resource.displayName}
+/MyEntity:
+  displayName: MyEntity
   is: [orderby, top, skip, filter, expand, format, select, inlinecount]
   get:
     description: Read
@@ -85,13 +73,13 @@ schemas:
                     "items": {
                       "type": "object",
                       "properties": {
-                        <#list resource.properties as property>
-                        "${property.name}" : {
-                          "type": "${property.type}"
-                        }<#sep>,
+                        "MyField" : {
+                          "type": "number"
+                        },
 
-                        </#list>
-
+                        "NullableField" : {
+                          "type": "number"
+                        }
                       },
                       "additionalProperties": false
                     }
@@ -111,20 +99,15 @@ schemas:
             "$schema": "http://json-schema.org/draft-04/schema#",
             "type": "object",
             "properties": {
-              <#list resource.properties as property>
-              "${property.name}" : {
-                "type": "${property.type}"
-              }<#sep>,
+              "MyField" : {
+                "type": "number"
+              },
 
-              </#list>
-
+              "NullableField" : {
+                "type": "number"
+              }
             },
             "required": [
-              <#list nonKeys(resource.properties) as property>
-                <#if property.isNullable == 'false'>
-                  "${property.name}"<#sep>,
-                </#if>
-              </#list>
 
             ],
             "additionalProperties": false
@@ -143,13 +126,13 @@ schemas:
                     "items": {
                       "type": "object",
                       "properties": {
-                        <#list resource.properties as property>
-                        "${property.name}" : {
-                          "type": "${property.type}"
-                        }<#sep>,
+                        "MyField" : {
+                          "type": "number"
+                        },
 
-                        </#list>
-
+                        "NullableField" : {
+                          "type": "number"
+                        }
                       },
                       "additionalProperties": false
                     }
@@ -161,8 +144,8 @@ schemas:
                 "additionalProperties": false
               }
 
-  /${resource.key}:
-    displayName: ${resource.displayName} id
+  /{MyEntityId}:
+    displayName: MyEntity id
     is: [filter, expand, format, select]
     get:
       description: Read
@@ -180,13 +163,13 @@ schemas:
                       "items": {
                         "type": "object",
                         "properties": {
-                          <#list resource.properties as property>
-                          "${property.name}" : {
-                            "type": "${property.type}"
-                          }<#sep>,
+                          "MyField" : {
+                            "type": "number"
+                          },
 
-                          </#list>
-
+                          "NullableField" : {
+                            "type": "number"
+                          }
                         },
                         "additionalProperties": false
                       }
@@ -212,20 +195,15 @@ schemas:
               "$schema": "http://json-schema.org/draft-04/schema#",
               "type": "object",
               "properties": {
-                <#list resource.properties as property>
-                "${property.name}" : {
-                  "type": "${property.type}"
-                }<#sep>,
+                "MyField" : {
+                  "type": "number"
+                },
 
-                </#list>
-
+                "NullableField" : {
+                  "type": "number"
+                }
               },
               "required": [
-                <#list nonKeys(resource.properties) as property>
-                  <#if property.isNullable == 'false'>
-                  "${property.name}"<#sep>,
-                  </#if>
-                </#list>
 
               ],
               "additionalProperties": false
@@ -234,4 +212,3 @@ schemas:
         204:
           body:
             application/json: ~
-</#list>
