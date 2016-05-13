@@ -11,6 +11,12 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.mule.module.apikit.odata.exception.ODataBadRequestException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
+import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
+import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 
 import java.util.Iterator;
 
@@ -21,9 +27,9 @@ import java.util.Iterator;
  * LICENSE.txt file.
  */
 public class BodyToJsonConverter {
-	public static String convertPayload(boolean isXMLFormat, String payloadAsString) throws ODataInvalidFormatException, ODataBadRequestException  {
+	public static String convertPayload(String entity, boolean isXMLFormat, String payloadAsString) throws ODataInvalidFormatException, ODataBadRequestException, OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
 		if (isXMLFormat){
-			return adaptBodyToJson(payloadAsString).toString();
+			return adaptBodyToJson(entity, payloadAsString).toString();
 		} else {
 			if(!isValidJson(payloadAsString)){
 				throw new ODataInvalidFormatException("Invalid format.");
@@ -48,13 +54,16 @@ public class BodyToJsonConverter {
 		.replaceAll("(</)(\\w+:)(.*?>)", "$1$3"); /* remove closing tags prefix */
 	}
 
-	private static JSONObject adaptBodyToJson(String body) throws ODataInvalidFormatException {
+	private static JSONObject adaptBodyToJson(String entity, String body) throws ODataInvalidFormatException, OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
 		try {
 			JSONObject jsonObject = XML.toJSONObject(removeXmlStringNamespaceAndPreamble(body));
 			JSONObject entry = jsonObject.getJSONObject("entry");
 			JSONObject content = entry.getJSONObject("content");
 			JSONObject properties = content.getJSONObject("properties");
 			Iterator<String> keyIterator = properties.keys();
+
+			OdataMetadataManager odataMetadataManager = new OdataMetadataManager();
+
 			while(keyIterator.hasNext()){
 				String key = keyIterator.next();
 				try {
@@ -62,6 +71,15 @@ public class BodyToJsonConverter {
 					properties.put(key, object.get("content"));
 				} catch (JSONException ex){
 					// not a json object? it's ok
+				}
+
+				// now check against the property's type
+				if(entity != null){
+					EntityDefinitionProperty propertyDefinition = odataMetadataManager.getEntityByName(entity).findPropertyDefinition(key);
+					Object value = properties.get(key);
+					if(propertyDefinition.getType().contains("String") && !value.toString().startsWith("\"")){
+						properties.put(key, "\""+value.toString()+"\"");
+					}
 				}
 			}
 			return properties;

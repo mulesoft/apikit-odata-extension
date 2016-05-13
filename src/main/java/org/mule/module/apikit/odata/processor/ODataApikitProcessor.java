@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONObject;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -132,7 +133,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 				payloadAsString = "";
 			}
 			boolean isXMLFormat = !formats.contains(Format.Json);
-			event.getMessage().setPayload(BodyToJsonConverter.convertPayload(isXMLFormat, payloadAsString));
+			event.getMessage().setPayload(BodyToJsonConverter.convertPayload(entity, isXMLFormat, payloadAsString));
 			// Setting again encoding and mimetype. For some reason encoding is set to null and mimetype to */* after setPayload
 			event.getMessage().getDataType().setEncoding(event.getEncoding());
 			event.getMessage().getDataType().setMimeType("application/json");

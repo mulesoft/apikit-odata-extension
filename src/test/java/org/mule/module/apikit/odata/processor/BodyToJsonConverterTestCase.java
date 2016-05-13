@@ -8,11 +8,7 @@ package org.mule.module.apikit.odata.processor;
 
 import org.json.JSONObject;
 import org.junit.Test;
-import org.mule.module.apikit.odata.exception.ODataBadRequestException;
-import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.util.FileUtils;
-
-import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
 
@@ -23,9 +19,9 @@ public class BodyToJsonConverterTestCase {
 
 
     @Test
-    public void dateTimeInputWithoutQuotesShouldBeCastToDateTime() throws IOException, ODataBadRequestException, ODataInvalidFormatException {
+    public void dateTimeInputWithoutQuotesShouldBeCastToDateTime() throws Exception {
         String input = FileUtils.readFromFile("org/mule/module/apikit/odata/processor/_api_create_order.xml");
-        String json = BodyToJsonConverter.convertPayload(true, input);
+        String json = BodyToJsonConverter.convertPayload(null, true, input);
         JSONObject jsonObject = new JSONObject(json);
         assertTrue(Double.compare((Double) jsonObject.get("Double"), 1.2) == 0);
         assertTrue(jsonObject.get("OrderDate").equals("1996-08-05 00:00:00"));

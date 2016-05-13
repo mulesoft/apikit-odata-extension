@@ -16,14 +16,14 @@ import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 
 public class ODataUriParserTestCase {
 	@Test
-	public void sendingXMLAsBodyReturnsValidJSON() throws ODataInvalidFormatException, ODataBadRequestException {
+	public void sendingXMLAsBodyReturnsValidJSON() throws Exception {
 		String xml = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>"
 				+ "<entry xmlns:d=\"http://schemas.microsoft.com/ado/2007/08/dataservices\" xmlns:m=\"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata\" xmlns=\"http://www.w3.org/2005/Atom\">"
 				+ "  <title />" + "  <updated>2013-09-18T23:46:19.3857256Z</updated>" + "  <author>" + "    <name />" + "  </author>" + "  <id />"
 				+ "  <content type=\"application/xml\">" + "    <m:properties>" + "      <d:OrderID>20000</d:OrderID>" + "      <d:ShipName>ship-name-1</d:ShipName>"
 				+ "      <d:ShipAddress>ship-address-1</d:ShipAddress>" + "    </m:properties>" + "  </content>" + "</entry>";
 
-		String actual = BodyToJsonConverter.convertPayload(true, xml).toString();
+		String actual = BodyToJsonConverter.convertPayload(null, true, xml).toString();
 
 		String expected = "{\"OrderID\":20000,\"ShipAddress\":\"ship-address-1\",\"ShipName\":\"ship-name-1\"}";
 
@@ -31,10 +31,10 @@ public class ODataUriParserTestCase {
 	}
 
 	@Test
-	public void sendingJSONAsBodyReturnsSameJSON() throws ODataInvalidFormatException, ODataBadRequestException {
+	public void sendingJSONAsBodyReturnsSameJSON() throws Exception {
 		String input = "{\"OrderID\":20000,\"ShipAddress\":\"ship-address-1\",\"ShipName\":\"ship-name-1\"}";
 
-		String actual = BodyToJsonConverter.convertPayload(false, input).toString();
+		String actual = BodyToJsonConverter.convertPayload(null, false, input).toString();
 
 		String expected = "{\"OrderID\":20000,\"ShipAddress\":\"ship-address-1\",\"ShipName\":\"ship-name-1\"}";
 
@@ -43,7 +43,7 @@ public class ODataUriParserTestCase {
 
 	@Ignore // This test makes no sense since we are letting apikit validate the payload. 
 	@Test
-	public void sendingXMLAsBodyButJsonAsContentTypeThrowsException() throws ODataInvalidFormatException {
+	public void sendingXMLAsBodyButJsonAsContentTypeThrowsException() throws Exception {
 		try {
 			String xml = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>"
 					+ "<entry xmlns:d=\"http://schemas.microsoft.com/ado/2007/08/dataservices\" xmlns:m=\"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata\" xmlns=\"http://www.w3.org/2005/Atom\">"
@@ -51,18 +51,18 @@ public class ODataUriParserTestCase {
 					+ "  <content type=\"application/xml\">" + "    <m:properties>" + "      <d:OrderID>20000</d:OrderID>" + "      <d:ShipName>ship-name-1</d:ShipName>"
 					+ "      <d:ShipAddress>ship-address-1</d:ShipAddress>" + "    </m:properties>" + "  </content>" + "</entry>";
 
-			BodyToJsonConverter.convertPayload(false, xml);
+			BodyToJsonConverter.convertPayload(null, false, xml);
 			fail("Exception expected");
 		} catch (ODataBadRequestException e) {
 		}
 	}
 
 	@Test
-	public void sendingJSONAsBodyButXMLasContentTypeThrowsException() throws ODataBadRequestException {
+	public void sendingJSONAsBodyButXMLasContentTypeThrowsException() throws Exception {
 		try {
 			String input = "{\"OrderID\":20000,\"ShipAddress\":\"ship-address-1\",\"ShipName\":\"ship-name-1\"}";
 
-			BodyToJsonConverter.convertPayload(true, input);
+			BodyToJsonConverter.convertPayload(null, true, input);
 			fail("Exception expected");
 		} catch (ODataInvalidFormatException e) {
 		}
