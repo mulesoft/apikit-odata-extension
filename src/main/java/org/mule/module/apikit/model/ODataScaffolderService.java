@@ -25,7 +25,7 @@ public class ODataScaffolderService implements ScaffolderService {
   private static final String LIBRARIES_FOLDER = "/libraries";
   private static final String RESOURCES_FOLDER = "/resources";
   
-  private static final String LIBRARIES_ODATA_RAML = "/libraries/odata.raml";
+  private static final String LIBRARIES_ODATA_RAML = "/libraries/odataAnnotations.raml";
   private static final String RESOURCES_COLLECTION_RAML = "/resources/collection.raml";
   private static final String RESOURCES_MEMBER_RAML = "/resources/member.raml";
   

@@ -4,7 +4,7 @@ description: A collection resource
 usage: Use this to describe a resource that lists items
 
 uses:
-  odata: !include ../libraries/odata.raml
+  odata: !include ../libraries/odataAnnotations.raml
 is: [odata.orderby, odata.top, odata.skip, odata.filter, odata.expand, odata.format, odata.select, odata.inlinecount]
 get:
   description: List of <<model | !pluralize>>

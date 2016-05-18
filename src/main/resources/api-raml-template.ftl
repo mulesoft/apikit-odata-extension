@@ -4,7 +4,8 @@ version: ${version}
 mediaType:  application/json
 
 uses:
-  model: !include odataModel.raml
+  model: !include odata.raml
+  annotations: !include libraries/odataAnnotations.raml
 
 resourceTypes:
   collection: !include resources/collection.raml
