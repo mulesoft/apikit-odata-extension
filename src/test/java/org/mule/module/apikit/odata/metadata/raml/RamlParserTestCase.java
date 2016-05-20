@@ -68,67 +68,67 @@ public class RamlParserTestCase {
 	public void incompleteSchemaTest() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFieldsException.class);
 		thrown.expectMessage("Property \"nullable\" is missing in field \"draft\" in entity \"gateways\"");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/incomplete-schema.raml");
+		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/incomplete-schema.raml");
 	}
 
 	@Test
 	public void withSomeTraitsTest() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFormatException.class);
 		thrown.expectMessage("RAML is invalid. See log list.");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/with-some-traits.raml");
+		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/with-some-traits.raml");
 	}
 
 	@Test
 	public void withoutTraitsTest() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFormatException.class);
 		thrown.expectMessage("RAML is invalid. See log list.");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/without-traits.raml");
+		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/without-traits.raml");
 	}
 
 	@Test
 	public void withoutSchemas() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFormatException.class);
 		thrown.expectMessage("No schemas found.");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/without-schemas.raml");
+		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/without-schemas.raml");
 	}
 
 	@Test
 	public void withSchemasKey() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFieldsException.class);
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/with-schemas-key.raml");
+		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/with-schemas-key.raml");
 	}
 
 	@Test
 	public void schemasMultipleKey() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFormatException.class);
 		thrown.expectMessage("Duplicate key \"edm.remoteName\"");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/schemas-multiple-keys.raml");
+		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/schemas-multiple-keys.raml");
 	}
 
 	@Test
 	public void schemasWithoutProperties() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFieldsException.class);
 		thrown.expectMessage("JSONObject[\"properties\"] not found.");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/schema-without-properties.raml");
+		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/schema-without-properties.raml");
 	}
 
 	@Test
 	public void invalidKeyValue() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFieldsException.class);
 		thrown.expectMessage("Property \"key\" in field \"draft\" must be a boolean.");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/invalid-key-value.raml");
+		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/invalid-key-value.raml");
 	}
 
 	@Test
 	public void invalidNullableValue() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFieldsException.class);
 		thrown.expectMessage("Property \"nullable\" in field \"draft\" must be a boolean.");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/raml/invalid-nullable-value.raml");
+		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/invalid-nullable-value.raml");
 	}
 
 	@Test
 	public void testPositive() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
-		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml("org/mule/module/apikit/odata/metadata/raml/datagateway-definition.raml");
+		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/datagateway-definition.raml");
 		EntityDefinition entityDefinition = entitySet.toList().get(0);
 		for (int i = 0; i < mockEntitySet.toList().get(0).getProperties().size(); i++) {
 			EntityDefinitionProperty expectedProperty = mockEntitySet.toList().get(0).getProperties().get(i);

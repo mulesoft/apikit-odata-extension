@@ -4,27 +4,24 @@ version: 0.1
 mediaType:  application/json
 
 uses:
-  - model: !include odataModel.raml
-
-resourceTypes:
-  - collection: !include resources/collection.raml
-  - member: !include resources/member.raml
+  odata: libraries/odataLibrary.raml
+  model: odataModel-mk.raml
 
 /orders:
   displayName: orders
-  type: { collection: { model: model.order } }
+  type: { odata.collection: { model: model.order } }
   /orderId:
     displayName: order
-    type: { member: { model: model.order } }
+    type: { odata.member: { model: model.order } }
 /customers:
   displayName: customers
-  type: { collection: { model: model.customer } }
+  type: { odata.collection: { model: model.customer } }
   /customerId:
     displayName: customer
-    type: { member: { model: model.customer } }    
+    type: { odata.member: { model: model.customer } }
 /Weird-resource_NAMEs:
   displayName: Weird-resource_NAMEs
-  type: { collection: { model: model.Weird-resource_NAME } }
+  type: { odata.collection: { model: model.Weird-resource_NAME } }
   /Weird-resource_NAMEId:
     displayName: Weird-resource_NAME
-    type: { member: { model: model.Weird-resource_NAME } }  
+    type: { odata.member: { model: model.Weird-resource_NAME } }

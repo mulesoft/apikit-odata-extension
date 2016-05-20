@@ -4,15 +4,12 @@ version: 0.1
 mediaType:  application/json
 
 uses:
-  model: !include odataModel.raml
-
-resourceTypes:
-  collection: !include resources/collection.raml
-  member: !include resources/member.raml
+  model: odata.raml
+  odata: libraries/odataLibrary.raml
 
 /Employees:
   displayName: Employees
-  type: { collection: { model: model.Employee } }
+  type: { odata.collection: { model: model.Employee } }
   /EmployeeId:
     displayName: Employee
-    type: { member: { model: model.Employee } }
+    type: { odata.member: { model: model.Employee } }

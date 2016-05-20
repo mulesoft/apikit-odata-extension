@@ -4,15 +4,12 @@ version: 0.1
 mediaType:  application/json
 
 uses:
-  model: !include libraries/odata.raml
-
-resourceTypes:
-  collection: !include resources/collection.raml
-  member: !include resources/member.raml
+  model: odata.raml
+  odata: libraries/odataLibrary.raml
 
 /s:
   displayName: s
-  type: { collection: { model: model. } }
+  type: { odata.collection: { model: model. } }
   /Id:
     displayName: 
-    type: { member: { model: model. } }
+    type: { odata.member: { model: model. } }

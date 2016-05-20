@@ -49,7 +49,7 @@ public class ODataScaffolderServiceTestCase {
 
 		List<File> ramlFiles = new ArrayList<File>();
 
-		File model = getFile("valid/api/odataModel.raml");
+		File model = getFile("valid/api/odata.raml");
 		File appDir = getFile("valid/app");
 		File domainDir = getFile("valid/domain");
 
@@ -63,7 +63,7 @@ public class ODataScaffolderServiceTestCase {
 
 		List<File> ramlFiles = new ArrayList<File>();
 
-		File modelJson = getFile("invalid/api/odataModel.raml");
+		File modelJson = getFile("invalid/api/odata.raml");
 		File appDir = getFile("invalid/app");
 		File domainDir = getFile("invalid/domain");
 

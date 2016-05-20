@@ -28,28 +28,8 @@ public class RamlParserUtils {
 		return parser.build();
 	}
 
-	private static void validateResults(List<ValidationResult> results) throws OdataMetadataFormatException {
-		if (!results.isEmpty()) {
-			for (ValidationResult result : results) {
-				Logger.getLogger(RamlParser.class).error(result.toString());
-			}
-			throw new OdataMetadataFormatException("RAML is invalid. See log list.");
-		} else {
-			Logger.getLogger(RamlParser.class).info("RAML Validation ok");
-		}
-	}
-
 	public static boolean equalsRaml(IRaml one, IRaml two) {
 		return (one.getVersion().equals(two.getVersion()) && one.getUri().equals(two.getUri()) && one.getSchemas().equals(two.getSchemas()));
 	}
 
-	public static void validateRaml(String path) throws OdataMetadataFormatException {
-		List<ValidationResult> results = RamlValidationService.createDefault().validate(path);
-		validateResults(results);
-	}
-
-	public static void validateRaml(InputStream inputStream) throws OdataMetadataFormatException {
-		List<ValidationResult> results = RamlValidationService.createDefault().validate(inputStream);
-		validateResults(results);
-	}
 }

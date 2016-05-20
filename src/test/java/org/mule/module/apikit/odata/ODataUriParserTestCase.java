@@ -14,9 +14,12 @@ import java.util.HashMap;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mule.module.apikit.AbstractConfiguration;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
+import org.mule.module.apikit.odata.metadata.raml.RamlParserUtils;
 import org.mule.module.apikit.odata.processor.ODataApikitProcessor;
 import org.mule.module.apikit.odata.processor.ODataMetadataProcessor;
 import org.mule.module.apikit.odata.processor.ODataRequestProcessor;
@@ -30,14 +33,15 @@ public class ODataUriParserTestCase {
 	@BeforeClass
 	public static void setUp() throws ODataException {
 		OdataMetadataManager odataMetadataManager = new OdataMetadataManager();
-		odataMetadataManager.refreshMetadata("src/test/resources/org/mule/module/apikit/odata/api-mk.raml", true);
+		String ramlPath = "src/test/resources/org/mule/module/apikit/odata/api-mk.raml";
+		odataMetadataManager.refreshMetadata(ramlPath, true);
 		oDataContext = new OdataContext(odataMetadataManager, "GET");
 	}
 
 	// should parse a $metadata request and return a Metadata processor
 	@Test
 	public void parseMetadataRequest() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/$metadata", "");
+		ODataRequestProcessor processor = org.mule.module.apikit.odata.ODataUriParser.parse(oDataContext, "/odata.svc/$metadata", "");
 		assertTrue(processor instanceof ODataMetadataProcessor);
 	}
 

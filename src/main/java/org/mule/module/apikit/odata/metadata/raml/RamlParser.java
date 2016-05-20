@@ -21,7 +21,10 @@ import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotF
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
+import org.mule.module.apikit.parser.ParserWrapperV2;
 import org.mule.raml.interfaces.model.IRaml;
+import org.raml.v2.internal.impl.RamlBuilder;
+import org.raml.v2.internal.impl.emitter.tck.TckEmitter;
 
 /**
  * 
@@ -47,25 +50,20 @@ public class RamlParser {
 
 	public EntityDefinitionSet getEntitiesFromRaml(String path) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
 			OdataMetadataFormatException {
-		RamlParserUtils.validateRaml(path);
 		return getEntitiesFromRaml(RamlParserUtils.getRaml(path));
 	}
 
 	public EntityDefinitionSet getEntitiesFromRaml(IRaml raml) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
 			OdataMetadataFormatException {
-		Logger.getLogger(getClass()).info("Loading entities from RAML...");
-		Long initTime = System.nanoTime();
-		Long part = System.nanoTime();
-
 		EntityDefinitionSet entitySet = new EntityDefinitionSet();
 
 		List<Map<String, String>> schemas = raml.getSchemas();
 
+//		JSONObject ramlAsJson = new JSONObject(new ParserWrapperV2(null, null).dump(raml, null));
+//		System.out.println(ramlAsJson);
 		if (schemas.isEmpty()) {
 			throw new OdataMetadataFormatException("No schemas found. ");
 		}
-		part = System.nanoTime();
-		Logger.getLogger(getClass()).info("Parsing schemas reached in " + (part - initTime) / 1000000);
 
 		for (int i = 0; i < schemas.size(); i++) {
 			Map<String, String> schema = schemas.get(i);
@@ -74,14 +72,12 @@ public class RamlParser {
 			}
 			String entityName = (String) schema.keySet().toArray()[0];
 
-			part = System.nanoTime();
 			JSONObject jsonSchema = null;
 			try {
 				jsonSchema = new JSONObject(schema.get(entityName));
 			} catch (JSONException ex) {
 				throw new OdataMetadataFormatException(ex.getMessage());
 			}
-			Logger.getLogger(getClass()).info("Schema to JSON in " + (System.nanoTime() - part) / 1000000 + " ms!");
 
 			String remoteName = getStringFromJson(jsonSchema, NAMESPACE + "." + REMOTE_NAME);
 			notNull("\"remoteName\" not found in entity \"" + entityName + "\"", remoteName);
@@ -92,7 +88,6 @@ public class RamlParser {
 			if (properties == null) {
 				throw new OdataMetadataResourceNotFound("Properties not found in entity " + entityName + ".");
 			}
-			part = System.nanoTime();
 			entity.setProperties(parseEntityProperties(properties, entity));
 			// TODO See if it's possible to avoid this for
 			for (EntityDefinitionProperty property : entity.getProperties()) {
@@ -101,12 +96,8 @@ public class RamlParser {
 					break;
 				}
 			}
-			Logger.getLogger(getClass()).info("Properties parsed in " + (System.nanoTime() - part) / 1000000 + " ms!");
 			entitySet.addEntity(entity);
 		}
-		Long end = System.nanoTime();
-		Long total = (end - initTime) / 1000000;
-		Logger.getLogger(getClass()).info("Done in " + total + " ms!");
 
 		return entitySet;
 	}

@@ -3,61 +3,52 @@ title: Auto-generated RAML for DataGateway
 version: 0.1
 mediaType:  application/json
 uses:
-  - odata: !include libraries/odata.raml
+   odata: odataLibrary.raml
 
-resourceTypes:
-  - collection: !include resources/collection.raml
-  - member: !include resources/member.raml
+
+
 types:
   gateways:
     (odata.remote): gateways
     properties:
         draft:
           type: boolean
-          (odata.sample): 12
           (odata.key): false
           (odata.nullable): false
           required: true
         ch_full_domain:
           (odata.nullable): false
           type: string
-          (odata.sample): "bla"
           (odata.key): false
           required: true
         name:
           (odata.nullable): false
           type: string
-          (odata.sample): "bla"
           (odata.key): false
           required: true
         description:
           (odata.nullable): false
           type: string
-          (odata.sample): "bla"
           (odata.key): false
           required: true
         ch_domain:
           (odata.nullable): false
           type: string
-          (odata.sample): "bla"
           (odata.key): false
           required: true
         id:
           (odata.nullable): false
           type: integer
-          (odata.sample): 12
           (odata.key): true
           required: true
         published:
           (odata.nullable): false
           type: boolean
-          (odata.sample): 12
           (odata.key): false
           required: true
         status:
           (odata.nullable): false
           type: string
-          (odata.sample): "bla"
           (odata.key): false
           required: true
   users:
@@ -66,31 +57,27 @@ types:
       last_name:
         (odata.nullable): false
         type: string
-        (odata.sample): 12
         (odata.key): false
       id:
         (odata.nullable): false
         type: integer
-        (odata.sample): 12
         (odata.key): true
       first_name:
         (odata.nullable): false
         type: string
-        (odata.sample): 12
         (odata.key): false
       email:
         (odata.nullable): false
         type: string
-        (odata.sample): 12
         (odata.key): false
 /gateways:
     displayName: gateways
-    type: { collection: { model: model.gateways } }
+    type: { odata.collection: { model: model.gateways } }
     /{gatewaysId}:
         displayName: gateways Id
-        type: { member: { model: model.gateways } }
+        type: { odata.member: { model: model.gateways } }
 /users:
     displayName: users
-    type: { collection: { model: model.users } }
+    type: { odata.collection: { model: model.users } }
     /{usersId}:
-        type: { member: { model: model.users } }
+        type: { odata.member: { model: model.users } }

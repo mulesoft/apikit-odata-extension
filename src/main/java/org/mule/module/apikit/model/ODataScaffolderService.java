@@ -23,11 +23,8 @@ public class ODataScaffolderService implements ScaffolderService {
   private final static List<String> appExtensions = Arrays.asList(".xml");
 
   private static final String LIBRARIES_FOLDER = "/libraries";
-  private static final String RESOURCES_FOLDER = "/resources";
   
-  private static final String LIBRARIES_ODATA_RAML = "/libraries/odataAnnotations.raml";
-  private static final String RESOURCES_COLLECTION_RAML = "/resources/collection.raml";
-  private static final String RESOURCES_MEMBER_RAML = "/resources/member.raml";
+  private static final String LIBRARIES_ODATA_RAML = "/libraries/odataLibrary.raml";
   
 	public void executeScaffolder(List<File> ramlFiles, File appDir, File domainDir, String muleVersion) {
 		List<String> ramlsWithExtensionEnabledPaths = processDataModelFiles(ramlFiles);
@@ -76,7 +73,7 @@ public class ODataScaffolderService implements ScaffolderService {
 	private boolean isODataModel(File file) {
 		try {
 			String path = file.getCanonicalPath();
-			return path.contains("api" + File.separator + "odataModel.raml");
+			return path.contains("api" + File.separator + "odata.raml");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -118,7 +115,7 @@ public class ODataScaffolderService implements ScaffolderService {
 
 		try {
 			String ramlContents = ramlGenerator.generate(new FileInputStream(model));
-			String path = model.getCanonicalPath().replace("odataModel.raml", "api.raml");
+			String path = model.getCanonicalPath().replace("odata.raml", "api.raml");
 			raml = FileUtils.stringToFile(path, ramlContents);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -136,10 +133,7 @@ public class ODataScaffolderService implements ScaffolderService {
 		try {
 			FileUtils.createFolder(model.getParentFile().getAbsolutePath() + LIBRARIES_FOLDER);
 			ramlFiles.add(FileUtils.exportResource(LIBRARIES_ODATA_RAML, model.getParentFile().getAbsolutePath() + LIBRARIES_ODATA_RAML));
-			
-			FileUtils.createFolder(model.getParentFile().getAbsolutePath() + RESOURCES_FOLDER);
-			ramlFiles.add(FileUtils.exportResource(RESOURCES_COLLECTION_RAML, model.getParentFile().getAbsolutePath() + RESOURCES_COLLECTION_RAML));
-			ramlFiles.add(FileUtils.exportResource(RESOURCES_MEMBER_RAML, model.getParentFile().getAbsolutePath() + RESOURCES_MEMBER_RAML));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			SystemStreamLog log = new SystemStreamLog();

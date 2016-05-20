@@ -4,22 +4,18 @@ version: 0.1
 mediaType:  application/json
 
 uses:
-  model: !include odata.raml
-  annotations: !include libraries/odataAnnotations.raml
-
-resourceTypes:
-  collection: !include resources/collection.raml
-  member: !include resources/member.raml
+  model: odata.raml
+  odata: libraries/odataLibrary.raml
 
 /entityAs:
   displayName: entityAs
-  type: { collection: { model: model.entityA } }
+  type: { odata.collection: { model: model.entityA } }
   /entityAId:
     displayName: entityA
-    type: { member: { model: model.entityA } }
+    type: { odata.member: { model: model.entityA } }
 /entityBs:
   displayName: entityBs
-  type: { collection: { model: model.entityB } }
+  type: { odata.collection: { model: model.entityB } }
   /entityBId:
     displayName: entityB
-    type: { member: { model: model.entityB } }
+    type: { odata.member: { model: model.entityB } }
