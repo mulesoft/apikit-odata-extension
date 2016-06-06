@@ -6,10 +6,7 @@
  */
 package org.mule.module.apikit.odata.metadata.raml;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
@@ -71,6 +68,7 @@ public class RamlParserTestCase {
 		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/incomplete-schema.raml");
 	}
 
+	@Ignore // this test no longer makes sense since the trait is in the library
 	@Test
 	public void withSomeTraitsTest() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFormatException.class);
@@ -78,6 +76,7 @@ public class RamlParserTestCase {
 		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/with-some-traits.raml");
 	}
 
+	@Ignore // this test no longer makes sense since the trait is in the library
 	@Test
 	public void withoutTraitsTest() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFormatException.class);
@@ -88,7 +87,7 @@ public class RamlParserTestCase {
 	@Test
 	public void withoutSchemas() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFormatException.class);
-		thrown.expectMessage("No schemas found.");
+		thrown.expectMessage("Type not supported. gateways");
 		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/without-schemas.raml");
 	}
 
@@ -101,29 +100,15 @@ public class RamlParserTestCase {
 	@Test
 	public void schemasMultipleKey() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFormatException.class);
-		thrown.expectMessage("Duplicate key \"edm.remoteName\"");
+		thrown.expectMessage("Duplicated key '(odata.remote)'");
 		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/schemas-multiple-keys.raml");
 	}
 
 	@Test
 	public void schemasWithoutProperties() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
-		thrown.expect(OdataMetadataFieldsException.class);
-		thrown.expectMessage("JSONObject[\"properties\"] not found.");
+		thrown.expect(OdataMetadataFormatException.class);
+		thrown.expectMessage("No schemas found.");
 		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/schema-without-properties.raml");
-	}
-
-	@Test
-	public void invalidKeyValue() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
-		thrown.expect(OdataMetadataFieldsException.class);
-		thrown.expectMessage("Property \"key\" in field \"draft\" must be a boolean.");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/invalid-key-value.raml");
-	}
-
-	@Test
-	public void invalidNullableValue() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
-		thrown.expect(OdataMetadataFieldsException.class);
-		thrown.expectMessage("Property \"nullable\" in field \"draft\" must be a boolean.");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/invalid-nullable-value.raml");
 	}
 
 	@Test

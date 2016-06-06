@@ -104,9 +104,6 @@ public class Helper {
 					if (propertyMetadata.getMaxLength() != null) {
 					  builder.setMaxLength(Integer.parseInt(propertyMetadata.getMaxLength()));
 					}
-					if (propertyMetadata.isFixedLength() != null) {
-					  builder.setFixedLength(propertyMetadata.isFixedLength());
-					}
 					if (propertyMetadata.getCollation() != null) {
 					  builder.setCollation(propertyMetadata.getCollation());
 					}
