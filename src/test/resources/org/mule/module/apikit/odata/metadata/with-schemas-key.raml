@@ -1,0 +1,124 @@
+#%RAML 1.0
+title: Auto-generated RAML for DataGateway
+version: 0.1
+mediaType:  application/json
+uses:
+   odata: odataLibrary.raml
+
+resourceTypes:
+  collection:
+    is: [odata.orderby, odata.top, odata.skip, odata.filter, odata.expand, odata.format, odata.select, odata.inlinecount]
+    get:
+      description: List of <<model | !pluralize>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>[]
+    post:
+      description: Create a new <<model>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>
+  member:
+    is: [odata.filter, odata.expand, odata.format, odata.select]
+    get:
+      description: Read <<model>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>
+    delete:
+      description: Delete <<model>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>
+    put:
+      description: Update <<model>>
+      body:
+        application/json:
+          type: <<model>>
+      responses:
+        204:
+          body:
+            application/json:
+              type: <<model>>
+types:
+  gateways:
+    (odata.remote): gateways
+    properties:
+        draft:
+          type: boolean
+          (odata.key): false
+          (odata.nullable): false
+          required: true
+        ch_full_domain:
+          (odata.nullable): false
+          type: string
+          (odata.key): false
+          required: true
+        name:
+          (odata.nullable): false
+          type: string
+          (odata.key): false
+          required: true
+        description:
+          (odata.nullable): false
+          type: string
+          (odata.key): false
+          required: true
+        ch_domain:
+          (odata.nullable): false
+          type: string
+          (odata.key): false
+          required: true
+        id:
+          (odata.nullable): false
+          type: integer
+          (odata.key): true
+          required: true
+        published:
+          (odata.nullable): false
+          type: boolean
+          (odata.key): false
+          required: true
+        status:
+          (odata.nullable): false
+          type: string
+          (odata.key): false
+          required: true
+  users:
+    (odata.remote): users
+    properties:
+      last_name:
+        (odata.nullable): false
+        type: string
+      id:
+        (odata.nullable): false
+        type: integer
+        (odata.key): true
+      first_name:
+        (odata.nullable): false
+        type: string
+        (odata.key): false
+      email:
+        (odata.nullable): false
+        type: string
+        (odata.key): false
+/gateways:
+    displayName: gateways
+    type: { collection: { model: gateways } }
+    /{gatewaysId}:
+        displayName: gateways Id
+        type: { member: { model: gateways } }
+/users:
+    displayName: users
+    type: { collection: { model: users } }
+    /{usersId}:
+        type: { member: { model: users } }
+

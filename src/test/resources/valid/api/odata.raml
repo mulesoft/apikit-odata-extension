@@ -1,0 +1,18 @@
+#%RAML 1.0 Library
+
+types:
+  Employee:
+    (odata.remote): Employee 
+    properties:
+      id:
+        type: integer
+        (odata.key): true
+        (odata.nullable): false    
+      name:
+        type: string
+        (odata.nullable): false
+        (odata.key): false
+      age:
+        type: integer
+        (odata.nullable): false
+        (odata.key): false        

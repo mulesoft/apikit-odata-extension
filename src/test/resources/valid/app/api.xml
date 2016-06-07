@@ -24,6 +24,22 @@
         <set-property propertyName="Content-Type" value="application/json" />
         <set-payload value="#[NullPayload.getInstance()]" />
     </flow>
+    <flow name="put:/Employees/EmployeeId:api-config">
+        <set-property propertyName="Content-Type" value="application/json" />
+        <set-payload value="#[NullPayload.getInstance()]" />
+    </flow>
+    <flow name="delete:/Employees/EmployeeId:api-config">
+        <set-payload value="#[NullPayload.getInstance()]" />
+    </flow>
+    <flow name="get:/Employees/EmployeeId:api-config">
+        <set-payload value="#[NullPayload.getInstance()]" />
+    </flow>
+    <flow name="get:/Employees:api-config">
+        <set-payload value="#[NullPayload.getInstance()]" />
+    </flow>
+    <flow name="post:/Employees:api-config">
+        <set-payload value="#[NullPayload.getInstance()]" />
+    </flow>
     <apikit:mapping-exception-strategy name="api-apiKitGlobalExceptionMapping">
         <apikit:mapping statusCode="404">
             <apikit:exception value="org.mule.module.apikit.exception.NotFoundException" />

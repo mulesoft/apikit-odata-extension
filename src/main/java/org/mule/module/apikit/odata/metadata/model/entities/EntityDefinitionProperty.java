@@ -56,15 +56,15 @@ public class EntityDefinitionProperty implements Comparable<EntityDefinitionProp
 		if (this.maxLength != null) {
 			ret.append("\"maxLength:\"" + this.maxLength + "\",");
 		}
-		if (this.fixedLength != null) {
-			ret.append("\"fixedLength:\"" + this.fixedLength + "\",");
-		}
-		if (this.collation != null) {
-			ret.append("\"collation:\"" + this.collation + "\",");
-		}
-		if (this.unicode != null) {
-			ret.append("\"unicode:\"" + this.unicode + "\",");
-		}
+//		if (this.fixedLength != null) {
+//			ret.append("\"fixedLength:\"" + this.fixedLength + "\",");
+//		}
+//		if (this.collation != null) {
+//			ret.append("\"collation:\"" + this.collation + "\",");
+//		}
+//		if (this.unicode != null) {
+//			ret.append("\"unicode:\"" + this.unicode + "\",");
+//		}
 		if (this.precision != null) {
 			ret.append("\"precision:\"" + this.precision + "\",");
 		}

@@ -6,50 +6,31 @@
  */
 package org.mule.module.apikit.odata.metadata.raml;
 
-import java.io.InputStream;
-import java.util.List;
-
-import org.apache.log4j.Logger;
 import org.mule.module.apikit.AbstractConfiguration;
+import org.mule.module.apikit.model.RamlImpl10V2Wrapper;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
-import org.mule.module.apikit.parser.ParserWrapper;
-import org.mule.module.apikit.parser.ParserWrapperV2;
-import org.mule.raml.interfaces.model.IRaml;
-import org.raml.parser.rule.ValidationResult;
-import org.raml.parser.visitor.RamlValidationService;
+import org.raml.v2.api.RamlModelBuilder;
+import org.raml.v2.api.RamlModelResult;
+import org.raml.v2.api.loader.DefaultResourceLoader;
+import org.raml.v2.api.loader.ResourceLoader;
 
 public class RamlParserUtils {
-	public static IRaml getRaml(AbstractConfiguration config) {
-		return config.getApi();
+	public static RamlImpl10V2Wrapper getRaml(AbstractConfiguration config) throws OdataMetadataFormatException {
+		return getRaml(config.getRaml());
 	}
 
-	public static IRaml getRaml(String ramlPath) {
-		ParserWrapper parser = new ParserWrapperV2(ramlPath, null);
-		return parser.build();
-	}
-
-	private static void validateResults(List<ValidationResult> results) throws OdataMetadataFormatException {
-		if (!results.isEmpty()) {
-			for (ValidationResult result : results) {
-				Logger.getLogger(RamlParser.class).error(result.toString());
-			}
-			throw new OdataMetadataFormatException("RAML is invalid. See log list.");
-		} else {
-			Logger.getLogger(RamlParser.class).info("RAML Validation ok");
+	public static RamlImpl10V2Wrapper getRaml(String ramlPath) throws OdataMetadataFormatException {
+		ResourceLoader resourceLoader = new DefaultResourceLoader();
+		RamlModelResult ramlModelResult = new RamlModelBuilder(resourceLoader).buildApi(ramlPath);
+		if(ramlModelResult.hasErrors()){
+			throw new OdataMetadataFormatException(ramlModelResult.getValidationResults().get(0).getMessage());
 		}
+		return new RamlImpl10V2Wrapper(ramlModelResult.getApiV10());
 	}
 
-	public static boolean equalsRaml(IRaml one, IRaml two) {
-		return (one.getVersion().equals(two.getVersion()) && one.getUri().equals(two.getUri()) && one.getSchemas().equals(two.getSchemas()));
+	public static boolean equalsRaml(RamlImpl10V2Wrapper one, RamlImpl10V2Wrapper two) throws OdataMetadataFieldsException, OdataMetadataFormatException {
+		return (one.getApi().ramlVersion().equals(two.getApi().ramlVersion()) && one.getSchemas().equals(two.getSchemas()));
 	}
 
-	public static void validateRaml(String path) throws OdataMetadataFormatException {
-		List<ValidationResult> results = RamlValidationService.createDefault().validate(path);
-		validateResults(results);
-	}
-
-	public static void validateRaml(InputStream inputStream) throws OdataMetadataFormatException {
-		List<ValidationResult> results = RamlValidationService.createDefault().validate(inputStream);
-		validateResults(results);
-	}
 }

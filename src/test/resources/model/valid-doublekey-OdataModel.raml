@@ -1,6 +1,6 @@
 #%RAML 1.0 Library
 uses:
-  odata: !include libraries/odata.raml
+  odata: libraries/odataLibrary.raml
 
 types:
   entityA:
@@ -26,7 +26,7 @@ types:
         type: string
         (odata.nullable): true
         (odata.key): false
-		maxLength: 200 
+		maxLength: 200
       name:
         type: string
         (odata.nullable): false

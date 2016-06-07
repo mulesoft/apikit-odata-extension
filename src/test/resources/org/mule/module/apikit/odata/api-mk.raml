@@ -3,28 +3,168 @@ title: Auto-generated RAML
 version: 0.1
 mediaType:  application/json
 
+types:
+  orders:
+    type: object
+    (odata.remote): Orders
+    properties:
+      userId:
+        type: integer
+        (odata.key): true
+        (odata.nullable): false
+      ShipName:
+        type: string
+        (odata.nullable): false
+        (odata.key): false
+        maxLength: 200
+      ShipAddress:
+        type: string
+        (odata.nullable): true
+        (odata.key): false
+        default: "None"
+      Amount:
+        type: number
+        (odata.nullable): true
+        (odata.key): false
+        (odata.precision): 3
+        (odata.scale): 3
+      Quantity:
+        type: number
+        (odata.nullable): false
+        (odata.key): false
+      Delivered:
+        type: boolean
+        (odata.nullable): false
+        (odata.key): false
+        default: false
+      DeliverDate:
+        type: date-only
+        (odata.nullable): false
+        (odata.key): false
+  customers:
+    type: object
+    (odata.remote): Customers
+    properties:
+      age:
+        type: integer
+        (odata.key): true
+        (odata.nullable): false
+      zebra:
+        type: integer
+        (odata.key): true
+        (odata.nullable): false
+      Integer64:
+        type: integer
+        format: int64
+        (odata.key): false
+        (odata.nullable): false
+      Integer16:
+        type: integer
+        format: int16
+        (odata.key): false
+        (odata.nullable): false
+      IntegerByte:
+        type: integer
+        format: int8
+        (odata.key): false
+        (odata.nullable): false
+      GuidType:
+        type: string
+        (odata.type): guid
+        (odata.nullable): true
+        (odata.key): false
+      TimeType:
+        type: datetime
+        (odata.type): time
+        (odata.nullable): true
+        (odata.key): false
+      CompanyName:
+        type: string
+        (odata.nullable): true
+        (odata.key): false
+      name:
+        type: string
+        (odata.nullable): false
+        (odata.key): true
+      ContactTitle:
+        type: string
+        (odata.nullable): true
+        (odata.key): false
+  Weird-resource_NAMEs:
+    type: object
+    (odata.remote): Weird-resource_NAME
+    properties:
+      just-A_key:
+        type: string
+        (odata.key): true
+        (odata.nullable): true
+      ANOTHER-strange_Key:
+        type: integer
+        (odata.nullable): true
+        (odata.key): true
+
 uses:
-  model: !include odataModel.raml
+  odata: libraries/odataLibrary.raml
 
 resourceTypes:
-  collection: !include resources/collection.raml
-  member: !include resources/member.raml
+  collection:
+    is: [odata.orderby, odata.top, odata.skip, odata.filter, odata.expand, odata.format, odata.select, odata.inlinecount]
+    get:
+      description: List of <<model | !pluralize>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>[]
+    post:
+      description: Create a new <<model>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>
+  member:
+    is: [odata.filter, odata.expand, odata.format, odata.select]
+    get:
+      description: Read <<model>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>
+    delete:
+      description: Delete <<model>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>
+    put:
+      description: Update <<model>>
+      body:
+        application/json:
+          type: <<model>>
+      responses:
+        204:
+          body:
+            application/json:
+              type: <<model>>
 
 /orders:
   displayName: orders
-  type: { collection: { model: model.order } }
+  type: { collection: { model: orders } }
   /orderId:
     displayName: order
-    type: { member: { model: model.order } }
+    type: { member: { model: orders } }
 /customers:
   displayName: customers
-  type: { collection: { model: model.customer } }
+  type: { collection: { model: customers } }
   /customerId:
     displayName: customer
-    type: { member: { model: model.customer } }    
+    type: { member: { model: customers } }
 /Weird-resource_NAMEs:
   displayName: Weird-resource_NAMEs
-  type: { collection: { model: model.Weird-resource_NAME } }
+  type: { collection: { model: Weird-resource_NAMEs } }
   /Weird-resource_NAMEId:
     displayName: Weird-resource_NAME
-    type: { member: { model: model.Weird-resource_NAME } }  
+    type: { member: { model: Weird-resource_NAMEs } }

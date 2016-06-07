@@ -4,17 +4,14 @@ version: ${version}
 mediaType:  application/json
 
 uses:
-  model: !include odataModel.raml
-
-resourceTypes:
-  collection: !include resources/collection.raml
-  member: !include resources/member.raml
+  model: odata.raml
+  odata: libraries/odataLibrary.raml
 
 <#list resources as resource>
 /${resource.collectionName}:
   displayName: ${resource.collectionName}
-  type: { collection: { model: model.${resource.name} } }
+  type: { odata.collection: { model: model.${resource.name} } }
   /${resource.id}:
     displayName: ${resource.elementName}
-    type: { member: { model: model.${resource.name} } }
+    type: { odata.member: { model: model.${resource.name} } }
 </#list>
