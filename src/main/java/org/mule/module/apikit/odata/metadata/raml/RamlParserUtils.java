@@ -30,7 +30,7 @@ public class RamlParserUtils {
 	}
 
 	public static boolean equalsRaml(RamlImpl10V2Wrapper one, RamlImpl10V2Wrapper two) throws OdataMetadataFieldsException, OdataMetadataFormatException {
-		return (one.getApi().ramlVersion().equals(two.getApi().ramlVersion()) && one.getApi().baseUri().equals(two.getApi().baseUri()) && one.getSchemas().equals(two.getSchemas()));
+		return (one.getApi().ramlVersion().equals(two.getApi().ramlVersion()) && one.getSchemas().equals(two.getSchemas()));
 	}
 
 }

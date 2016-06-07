@@ -46,9 +46,9 @@ public class OdataMetadataManager {
 	private boolean update(RamlImpl10V2Wrapper apiWrapper, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataFormatException {
 		if (forceUpdate)
 			return true;
-		if (apiWrapper == null)
+		if (this.apiWrapper == null)
 			return true;
-		if (apiWrapper != null && !RamlParserUtils.equalsRaml(apiWrapper, new RamlImpl10V2Wrapper(apiWrapper.getApi()))) {
+		if (this.apiWrapper != null && !RamlParserUtils.equalsRaml(this.apiWrapper, new RamlImpl10V2Wrapper(apiWrapper.getApi()))) {
 			return true;
 		}
 		if (entitySet == null) {
@@ -62,7 +62,7 @@ public class OdataMetadataManager {
 			OdataMetadataFormatException {
 		synchronized (lock) {
 			if (update(apiWrapper, forceUpdate)) {
-				apiWrapper = new RamlImpl10V2Wrapper(apiWrapper.getApi());
+				this.apiWrapper = apiWrapper;
 				entitySet = apiWrapper.getSchemas();
 			}
 		}
