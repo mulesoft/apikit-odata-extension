@@ -4,12 +4,68 @@ version: 0.1
 mediaType:  application/json
 
 uses:
-  model: odata.raml
   odata: libraries/odataLibrary.raml
 
+types:
+  MyEntity:
+    (odata.remote): myEntity
+    properties:
+      MyField:
+        type: decimal
+        (odata.key): true
+        (odata.nullable): false
+        (odata.precision): 2
+        (odata.scale): 2
+
+resourceTypes:
+  collection:
+    is: [odata.orderby, odata.top, odata.skip, odata.filter, odata.expand, odata.format, odata.select, odata.inlinecount]
+    get:
+      description: List of <<model | !pluralize>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>[]
+    post:
+      description: Create a new <<model>>
+      body:
+        application/json:
+          type: <<model>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>
+  member:
+    is: [odata.filter, odata.expand, odata.format, odata.select]
+    get:
+      description: Read <<model>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>
+    delete:
+      description: Delete <<model>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>
+    put:
+      description: Update <<model>>
+      body:
+        application/json:
+          type: <<model>>
+      responses:
+        204:
+          body:
+            application/json:
+              type: <<model>>
 /MyEntities:
   displayName: MyEntities
-  type: { odata.collection: { model: model.MyEntity } }
+  type: { collection: { model: MyEntity } }
   /MyEntityId:
     displayName: MyEntity
-    type: { odata.member: { model: model.MyEntity } }
+    type: { member: { model: MyEntity } }

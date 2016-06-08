@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.mule.module.apikit.model.exception.EntityModelParsingException;
 
@@ -61,20 +62,20 @@ public class RamlGenerator {
 		return fmkCfg;
 	}
 
-	public String generate(String path) throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException,
+	public String generate(String pathToModel) throws JSONException, IOException, TemplateException, ProcessingException,
 			EntityModelParsingException {
-		URL url = Thread.currentThread().getContextClassLoader().getResource(path);
+		URL url = Thread.currentThread().getContextClassLoader().getResource(pathToModel);
 		File file = new File(url.getPath());
 		InputStream inputStream = new FileInputStream(file);
-		return generate(entityModelParser.getEntities(inputStream));
+		return generate(pathToModel, entityModelParser.getEntities(inputStream));
 	}
 
-	public String generate(InputStream inputStream) throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException,
+	public String generate(String pathToModel, InputStream inputStream) throws JSONException, IOException, TemplateException, ProcessingException,
 			EntityModelParsingException {
-		return generate(entityModelParser.getEntities(inputStream));
+		return generate(pathToModel, entityModelParser.getEntities(inputStream));
 	}
 
-	private String generate(List<Entity> entities) throws FileNotFoundException, IOException, TemplateException {
+	private String generate(String pathToModel, List<Entity> entities) throws IOException, TemplateException {
 
 		Map<String, Object> raml = new HashMap<String, Object>();
 
@@ -95,6 +96,10 @@ public class RamlGenerator {
 			resource.put("id", entity.getIdElementName());
 			resources.add(resource);
 		}
+		URL url = Thread.currentThread().getContextClassLoader().getResource(pathToModel);
+		String typesDefinitionContent = IOUtils.toString(new FileInputStream(new File(url.getPath())));
+		typesDefinitionContent = typesDefinitionContent.replace("#%RAML 1.0 Library", "");
+		raml.put("types", typesDefinitionContent);
 		raml.put("resources", resources);
 		Template template = cfg.getTemplate("api-raml-template.ftl");
 
