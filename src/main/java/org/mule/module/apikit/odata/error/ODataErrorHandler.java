@@ -17,6 +17,7 @@ import java.util.List;
 import org.mule.api.MuleEvent;
 import org.mule.module.apikit.odata.ODataFormatHandler;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
+import org.mule.util.ExceptionUtils;
 
 public class ODataErrorHandler {
 
@@ -29,10 +30,12 @@ public class ODataErrorHandler {
 	}
 
 	public static MuleEvent handle(MuleEvent event, Exception ex, List<Format> formats) {
-		Exception exceptionToBeThrown = ex;
-		if (ex instanceof MuleException) {
+		Exception exceptionToBeThrown;
+		Throwable cause = ExceptionUtils.getRootCause(ex);
+		exceptionToBeThrown = cause != null ? (Exception)cause : ex;
+		if (exceptionToBeThrown instanceof MuleException) {
 			// Exception thrown by APIkit
-			exceptionToBeThrown = processMuleException((MuleException) ex);
+			exceptionToBeThrown = processMuleException((MuleException) exceptionToBeThrown);
 		}
 		
 		if (isJsonFormat(formats, event)) {

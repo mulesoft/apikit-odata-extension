@@ -130,7 +130,36 @@ public class EntityModelParser {
 		}
 		
 		return entities;
-	}	
+	}
+
+	public static String getSchemaTypeFromEdmType(String edmType) {
+		String schemaType = "string";
+		switch (edmType) {
+			case "Edm.Boolean":
+				schemaType = "boolean";
+				break;
+			case "Edm.Decimal":
+			case "Edm.Double":
+			case "Edm.Single":
+				schemaType = "number";
+				break;
+			case "Edm.Int16":
+			case "Edm.Int32":
+			case "Edm.Int64":
+			case "Edm.SByte":
+				schemaType = "integer";
+				break;
+			case "Edm.Guid":
+			case "Edm.Binary":
+			case "Edm.DateTime":
+			case "Edm.String":
+			case "Edm.Time":
+			case "Edm.DateTimeOffset":
+				schemaType = "string";
+				break;
+		}
+		return schemaType;
+	}
 	
 	private String[] getFileLines(InputStream inputStream) throws IOException {
 		StringWriter writer = new StringWriter();

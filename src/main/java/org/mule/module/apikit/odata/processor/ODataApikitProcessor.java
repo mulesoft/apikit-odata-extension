@@ -13,8 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONObject;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.apikit.AbstractRouter;
 import org.mule.module.apikit.odata.ODataPayload;
@@ -131,7 +133,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 				payloadAsString = "";
 			}
 			boolean isXMLFormat = !formats.contains(Format.Json);
-			event.getMessage().setPayload(BodyToJsonConverter.convertPayload(isXMLFormat, payloadAsString));
+			event.getMessage().setPayload(BodyToJsonConverter.convertPayload(entity, isXMLFormat, payloadAsString));
 			// Setting again encoding and mimetype. For some reason encoding is set to null and mimetype to */* after setPayload
 			event.getMessage().getDataType().setEncoding(event.getEncoding());
 			event.getMessage().getDataType().setMimeType("application/json");
@@ -147,7 +149,8 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 
 	private List<Entry> verifyFlowResponse(MuleEvent response) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
 			OdataMetadataResourceNotFound, OdataMetadataFormatException, ODataInvalidFlowResponseException, ClientErrorException {
-		checkResponseHttpStatus(response.getMessage().getOutboundProperty("http.status"));
+		checkResponseHttpStatus(response.getMessage());
+
 		try {
 			OdataMetadataManager metadataManager = getMetadataManager();
 			EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
@@ -184,19 +187,21 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		}
 	}
 
-	protected static void checkResponseHttpStatus(Object status) throws ClientErrorException {
+	protected static void checkResponseHttpStatus(MuleMessage response) throws ClientErrorException {
+		String status = response.getOutboundProperty("http.status").toString();
 		int httpStatus = 0;
-		
+
 		try {
  			httpStatus = Integer.valueOf(status.toString());
 		} catch (Exception e) {
 			// do nothing...
-		}		
-		
+		}
+
 		if(httpStatus >= 400){
 			// If there was an error, it makes no sense to return a list of entry
 			// just raise an exception
-			throw new ClientErrorException("The flow ended with an error status (" + httpStatus + ")", httpStatus);
+			Object payload = response.getPayload();
+			throw new ClientErrorException(payload != null ? payload.toString() : "", httpStatus);
 		}
 	}
 

@@ -105,4 +105,49 @@ public class RamlGenerator {
 
 	}
 
+	/**
+	 * 
+	 * @param entity
+	 * @return {entityId} or key1_{key1}-key2_{key2}-...-keyN_{keyN}
+	 */
+	private String buildKeyForResource(Map<String, Object> entity) {
+		List<String> keys = (List<String>) entity.get("keys");
+		String ret = "";
+		String delim = "";
+		if (keys.size() > 1) {
+			for (int i = 0; i < keys.size(); i++) {
+				String key = keys.get(i);
+				ret += delim;
+				ret += key + "_{" + key + "}";
+				delim = "-";
+			}
+		} else {
+			ret = "{" + entity.get("name") + "Id}";
+		}
+		return ret;
+	}
+
+	private List<Map<String, String>> buildPropertiesForResource(Map<String, Object> entity) {
+		// parsed properties
+		List<Map<String, Object>> entityProperties = (List<Map<String, Object>>) entity.get("properties");
+		// properties list
+		List<Map<String, String>> properties = new ArrayList<Map<String, String>>();
+		for (Map<String, Object> entityProperty : entityProperties) {
+			// build schema property
+			Map<String, String> property = new HashMap<String, String>();
+			property.put("name", (String) entityProperty.get("name"));
+			property.put("type", EntityModelParser.getSchemaTypeFromEdmType((String) entityProperty.get("type")));
+			property.put("isKey", String.valueOf(isKey(entity, property.get("name"))));
+			String nullable = property.get("nullable");
+			property.put("isNullable", nullable == null ? "false" : nullable);
+			// add to list
+			properties.add(property);
+		}
+		// return properties list
+		return properties;
+	}
+
+	private boolean isKey(Map<String, Object> entity, String field) {
+		return ((List<String>) entity.get("keys")).contains(field);
+	}
 }
