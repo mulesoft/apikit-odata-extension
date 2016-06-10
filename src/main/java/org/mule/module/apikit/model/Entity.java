@@ -71,4 +71,16 @@ public class Entity {
 		if (value==null || value.isEmpty()) return false;
 		return true;
 	}
+
+	public List<String> getKeys() {
+		List<String> keys = new ArrayList<>();
+
+		for(Property property: this.properties){
+			if(Boolean.valueOf(property.getKey())){
+				keys.add(property.getName());
+			}
+		}
+
+		return keys;
+	}
 }

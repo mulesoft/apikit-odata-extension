@@ -99,9 +99,13 @@ public class RamlParserTestCase {
 
 	@Test
 	public void schemasMultipleKey() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
-		thrown.expect(OdataMetadataFormatException.class);
-		thrown.expectMessage("Duplicated key '(odata.remote)'");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/schemas-multiple-keys.raml");
+		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/schemas-multiple-keys.raml");
+		EntityDefinition entityDefinition = entitySet.toList().get(0);
+		for (int i = 0; i < mockEntitySet.toList().get(0).getProperties().size(); i++) {
+			EntityDefinitionProperty expectedProperty = mockEntitySet.toList().get(0).getProperties().get(i);
+			Assert.assertEquals(expectedProperty, entityDefinition.getProperties().get(i));
+		}
+		Assert.assertEquals(mockEntitySet.toList().get(0), entityDefinition);
 	}
 
 	@Test

@@ -34,16 +34,15 @@ public class EntityModelParserTestCase {
 		File file = new File(url.getPath());
 		InputStream inputStream = new FileInputStream(file);
 
-		List<Entity> entities = new EntityModelParser().getEntities(inputStream);
-		Assert.assertEquals("Employee", entities.get(0).getName());
-		Assert.assertEquals("Employee", entities.get(0).getElementName());
-		Assert.assertEquals("Employees", entities.get(0).getCollectionName());
-		Assert.assertEquals("EmployeeId", entities.get(0).getIdElementName());
-		Assert.assertEquals("Customer", entities.get(1).getName());
-		Assert.assertEquals("Customer", entities.get(1).getElementName());
-		Assert.assertEquals("Customers", entities.get(1).getCollectionName());
-		Assert.assertEquals("CustomerId", entities.get(1).getIdElementName());
-
+		List<Entity> entities = new EntityModelParser().getEntities(url.getPath());
+		Assert.assertEquals("Customer", entities.get(0).getName());
+		Assert.assertEquals("Customer", entities.get(0).getElementName());
+		Assert.assertEquals("Customers", entities.get(0).getCollectionName());
+		Assert.assertEquals("CustomerId", entities.get(0).getIdElementName());
+		Assert.assertEquals("Employee", entities.get(1).getName());
+		Assert.assertEquals("Employee", entities.get(1).getElementName());
+		Assert.assertEquals("Employees", entities.get(1).getCollectionName());
+		Assert.assertEquals("EmployeeId", entities.get(1).getIdElementName());
 	}
 
 }

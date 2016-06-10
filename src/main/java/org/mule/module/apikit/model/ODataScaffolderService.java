@@ -114,7 +114,7 @@ public class ODataScaffolderService implements ScaffolderService {
 		File raml = null;
 
 		try {
-			String ramlContents = ramlGenerator.generate(null, new FileInputStream(model));
+			String ramlContents = ramlGenerator.generate(model.getPath());
 			String path = model.getCanonicalPath().replace("odata.raml", "api.raml");
 			raml = FileUtils.stringToFile(path, ramlContents);
 		} catch (Exception e) {

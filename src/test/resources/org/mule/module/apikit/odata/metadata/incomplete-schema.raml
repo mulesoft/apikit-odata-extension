@@ -4,69 +4,8 @@ version: 0.1
 mediaType:  application/json
 uses:
    odata: odataLibrary.raml
+   model: model-incomplete-schema.raml
 
-types:
-  gateways:
-    (odata.remote): gateways
-    properties:
-        draft:
-          type: boolean
-          (odata.key): false
-          required: true
-        ch_full_domain:
-          (odata.nullable): false
-          type: string
-          (odata.key): false
-          required: true
-        name:
-          (odata.nullable): false
-          type: string
-          (odata.key): false
-          required: true
-        description:
-          (odata.nullable): false
-          type: string
-          (odata.key): false
-          required: true
-        ch_domain:
-          (odata.nullable): false
-          type: string
-          (odata.key): false
-          required: true
-        id:
-          (odata.nullable): false
-          type: integer
-          (odata.key): true
-          required: true
-        published:
-          (odata.nullable): false
-          type: boolean
-          (odata.key): false
-          required: true
-        status:
-          (odata.nullable): false
-          type: string
-          (odata.key): false
-          required: true
-  users:
-    (odata.remote): users
-    properties:
-      last_name:
-        (odata.nullable): false
-        type: string
-        (odata.key): false
-      id:
-        (odata.nullable): false
-        type: integer
-        (odata.key): true
-      first_name:
-        (odata.nullable): false
-        type: string
-        (odata.key): false
-      email:
-        (odata.nullable): false
-        type: string
-        (odata.key): false
 resourceTypes:
   collection:
     is: [odata.orderby, odata.top, odata.skip, odata.filter, odata.expand, odata.format, odata.select, odata.inlinecount]
@@ -112,12 +51,12 @@ resourceTypes:
               type: <<model>>
 /gateways:
     displayName: gateways
-    type: { collection: { model: gateways } }
+    type: { collection: { model: model.gateways } }
     /gatewaysId:
         displayName: gateways Id
-        type: { member: { model: gateways } }
+        type: { member: { model: model.gateways } }
 /users:
     displayName: users
-    type: { collection: { model: users } }
+    type: { collection: { model: model.users } }
     /usersId:
-        type: { member: { model: users } }
+        type: { member: { model: model.users } }

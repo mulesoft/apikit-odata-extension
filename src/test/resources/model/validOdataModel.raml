@@ -1,13 +1,13 @@
 #%RAML 1.0 Library
 uses:
-  odata: libraries/odata.raml
+  odata: libraries/odataLibrary.raml
 
 types:
   Employee:
     (odata.remote): myEntity
     properties:
       id:
-        type: decimal
+        type: number
         (odata.key): true
         (odata.nullable): false
       name:
@@ -22,7 +22,7 @@ types:
     (odata.remote): myEntity
     properties:
       id:
-        type: decimal
+        type: number
         (odata.key): true
         (odata.nullable): false
       name:

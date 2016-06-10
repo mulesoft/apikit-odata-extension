@@ -57,38 +57,20 @@ public class RamlGeneratorTestsCase {
 
 	@Test
 	public void invalidModel1Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		thrown.expectMessage("there are entities with empty names, please fix the model");
+		thrown.expectMessage("Property \"remote name\" is missing in field \"MyField\" in entity \"MyEntity\"");
 		new RamlGenerator().generate("model/invalidOdataModel1.raml");
 	}
 
 	@Test
 	public void invalidModel2Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		thrown.expectMessage("the entity named 'MyEntity' is missing the remote field definition");
+		thrown.expectMessage("Property \"nullable\" is missing in field \"MyField\" in entity \"MyEntity\"");
 		new RamlGenerator().generate("model/invalidOdataModel2.raml");
 	}
 
 	@Test
 	public void invalidModel3Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		thrown.expectMessage("the field 'MyField' is missing the 'nullable' required property");
+		thrown.expectMessage("No schemas found.");
 		new RamlGenerator().generate("model/invalidOdataModel3.raml");
-	}
-
-	@Test
-	public void invalidModel4Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		thrown.expectMessage("a field name is missing");
-		new RamlGenerator().generate("model/invalidOdataModel4.raml");
-	}
-
-	@Test
-	public void invalidModel5Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		thrown.expectMessage("no types definition where found, please check the model");
-		new RamlGenerator().generate("model/invalidOdataModel5.raml");
-	}
-
-	@Test
-	public void invalidModel6Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		thrown.expectMessage("the entity named 'MyEntity' has no properties defined");
-		new RamlGenerator().generate("model/invalidOdataModel6.raml");
 	}
 
 	public static String readFromFile(String filePath) throws FileNotFoundException, IOException {

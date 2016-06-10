@@ -48,7 +48,7 @@ public class OdataMetadataManager {
 			return true;
 		if (this.apiWrapper == null)
 			return true;
-		if (this.apiWrapper != null && !RamlParserUtils.equalsRaml(this.apiWrapper, new RamlImpl10V2Wrapper(apiWrapper.getApi()))) {
+		if (this.apiWrapper != null && !RamlParserUtils.equalsRaml(this.apiWrapper, apiWrapper)) {
 			return true;
 		}
 		if (entitySet == null) {

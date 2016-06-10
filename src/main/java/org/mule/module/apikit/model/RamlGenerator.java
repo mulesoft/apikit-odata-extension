@@ -64,15 +64,7 @@ public class RamlGenerator {
 
 	public String generate(String pathToModel) throws JSONException, IOException, TemplateException, ProcessingException,
 			EntityModelParsingException {
-		URL url = Thread.currentThread().getContextClassLoader().getResource(pathToModel);
-		File file = new File(url.getPath());
-		InputStream inputStream = new FileInputStream(file);
-		return generate(pathToModel, entityModelParser.getEntities(inputStream));
-	}
-
-	public String generate(String pathToModel, InputStream inputStream) throws JSONException, IOException, TemplateException, ProcessingException,
-			EntityModelParsingException {
-		return generate(pathToModel, entityModelParser.getEntities(inputStream));
+		return generate(pathToModel, entityModelParser.getEntities(pathToModel));
 	}
 
 	private String generate(String pathToModel, List<Entity> entities) throws IOException, TemplateException {
@@ -93,13 +85,9 @@ public class RamlGenerator {
 			resource.put("name", entity.getName());
 			resource.put("elementName", entity.getElementName());
 			resource.put("collectionName", entity.getCollectionName());
-			resource.put("id", entity.getIdElementName());
+			resource.put("id", buildKeyForResource(entity));
 			resources.add(resource);
 		}
-		URL url = Thread.currentThread().getContextClassLoader().getResource(pathToModel);
-		String typesDefinitionContent = IOUtils.toString(new FileInputStream(new File(url.getPath())));
-		typesDefinitionContent = typesDefinitionContent.replace("#%RAML 1.0 Library", "");
-		raml.put("types", typesDefinitionContent);
 		raml.put("resources", resources);
 		Template template = cfg.getTemplate("api-raml-template.ftl");
 
@@ -115,8 +103,8 @@ public class RamlGenerator {
 	 * @param entity
 	 * @return {entityId} or key1_{key1}-key2_{key2}-...-keyN_{keyN}
 	 */
-	private String buildKeyForResource(Map<String, Object> entity) {
-		List<String> keys = (List<String>) entity.get("keys");
+	private String buildKeyForResource(Entity entity) {
+		List<String> keys = entity.getKeys();
 		String ret = "";
 		String delim = "";
 		if (keys.size() > 1) {
@@ -127,32 +115,9 @@ public class RamlGenerator {
 				delim = "-";
 			}
 		} else {
-			ret = "{" + entity.get("name") + "Id}";
+			ret = "{" + keys.get(0) + "}";
 		}
 		return ret;
 	}
 
-	private List<Map<String, String>> buildPropertiesForResource(Map<String, Object> entity) {
-		// parsed properties
-		List<Map<String, Object>> entityProperties = (List<Map<String, Object>>) entity.get("properties");
-		// properties list
-		List<Map<String, String>> properties = new ArrayList<Map<String, String>>();
-		for (Map<String, Object> entityProperty : entityProperties) {
-			// build schema property
-			Map<String, String> property = new HashMap<String, String>();
-			property.put("name", (String) entityProperty.get("name"));
-			property.put("type", EntityModelParser.getSchemaTypeFromEdmType((String) entityProperty.get("type")));
-			property.put("isKey", String.valueOf(isKey(entity, property.get("name"))));
-			String nullable = property.get("nullable");
-			property.put("isNullable", nullable == null ? "false" : nullable);
-			// add to list
-			properties.add(property);
-		}
-		// return properties list
-		return properties;
-	}
-
-	private boolean isKey(Map<String, Object> entity, String field) {
-		return ((List<String>) entity.get("keys")).contains(field);
-	}
 }

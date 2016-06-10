@@ -1,0 +1,25 @@
+#%RAML 1.0 Library
+uses:
+   odata: odataLibrary.raml
+types:
+  gateways:
+    (odata.remote): gateways
+  users:
+    (odata.remote): users
+    properties:
+      last_name:
+        (odata.nullable): false
+        type: string
+        (odata.key): false
+      id:
+        (odata.nullable): false
+        type: integer
+        (odata.key): true
+      first_name:
+        (odata.nullable): false
+        type: string
+        (odata.key): false
+      email:
+        (odata.nullable): false
+        type: string
+        (odata.key): false

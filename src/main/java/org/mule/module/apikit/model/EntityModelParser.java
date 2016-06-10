@@ -18,6 +18,12 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 import org.mule.module.apikit.model.exception.EntityModelParsingException;
 import org.mule.module.apikit.model.exception.InvalidModelException;
+import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
+import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
+import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
+import org.mule.module.apikit.odata.metadata.raml.RamlParserUtils;
+import org.raml.v2.api.RamlModelResult;
+import org.raml.v2.api.model.v10.api.Library;
 
 public class EntityModelParser {
 
@@ -29,106 +35,50 @@ public class EntityModelParser {
 	static final Pattern typePropertyPattern = Pattern.compile("^\\s{8}type:\\s*(\\w+)\\s*$");
 	static final Pattern keyPropertyPattern = Pattern.compile("^\\s{8}\\(odata.key\\):\\s*(\\w+)\\s*$");
 	static final Pattern nullablePropertyPattern = Pattern.compile("^\\s{8}\\(odata.nullable\\):\\s*(\\w+)\\s*$");
-	 
+
 	/**
 	 * Parses the entities out of the RAML file and looks for required fields
-	 * @param inputStream
+	 * @param pathToModel
 	 * @return
 	 * @throws IOException
 	 * @throws EntityModelParsingException
 	 */
-	public List<Entity> getEntities(InputStream inputStream) throws IOException, EntityModelParsingException {
+	public List<Entity> getEntities(String pathToModel) throws IOException, EntityModelParsingException {
 
-		try { 
-  		String[] lines = getFileLines(inputStream);
-  		return getEntities(lines);
+		try {
+			RamlImpl10V2Wrapper model = RamlParserUtils.getRaml(pathToModel);
+
+			return getEntities(model.getSchemas());
 		} catch (Exception e) {
 			throw new EntityModelParsingException(e.getMessage());
 		}
 	}
 
-	private List<Entity> getEntities(String[] lines) throws InvalidModelException {
+	private List<Entity> getEntities(EntityDefinitionSet entityDefinitionSet) throws InvalidModelException {
 		List<Entity> entities = new ArrayList<Entity>();
 		boolean typesFound = false;
 
-		Entity entity = new Entity(null);
-		Property property = new Property(null);
-		for (String line : lines) {
-			
-			// Looks for the "types:" keyword
-			if (line.matches(typesPattern)) {
-				typesFound = true;
+		Entity entity;
+		Property property;
+		for (EntityDefinition entityDefinition : entityDefinitionSet.toList()) {
+			typesFound = true;
+			entity = new Entity(entityDefinition.getName());
+			entity.setRemote(entityDefinition.getRemoteEntity());
+			entity.setPropertiesFound(true);
+			for(EntityDefinitionProperty entityDefinitionProperty : entityDefinition.getProperties()){
+				property = new Property(entityDefinitionProperty.getName());
+				property.setKey(String.valueOf(entityDefinitionProperty.isKey()));
+				property.setNullable(String.valueOf(entityDefinitionProperty.isNullable()));
+				property.setType(entityDefinitionProperty.getType());
+				entity.addProperty(property);
 			}
-			
-			// If "types" was found, looks for other possible matches to build the entities
-			if (typesFound) {
-				
-				// Matches element name
-				Matcher matcher = elementPattern.matcher(line);
-				if (matcher.find()) {
-					if (entity.getName() == null) {
-						entity = new Entity(matcher.group(1));
-					} else {
-						if (entity.isValid()) {
-							entities.add(entity);
-							entity = new Entity(matcher.group(1));
-						}
-					}
-				}
-
-				matcher = remotePattern.matcher(line);
-				if (matcher.find()) {
-					entity.setRemote(matcher.group(1));
-				}
-				
-				// Matches the properties keyword
-				if (line.matches(propertiesPattern)) {
-					entity.setPropertiesFound(true);
-				}
-				matcher = fieldPattern.matcher(line);
-				if (matcher.find()) {
-					if (property.getName() == null) {
-						property = new Property(matcher.group(1));
-					} else {
-						if (property.isValid()) {
-							entity.addProperty(property);
-							property = new Property(matcher.group(1));
-						}
-					}
-				}
-				
-				// Matches the required property attributes
-				matcher = typePropertyPattern.matcher(line);
-				if (matcher.find()) {
-					property.setType(matcher.group(1));
-				}
-				
-				matcher = keyPropertyPattern.matcher(line);
-				if (matcher.find()) {
-					property.setKey(matcher.group(1));
-				}
-				
-				matcher = nullablePropertyPattern.matcher(line);
-				if (matcher.find()) {
-					property.setNullable(matcher.group(1));
-				}
-			}	
+			entities.add(entity);
 		}
-		
+
 		if (!typesFound) {
 			throw new InvalidModelException("no types definition where found, please check the model");
 		}
-		
-		
-		// if there is any entity left...
-		if (property.isValid()) {
-			entity.addProperty(property);
-		}
-		
-		if (entity.isValid()) {
-			entities.add(entity);
-		}
-		
+
 		return entities;
 	}
 
@@ -160,7 +110,7 @@ public class EntityModelParser {
 		}
 		return schemaType;
 	}
-	
+
 	private String[] getFileLines(InputStream inputStream) throws IOException {
 		StringWriter writer = new StringWriter();
 		IOUtils.copy(inputStream, writer, Charset.defaultCharset());
@@ -168,5 +118,5 @@ public class EntityModelParser {
 		String[] lines = text.split("\\n");
 		return lines;
 	}
-	
+
 }

@@ -2,7 +2,10 @@
 title: ${title}
 version: ${version}
 mediaType:  application/json
-${types}
+
+uses:
+  odata: libraries/odataLibrary.raml
+  model: odataModel.raml
 
 resourceTypes:
   collection:

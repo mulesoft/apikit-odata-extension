@@ -1,14 +1,9 @@
 #%RAML 1.0 Library
 uses:
-  odata: libraries/odata.raml
+  odata: libraries/odataLibrary.raml
 
 types:
   MyEntity:
-    (odata.remote): myEntity 
+    (odata.remote): myEntity
     properties:
-      MyField:
-        type: decimal
-        (odata.key): true
-        (odata.precision): 2
-        (odata.scale): 2
         

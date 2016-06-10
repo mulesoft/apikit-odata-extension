@@ -5,17 +5,7 @@ mediaType:  application/json
 
 uses:
   odata: libraries/odataLibrary.raml
-
-types:
-  MyEntity:
-    (odata.remote): myEntity
-    properties:
-      MyField:
-        type: decimal
-        (odata.key): true
-        (odata.nullable): false
-        (odata.precision): 2
-        (odata.scale): 2
+  model: odataModel.raml
 
 resourceTypes:
   collection:
@@ -66,6 +56,6 @@ resourceTypes:
 /MyEntities:
   displayName: MyEntities
   type: { collection: { model: MyEntity } }
-  /MyEntityId:
+  /{MyField}:
     displayName: MyEntity
     type: { member: { model: MyEntity } }

@@ -14,6 +14,7 @@ import org.raml.v2.api.RamlModelBuilder;
 import org.raml.v2.api.RamlModelResult;
 import org.raml.v2.api.loader.DefaultResourceLoader;
 import org.raml.v2.api.loader.ResourceLoader;
+import org.raml.v2.api.model.v10.api.Library;
 
 public class RamlParserUtils {
 	public static RamlImpl10V2Wrapper getRaml(AbstractConfiguration config) throws OdataMetadataFormatException {
@@ -21,16 +22,25 @@ public class RamlParserUtils {
 	}
 
 	public static RamlImpl10V2Wrapper getRaml(String ramlPath) throws OdataMetadataFormatException {
+		RamlModelResult ramlModelResult = getRamlModelResult(ramlPath);
+		return new RamlImpl10V2Wrapper(ramlModelResult);
+	}
+
+	private static RamlModelResult getRamlModelResult(String ramlPath) throws OdataMetadataFormatException {
 		ResourceLoader resourceLoader = new DefaultResourceLoader();
 		RamlModelResult ramlModelResult = new RamlModelBuilder(resourceLoader).buildApi(ramlPath);
 		if(ramlModelResult.hasErrors()){
 			throw new OdataMetadataFormatException(ramlModelResult.getValidationResults().get(0).getMessage());
 		}
-		return new RamlImpl10V2Wrapper(ramlModelResult.getApiV10());
+		return ramlModelResult;
 	}
 
 	public static boolean equalsRaml(RamlImpl10V2Wrapper one, RamlImpl10V2Wrapper two) throws OdataMetadataFieldsException, OdataMetadataFormatException {
 		return (one.getApi().ramlVersion().equals(two.getApi().ramlVersion()) && one.getSchemas().equals(two.getSchemas()));
 	}
 
+	public static Library getLibrary(String pathToModel) throws OdataMetadataFormatException {
+		RamlModelResult ramlModelResult = getRamlModelResult(pathToModel);
+		return ramlModelResult.getLibrary();
+	}
 }
