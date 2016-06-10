@@ -45,4 +45,16 @@ public class EntityModelParserTestCase {
 		Assert.assertEquals("EmployeeId", entities.get(1).getIdElementName());
 	}
 
+	@Test
+	public void testPositive3() throws IOException, EntityModelParsingException {
+		URL url = Thread.currentThread().getContextClassLoader().getResource("model/validOdataModel3.raml");
+		File file = new File(url.getPath());
+		InputStream inputStream = new FileInputStream(file);
+
+		List<Entity> entities = new EntityModelParser().getEntities(url.getPath());
+		Assert.assertEquals("orders", entities.get(1).getName());
+		Assert.assertEquals("orders", entities.get(1).getElementName());
+		Assert.assertEquals("ordersId", entities.get(1).getIdElementName());
+	}
+
 }
