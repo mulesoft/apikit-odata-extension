@@ -7,23 +7,16 @@
 package org.mule.module.apikit.model;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.mule.module.apikit.model.exception.EntityModelParsingException;
 import org.mule.module.apikit.model.exception.InvalidModelException;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 import org.mule.module.apikit.odata.metadata.raml.RamlParserUtils;
-import org.raml.v2.api.RamlModelResult;
-import org.raml.v2.api.model.v10.api.Library;
 
 public class EntityModelParser {
 
@@ -43,7 +36,7 @@ public class EntityModelParser {
 	 * @throws IOException
 	 * @throws EntityModelParsingException
 	 */
-	public List<Entity> getEntities(String pathToModel) throws IOException, EntityModelParsingException {
+	public static List<Entity> getEntities(String pathToModel) throws IOException, EntityModelParsingException {
 
 		try {
 			RamlImpl10V2Wrapper model = RamlParserUtils.getRaml(pathToModel);
@@ -54,7 +47,7 @@ public class EntityModelParser {
 		}
 	}
 
-	private List<Entity> getEntities(EntityDefinitionSet entityDefinitionSet) throws InvalidModelException {
+	private static List<Entity> getEntities(EntityDefinitionSet entityDefinitionSet) throws InvalidModelException {
 		List<Entity> entities = new ArrayList<Entity>();
 		boolean typesFound = false;
 
@@ -109,14 +102,6 @@ public class EntityModelParser {
 				break;
 		}
 		return schemaType;
-	}
-
-	private String[] getFileLines(InputStream inputStream) throws IOException {
-		StringWriter writer = new StringWriter();
-		IOUtils.copy(inputStream, writer, Charset.defaultCharset());
-		String text = writer.toString();
-		String[] lines = text.split("\\n");
-		return lines;
 	}
 
 }

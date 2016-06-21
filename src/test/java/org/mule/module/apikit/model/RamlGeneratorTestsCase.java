@@ -37,22 +37,22 @@ public class RamlGeneratorTestsCase {
 
 	@Test
 	public void testSingleKey() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		Assert.assertEquals(readFromFile("model/custom.raml"), new RamlGenerator().generate(("model/validOdataModel2.raml")));
+		Assert.assertEquals(readFromFile("model/custom.raml"), new RamlGenerator().generate("model/validOdataModel2.raml"));
 	}
 
 	@Test
 	public void testSingleKeyWithNullableFields() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		Assert.assertEquals(readFromFile("model/custom-with-nullable-fields.raml"), new RamlGenerator().generate(("model/valid-with-nullable-fields.raml")));
+		Assert.assertEquals(readFromFile("model/custom-with-nullable-fields.raml"), new RamlGenerator().generate("model/valid-with-nullable-fields.raml"));
 	}
 
 	@Test
 	public void testSingleKeyWithNonNullableFields() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		Assert.assertEquals(readFromFile("model/custom-with-non-nullable-fields.raml"), new RamlGenerator().generate(("model/valid-with-non-nullable-fields.raml")));
+		Assert.assertEquals(readFromFile("model/custom-with-non-nullable-fields.raml"), new RamlGenerator().generate("model/valid-with-non-nullable-fields.raml"));
 	}
 
 	@Test
 	public void testDoubleKey() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		Assert.assertEquals(readFromFile("model/custom-double-key.raml"), new RamlGenerator().generate(("model/valid-doublekey-OdataModel.raml")));
+		Assert.assertEquals(readFromFile("model/custom-double-key.raml"), new RamlGenerator().generate("model/valid-doublekey-OdataModel.raml"));
 	}
 
 	@Test

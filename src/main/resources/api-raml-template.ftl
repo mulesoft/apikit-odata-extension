@@ -5,7 +5,6 @@ mediaType:  application/json
 
 uses:
   odata: libraries/odataLibrary.raml
-  model: odataModel.raml
 
 resourceTypes:
   collection:
@@ -53,6 +52,7 @@ resourceTypes:
           body:
             application/json:
               type: <<model>>
+              
 <#list resources as resource>
 /${resource.collectionName}:
   displayName: ${resource.collectionName}

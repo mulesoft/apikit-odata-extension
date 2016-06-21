@@ -7,7 +7,6 @@
 package org.mule.module.apikit.model;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,8 +22,11 @@ public class ODataScaffolderService implements ScaffolderService {
   private final static List<String> appExtensions = Arrays.asList(".xml");
 
   private static final String LIBRARIES_FOLDER = "/libraries";
-  
   private static final String LIBRARIES_ODATA_RAML = "/libraries/odataLibrary.raml";
+  
+  private final static String API_FOLDER = "api";
+  private final static String ODATA_MODEL_FILE = "odata.raml";
+  private final static String FINAL_RAML_FILE = "api.raml";
   
 	public void executeScaffolder(List<File> ramlFiles, File appDir, File domainDir, String muleVersion) {
 		List<String> ramlsWithExtensionEnabledPaths = processDataModelFiles(ramlFiles);
@@ -73,7 +75,7 @@ public class ODataScaffolderService implements ScaffolderService {
 	private boolean isODataModel(File file) {
 		try {
 			String path = file.getCanonicalPath();
-			return path.contains("api" + File.separator + "odata.raml");
+			return path.contains(API_FOLDER + File.separator + ODATA_MODEL_FILE);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -103,22 +105,21 @@ public class ODataScaffolderService implements ScaffolderService {
 	private List<String> generateRamlFilesFromODataModel(File model) {
 		
 		List<String> ramlFiles = new ArrayList<String>();
-		ramlFiles.add(generateApiRamlFromODataModel(model).getAbsolutePath());
+		ramlFiles.add(generateApiRaml(model).getAbsolutePath());
 		ramlFiles.addAll(copyRamlTemplateFiles(model));
 		
 		return ramlFiles;
 	}
 
-	private File generateApiRamlFromODataModel(File model) {
+	private File generateApiRaml(File model) {
 		RamlGenerator ramlGenerator = new RamlGenerator();
 		File raml = null;
 
 		try {
-			String ramlContents = ramlGenerator.generate(model.getPath());
-			String path = model.getCanonicalPath().replace("odata.raml", "api.raml");
+			String ramlContents = ramlGenerator.generate(model.getAbsolutePath());
+			String path = model.getCanonicalPath().replace(ODATA_MODEL_FILE, FINAL_RAML_FILE);
 			raml = FileUtils.stringToFile(path, ramlContents);
 		} catch (Exception e) {
-			e.printStackTrace();
 			SystemStreamLog log = new SystemStreamLog();
 			log.error("Error: " + e.getMessage());
 			throw new RuntimeException("Error: " + e.getMessage());
@@ -135,7 +136,6 @@ public class ODataScaffolderService implements ScaffolderService {
 			ramlFiles.add(FileUtils.exportResource(LIBRARIES_ODATA_RAML, model.getParentFile().getAbsolutePath() + LIBRARIES_ODATA_RAML));
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			SystemStreamLog log = new SystemStreamLog();
 			log.error("Error: " + e.getMessage());
 			throw new RuntimeException("Error: " + e.getMessage());
