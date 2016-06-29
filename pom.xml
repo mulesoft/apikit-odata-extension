@@ -19,12 +19,11 @@
 
 	<!-- Properties -->
 	<properties>
-		<mule.version>3.8.0-SNAPSHOT</mule.version>
+		<mule.version>3.8.0</mule.version>
 		<apikit.version>3.8.1-SNAPSHOT</apikit.version>
 		<apikit.spi.version>3.8.0-SNAPSHOT</apikit.spi.version>
 		<licensePath>LICENSE_HEADER.txt</licensePath>
 	</properties>
-
 
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>

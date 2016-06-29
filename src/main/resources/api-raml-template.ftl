@@ -5,6 +5,7 @@ mediaType:  application/json
 
 uses:
   odata: libraries/odataLibrary.raml
+  model: odata.raml
 
 resourceTypes:
   collection:
