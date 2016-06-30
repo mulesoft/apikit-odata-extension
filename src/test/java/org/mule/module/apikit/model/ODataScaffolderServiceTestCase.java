@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,9 +32,11 @@ public class ODataScaffolderServiceTestCase {
 	@Before
 	public void setUp() throws Exception {
 		scaffolder = new ODataScaffolderService();
+		File api = getResource("valid/app/api.xml");
+		api.delete();
 	}
 
-	private File getFile(String path) {
+	private File getResource(String path) {
 		try {
 			System.out.println((new File("src/test/resources")).getCanonicalPath());
 		} catch (IOException e) {
@@ -43,35 +46,50 @@ public class ODataScaffolderServiceTestCase {
 		File file = new File((RESOURCES_PATH + path).replace("/", File.separator));
 		return file;
 	}
-
+	
 	@Test
 	public void scaffoldPositive() {
 
+		File api = getResource("valid/app/api.xml");
+		
+		Assert.assertFalse(api.exists());
+		
 		List<File> ramlFiles = new ArrayList<File>();
 
-		File model = getFile("valid/api/odata.raml");
-		File appDir = getFile("valid/app");
-		File domainDir = getFile("valid/domain");
+		File model = getResource("valid/api/odata.raml");
+		File appDir = getResource("valid/app");
+		File domainDir = getResource("valid/domain");
 
 		ramlFiles.add(model);
 
 		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "3.8.0");
+		
+		api = getResource("valid/app/api.xml");
+		
+		Assert.assertTrue(api.exists());
 	}
 
 	@Test
 	public void scaffoldNegative() {
 
+		File api = getResource("valid/app/api.xml");
+		
+		Assert.assertFalse(api.exists());
+		
 		List<File> ramlFiles = new ArrayList<File>();
 
-		File modelJson = getFile("invalid/api/odata.raml");
-		File appDir = getFile("invalid/app");
-		File domainDir = getFile("invalid/domain");
+		File modelJson = getResource("invalid/api/odata.raml");
+		File appDir = getResource("invalid/app");
+		File domainDir = getResource("invalid/domain");
 
 		ramlFiles.add(modelJson);
 
 		thrown.expect(RuntimeException.class);
 		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "3.8.0");
 
+		api = getResource("valid/app/api.xml");
+		
+		Assert.assertFalse(api.exists());
 	}
 
 }

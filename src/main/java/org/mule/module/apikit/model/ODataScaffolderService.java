@@ -30,8 +30,9 @@ public class ODataScaffolderService implements ScaffolderService {
   
 	public void executeScaffolder(List<File> ramlFiles, File appDir, File domainDir, String muleVersion) {
 		List<String> ramlsWithExtensionEnabledPaths = processDataModelFiles(ramlFiles);
-		List<String> ramlFilePaths = retrieveFilePaths(ramlFiles, apiExtensions);
-		ramlFilePaths.addAll(ramlsWithExtensionEnabledPaths);
+		//List<String> ramlFilePaths = retrieveFilePaths(ramlFiles, apiExtensions);
+		//ramlFilePaths.addAll(ramlsWithExtensionEnabledPaths);
+		List<String> ramlFilePaths = ramlsWithExtensionEnabledPaths;
 		List<String> muleXmlFiles = retrieveFilePaths(appDir, appExtensions);
 		SystemStreamLog log = new SystemStreamLog();
 		String domain = null;
@@ -95,22 +96,20 @@ public class ODataScaffolderService implements ScaffolderService {
 		if (files != null) {
 			for (File file : files) {
 				if (isODataModel(file)) {
-					ramlFilePaths.addAll(generateRamlFilesFromODataModel(file));
+					ramlFilePaths.add(generateApiRaml(file).getAbsolutePath());
+					copyRamlTemplateFiles(file);
 				}
 			}
+			
 		}
 		return ramlFilePaths;
 	}
 
-	private List<String> generateRamlFilesFromODataModel(File model) {
-		
-		List<String> ramlFiles = new ArrayList<String>();
-		ramlFiles.add(generateApiRaml(model).getAbsolutePath());
-		ramlFiles.addAll(copyRamlTemplateFiles(model));
-		
-		return ramlFiles;
-	}
-
+	/**
+	 * Generates the api.raml root file from the odata model
+	 * @param model
+	 * @return
+	 */
 	private File generateApiRaml(File model) {
 		RamlGenerator ramlGenerator = new RamlGenerator();
 		File raml = null;
@@ -128,6 +127,11 @@ public class ODataScaffolderService implements ScaffolderService {
 		return raml;
 	}
 
+	/**
+	 *  Copies the api.raml dependencies to the project
+	 * @param model
+	 * @return
+	 */
 	private List<String> copyRamlTemplateFiles(File model) {
 		List<String> ramlFiles = new ArrayList<String>();
 

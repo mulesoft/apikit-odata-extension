@@ -57,8 +57,8 @@ resourceTypes:
 <#list resources as resource>
 /${resource.collectionName}:
   displayName: ${resource.collectionName}
-  type: { collection: { model: ${resource.name} } }
+  type: { collection: { model: model.${resource.name} } }
   /${resource.id}:
     displayName: ${resource.elementName}
-    type: { member: { model: ${resource.name} } }
+    type: { member: { model: model.${resource.name} } }
 </#list>
