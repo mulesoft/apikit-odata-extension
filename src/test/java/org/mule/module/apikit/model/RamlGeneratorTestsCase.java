@@ -37,40 +37,40 @@ public class RamlGeneratorTestsCase {
 
 	@Test
 	public void testSingleKey() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		Assert.assertEquals(readFromFile("model/custom.raml"), new RamlGenerator().generate(("model/validOdataModel2.raml")));
+		Assert.assertEquals(readFromFile("model/custom.raml"), new RamlGenerator().generate("model/validOdata2.raml"));
 	}
 
 	@Test
 	public void testSingleKeyWithNullableFields() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		Assert.assertEquals(readFromFile("model/custom-with-nullable-fields.raml"), new RamlGenerator().generate(("model/valid-with-nullable-fields.raml")));
+		Assert.assertEquals(readFromFile("model/custom-with-nullable-fields.raml"), new RamlGenerator().generate("model/valid-with-nullable-fields.raml"));
 	}
 
 	@Test
 	public void testSingleKeyWithNonNullableFields() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		Assert.assertEquals(readFromFile("model/custom-with-non-nullable-fields.raml"), new RamlGenerator().generate(("model/valid-with-non-nullable-fields.raml")));
+		Assert.assertEquals(readFromFile("model/custom-with-non-nullable-fields.raml"), new RamlGenerator().generate("model/valid-with-non-nullable-fields.raml"));
 	}
 
 	@Test
 	public void testDoubleKey() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		Assert.assertEquals(readFromFile("model/custom-double-key.raml"), new RamlGenerator().generate(("model/valid-doublekey-OdataModel.raml")));
+		Assert.assertEquals(readFromFile("model/custom-double-key.raml"), new RamlGenerator().generate("model/valid-doublekey-odata.raml"));
 	}
 
 	@Test
 	public void invalidModel1Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
 		thrown.expectMessage("Property \"remote name\" is missing in field \"MyField\" in entity \"MyEntity\"");
-		new RamlGenerator().generate("model/invalidOdataModel1.raml");
+		new RamlGenerator().generate("model/invalidOdata1.raml");
 	}
 
 	@Test
 	public void invalidModel2Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
 		thrown.expectMessage("Property \"nullable\" is missing in field \"MyField\" in entity \"MyEntity\"");
-		new RamlGenerator().generate("model/invalidOdataModel2.raml");
+		new RamlGenerator().generate("model/invalidOdata2.raml");
 	}
 
 	@Test
 	public void invalidModel3Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
 		thrown.expectMessage("No schemas found.");
-		new RamlGenerator().generate("model/invalidOdataModel3.raml");
+		new RamlGenerator().generate("model/invalidOdata3.raml");
 	}
 
 	public static String readFromFile(String filePath) throws FileNotFoundException, IOException {

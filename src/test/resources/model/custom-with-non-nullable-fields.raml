@@ -5,7 +5,7 @@ mediaType:  application/json
 
 uses:
   odata: libraries/odataLibrary.raml
-  model: odataModel.raml
+  model: odata.raml
 
 resourceTypes:
   collection:
@@ -53,9 +53,10 @@ resourceTypes:
           body:
             application/json:
               type: <<model>>
+              
 /MyEntities:
   displayName: MyEntities
-  type: { collection: { model: MyEntity } }
+  type: { collection: { model: model.MyEntity } }
   /{MyField}:
     displayName: MyEntity
-    type: { member: { model: MyEntity } }
+    type: { member: { model: model.MyEntity } }

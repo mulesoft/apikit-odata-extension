@@ -6,10 +6,7 @@
  */
 package org.mule.module.apikit.model;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
@@ -30,11 +27,9 @@ public class EntityModelParserTestCase {
 
 	@Test
 	public void testPositive() throws IOException, EntityModelParsingException {
-		URL url = Thread.currentThread().getContextClassLoader().getResource("model/validOdataModel.raml");
-		File file = new File(url.getPath());
-		InputStream inputStream = new FileInputStream(file);
+		URL url = Thread.currentThread().getContextClassLoader().getResource("model/validodata.raml");
 
-		List<Entity> entities = new EntityModelParser().getEntities(url.getPath());
+		List<Entity> entities = EntityModelParser.getEntities(url.getPath());
 		Assert.assertEquals("Customer", entities.get(0).getName());
 		Assert.assertEquals("Customer", entities.get(0).getElementName());
 		Assert.assertEquals("Customers", entities.get(0).getCollectionName());
@@ -47,11 +42,9 @@ public class EntityModelParserTestCase {
 
 	@Test
 	public void testPositive3() throws IOException, EntityModelParsingException {
-		URL url = Thread.currentThread().getContextClassLoader().getResource("model/validOdataModel3.raml");
-		File file = new File(url.getPath());
-		InputStream inputStream = new FileInputStream(file);
+		URL url = Thread.currentThread().getContextClassLoader().getResource("model/validOdata3.raml");
 
-		List<Entity> entities = new EntityModelParser().getEntities(url.getPath());
+		List<Entity> entities = EntityModelParser.getEntities(url.getPath());
 		Assert.assertEquals("orders", entities.get(1).getName());
 		Assert.assertEquals("orders", entities.get(1).getElementName());
 		Assert.assertEquals("ordersId", entities.get(1).getIdElementName());

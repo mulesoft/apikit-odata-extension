@@ -6,25 +6,16 @@
  */
 package org.mule.module.apikit.model;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-import org.json.JSONException;
 import org.mule.module.apikit.model.exception.EntityModelParsingException;
-
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -39,11 +30,6 @@ import freemarker.template.Version;
 public class RamlGenerator {
 
 	private static Configuration fmkCfg;
-	private EntityModelParser entityModelParser;
-
-	public RamlGenerator() {
-		entityModelParser = new EntityModelParser();
-	}
 
 	private static Configuration getConfiguration() {
 		if (fmkCfg == null) {
@@ -62,12 +48,11 @@ public class RamlGenerator {
 		return fmkCfg;
 	}
 
-	public String generate(String pathToModel) throws JSONException, IOException, TemplateException, ProcessingException,
-			EntityModelParsingException {
-		return generate(pathToModel, entityModelParser.getEntities(pathToModel));
+	public String generate(String filePath) throws IOException, TemplateException, EntityModelParsingException {
+		return generate(EntityModelParser.getEntities(filePath));
 	}
-
-	private String generate(String pathToModel, List<Entity> entities) throws IOException, TemplateException {
+	
+	private String generate(List<Entity> entities) throws IOException, TemplateException {
 
 		Map<String, Object> raml = new HashMap<String, Object>();
 
