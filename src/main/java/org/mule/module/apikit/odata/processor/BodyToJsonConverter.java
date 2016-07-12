@@ -29,7 +29,7 @@ import java.util.Iterator;
 public class BodyToJsonConverter {
 	public static String convertPayload(String entity, boolean isXMLFormat, String payloadAsString) throws ODataInvalidFormatException, ODataBadRequestException, OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
 		if (isXMLFormat){
-			return adaptBodyToJson(entity, payloadAsString).toString();
+			return adaptBodyToJson(payloadAsString).toString();
 		} else {
 			if(!isValidJson(payloadAsString)){
 				throw new ODataInvalidFormatException("Invalid format.");
@@ -54,15 +54,13 @@ public class BodyToJsonConverter {
 		.replaceAll("(</)(\\w+:)(.*?>)", "$1$3"); /* remove closing tags prefix */
 	}
 
-	private static JSONObject adaptBodyToJson(String entity, String body) throws ODataInvalidFormatException, OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
+	private static JSONObject adaptBodyToJson(String body) throws ODataInvalidFormatException, OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
 		try {
 			JSONObject jsonObject = XML.toJSONObject(removeXmlStringNamespaceAndPreamble(body));
 			JSONObject entry = jsonObject.getJSONObject("entry");
 			JSONObject content = entry.getJSONObject("content");
 			JSONObject properties = content.getJSONObject("properties");
 			Iterator<String> keyIterator = properties.keys();
-
-			OdataMetadataManager odataMetadataManager = new OdataMetadataManager();
 
 			while(keyIterator.hasNext()){
 				String key = keyIterator.next();
@@ -71,15 +69,6 @@ public class BodyToJsonConverter {
 					properties.put(key, object.get("content"));
 				} catch (JSONException ex){
 					// not a json object? it's ok
-				}
-
-				// now check against the property's type
-				if(entity != null){
-					EntityDefinitionProperty propertyDefinition = odataMetadataManager.getEntityByName(entity).findPropertyDefinition(key);
-					Object value = properties.get(key);
-					if(propertyDefinition.getType().contains("String") && !value.toString().startsWith("\"")){
-						properties.put(key, "\""+value.toString()+"\"");
-					}
 				}
 			}
 			return properties;
