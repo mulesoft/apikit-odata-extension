@@ -30,6 +30,8 @@ import java.util.List;
  * Created by arielsegura on 6/6/16.
  */
 public class RamlImpl10V2Wrapper {
+    private static final String FIXED_DECIMAL_SCALE = "3";
+    private static final String FIXED_DECIMAL_PRECISION = "3";
     RamlModelResult api;
 
     public RamlImpl10V2Wrapper(RamlModelResult api) {
@@ -102,15 +104,7 @@ public class RamlImpl10V2Wrapper {
                         castedType.maximum();
 
                         String format = castedType.format();
-                        if (RamlParser.INT64.equals(format)) {
-                            type = EDMTypeConverter.EDM_INT64;
-                        } else if (RamlParser.INT16.equals(format)) {
-                            type = EDMTypeConverter.EDM_INT16;
-                        } else if (RamlParser.INT8.equals(format)) {
-                            type = EDMTypeConverter.EDM_BYTE;
-                        } else {
-                            type = EDMTypeConverter.EDM_INT32;
-                        }
+                        type = processIntegerType(format);
 
                     } else if (propertyTypeDeclaration instanceof BooleanTypeDeclaration) {
                         BooleanTypeDeclaration castedType = (BooleanTypeDeclaration) propertyTypeDeclaration;
@@ -130,8 +124,11 @@ public class RamlImpl10V2Wrapper {
                         String format = castedType.format();
                         if ("float".equals(format)) {
                             type = EDMTypeConverter.EDM_SINGLE;
-                        } else {
+                        } else if(FIXED_DECIMAL_SCALE.equals(scale) && FIXED_DECIMAL_PRECISION.equals(precision)){
                             type = EDMTypeConverter.EDM_DECIMAL;
+                        } else {
+                            // process integer
+                            type = processIntegerType(format);
                         }
                     } else if (propertyTypeDeclaration instanceof StringTypeDeclaration) {
                         StringTypeDeclaration castedType = (StringTypeDeclaration) propertyTypeDeclaration;
@@ -168,6 +165,20 @@ public class RamlImpl10V2Wrapper {
             }
         }
         return entityDefinitionSet;
+    }
+
+    private String processIntegerType(String format) {
+        String type;
+        if (RamlParser.INT64.equals(format)) {
+            type = EDMTypeConverter.EDM_INT64;
+        } else if (RamlParser.INT16.equals(format)) {
+            type = EDMTypeConverter.EDM_INT16;
+        } else if (RamlParser.INT8.equals(format)) {
+            type = EDMTypeConverter.EDM_BYTE;
+        } else {
+            type = EDMTypeConverter.EDM_INT32;
+        }
+        return type;
     }
 
     private void notNull(String message, Object actual) throws OdataMetadataFieldsException {
