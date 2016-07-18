@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.exception.ODataInvalidUriException;
+import org.mule.module.apikit.odata.exception.ODataUnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 
 public class ODataFormatHandler {
@@ -51,7 +52,7 @@ public class ODataFormatHandler {
 				formats.add(Format.Json);
 				return formats;
 			} else {
-				throw new ODataInvalidFormatException("Unsupported media type requested.");
+				throw new ODataUnsupportedMediaTypeException("Unsupported media type requested.");
 			}
 		}
 
@@ -80,7 +81,7 @@ public class ODataFormatHandler {
 			}
 			
 			if (unsupportedMediaType) {
-				throw new ODataInvalidFormatException("Unsupported media type requested.");
+				throw new ODataUnsupportedMediaTypeException("Unsupported media type requested.");
 			}
 			
 			return formats;

@@ -6,7 +6,7 @@
  */
 package org.mule.module.apikit.odata.exception;
 
-public class ODataInvalidFormatException extends ODataUnsupportedMediaTypeException {
+public class ODataInvalidFormatException extends ODataBadRequestException {
 
 	/**
 	 * 

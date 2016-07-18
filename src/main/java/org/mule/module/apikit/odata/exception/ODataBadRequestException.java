@@ -20,4 +20,7 @@ public class ODataBadRequestException extends ODataException {
 	public ODataBadRequestException() {
         super("Bad request", HttpConstants.SC_BAD_REQUEST);
     }
+    public ODataBadRequestException(String message, Throwable cause) {
+        super(message, cause, HttpConstants.SC_BAD_REQUEST);
+    }
 }

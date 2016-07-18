@@ -9,8 +9,10 @@ package org.mule.module.apikit.odata;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mule.module.apikit.odata.context.OdataContext;
+import org.mule.module.apikit.odata.exception.ODataBadRequestException;
 import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
+import org.mule.module.apikit.odata.exception.ODataUnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.processor.ODataApikitProcessor;
 import org.mule.module.apikit.odata.processor.ODataMetadataProcessor;
@@ -67,7 +69,7 @@ public class ODataUriParserTestCase {
 
 	// should reject a $count request with a $format, since $count always returns
 	// text/plain
-	@Test(expected = ODataInvalidFormatException.class)
+	@Test(expected = ODataUnsupportedMediaTypeException.class)
 	public void rejectUnsupportedFormatForCountRequest() throws ODataException {
 		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/orders/$count", "$format=json");
 //		fail("Exception expected");
