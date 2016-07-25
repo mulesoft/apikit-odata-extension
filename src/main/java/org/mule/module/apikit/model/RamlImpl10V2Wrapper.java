@@ -20,11 +20,11 @@ import org.raml.v2.api.model.v10.api.Library;
 import org.raml.v2.api.model.v10.datamodel.*;
 import org.raml.v2.api.model.v10.declarations.AnnotationRef;
 
-import static java.lang.String.format;
-import static org.mule.module.apikit.model.OdataServiceConstants.*;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.String.format;
+import static org.mule.module.apikit.model.OdataServiceConstants.ODATA_MODEL;
 
 /**
  * Created by arielsegura on 6/6/16.
@@ -99,28 +99,43 @@ public class RamlImpl10V2Wrapper {
                         }
                     }
 
-                    if (propertyTypeDeclaration instanceof IntegerTypeDeclaration) {
+                    TypeDeclaration propTypeDeclaration = null;
+                    if(propertyTypeDeclaration instanceof UnionTypeDeclaration){
+                        UnionTypeDeclaration unionType = (UnionTypeDeclaration) propertyTypeDeclaration;
+                        for(TypeDeclaration unionSubType : unionType.of()){
+                            if(!(unionSubType instanceof NullTypeDeclaration)){
+                                propTypeDeclaration = unionSubType;
+                            }
+                        }
+                        if(propTypeDeclaration == null){
+                            throw new OdataMetadataFieldsException(format("Property %s cannot be just null.", propertyTypeDeclaration.name()));
+                        }
+                    } else {
+                        propTypeDeclaration = propertyTypeDeclaration;
+                    }
+
+                    if (propTypeDeclaration instanceof IntegerTypeDeclaration) {
                         IntegerTypeDeclaration castedType = (IntegerTypeDeclaration) propertyTypeDeclaration;
                         castedType.maximum();
 
                         String format = castedType.format();
                         type = processIntegerType(format);
 
-                    } else if (propertyTypeDeclaration instanceof BooleanTypeDeclaration) {
-                        BooleanTypeDeclaration castedType = (BooleanTypeDeclaration) propertyTypeDeclaration;
+                    } else if (propTypeDeclaration instanceof BooleanTypeDeclaration) {
+                        BooleanTypeDeclaration castedType = (BooleanTypeDeclaration) propTypeDeclaration;
                         castedType.defaultValue();
                         type = EDMTypeConverter.EDM_BOOLEAN;
-                    } else if (propertyTypeDeclaration instanceof DateTimeOnlyTypeDeclaration) {
-                        DateTimeOnlyTypeDeclaration castedType = (DateTimeOnlyTypeDeclaration) propertyTypeDeclaration;
+                    } else if (propTypeDeclaration instanceof DateTimeOnlyTypeDeclaration) {
+                        DateTimeOnlyTypeDeclaration castedType = (DateTimeOnlyTypeDeclaration) propTypeDeclaration;
                         type = EDMTypeConverter.EDM_DATETIME;
-                    } else if (propertyTypeDeclaration instanceof DateTimeTypeDeclaration) {
-                        DateTimeTypeDeclaration castedType = (DateTimeTypeDeclaration) propertyTypeDeclaration;
+                    } else if (propTypeDeclaration instanceof DateTimeTypeDeclaration) {
+                        DateTimeTypeDeclaration castedType = (DateTimeTypeDeclaration) propTypeDeclaration;
                         type = EDMTypeConverter.EDM_DATETIME;
-                    } else if (propertyTypeDeclaration instanceof DateTypeDeclaration) {
-                        DateTypeDeclaration castedType = (DateTypeDeclaration) propertyTypeDeclaration;
+                    } else if (propTypeDeclaration instanceof DateTypeDeclaration) {
+                        DateTypeDeclaration castedType = (DateTypeDeclaration) propTypeDeclaration;
                         type = EDMTypeConverter.EDM_DATETIME;
-                    } else if (propertyTypeDeclaration instanceof NumberTypeDeclaration) {
-                        NumberTypeDeclaration castedType = (NumberTypeDeclaration) propertyTypeDeclaration;
+                    } else if (propTypeDeclaration instanceof NumberTypeDeclaration) {
+                        NumberTypeDeclaration castedType = (NumberTypeDeclaration) propTypeDeclaration;
                         String format = castedType.format();
                         if ("float".equals(format)) {
                             type = EDMTypeConverter.EDM_SINGLE;
@@ -130,8 +145,8 @@ public class RamlImpl10V2Wrapper {
                             // process integer
                             type = processIntegerType(format);
                         }
-                    } else if (propertyTypeDeclaration instanceof StringTypeDeclaration) {
-                        StringTypeDeclaration castedType = (StringTypeDeclaration) propertyTypeDeclaration;
+                    } else if (propTypeDeclaration instanceof StringTypeDeclaration) {
+                        StringTypeDeclaration castedType = (StringTypeDeclaration) propTypeDeclaration;
                         for (AnnotationRef annotation : castedType.annotations()) {
                             if ("guid".equals(annotation.name())) {
                                 type = EDMTypeConverter.EDM_GUID;
@@ -143,7 +158,7 @@ public class RamlImpl10V2Wrapper {
                             type = EDMTypeConverter.EDM_STRING;
                         }
                     } else {
-                        throw new UnsupportedOperationException("Type not supported " + propertyTypeDeclaration.name());
+                        throw new UnsupportedOperationException("Type not supported " + propTypeDeclaration.name());
                     }
 
                     notNull("Property \"remote name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", remoteName);
