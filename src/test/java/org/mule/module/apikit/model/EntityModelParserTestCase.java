@@ -27,7 +27,7 @@ public class EntityModelParserTestCase {
 
 	@Test
 	public void testPositive() throws IOException, EntityModelParsingException {
-		URL url = Thread.currentThread().getContextClassLoader().getResource("model/validodata.raml");
+		URL url = Thread.currentThread().getContextClassLoader().getResource("model/validOdata.raml");
 
 		List<Entity> entities = EntityModelParser.getEntities(url.getPath());
 		Assert.assertEquals("Customer", entities.get(0).getName());
