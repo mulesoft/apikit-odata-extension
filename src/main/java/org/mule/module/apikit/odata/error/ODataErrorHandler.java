@@ -65,7 +65,7 @@ public class ODataErrorHandler {
 		if (ex instanceof MethodNotAllowedException) {
 			return new ODataMethodNotAllowedException();
 		} else if (ex instanceof BadRequestException) {
-			return new ODataBadRequestException();
+			return new ODataBadRequestException(ex.getMessage(), ex);
 		} else if (ex instanceof NotAcceptableException) {
 			return new ODataNotAcceptableException();
 		} else if (ex instanceof NotFoundException) {
