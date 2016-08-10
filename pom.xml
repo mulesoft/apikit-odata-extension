@@ -19,9 +19,8 @@
 
 	<!-- Properties -->
 	<properties>
-		<mule.version>3.8.0</mule.version>
+		<mule.version>3.8.1-SNAPSHOT</mule.version>
 		<apikit.version>3.8.1-SNAPSHOT</apikit.version>
-		<apikit.spi.version>3.8.0-SNAPSHOT</apikit.spi.version>
 		<licensePath>LICENSE_HEADER.txt</licensePath>
 	</properties>
 
@@ -105,7 +104,7 @@
 		<dependency>
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-module-apikit-spi</artifactId>
-			<version>${apikit.spi.version}</version>
+			<version>${apikit.version}</version>
 			<scope>provided</scope>			
 		</dependency>
 			
@@ -152,8 +151,6 @@
 			<artifactId>mockito-all</artifactId>
 			<version>1.10.19</version>
 		</dependency>
-
-
 		<dependency>
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
