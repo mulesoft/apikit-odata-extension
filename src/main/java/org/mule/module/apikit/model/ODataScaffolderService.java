@@ -30,8 +30,6 @@ public class ODataScaffolderService implements ScaffolderService {
   
 	public void executeScaffolder(List<File> ramlFiles, File appDir, File domainDir, String muleVersion) {
 		List<String> ramlsWithExtensionEnabledPaths = processDataModelFiles(ramlFiles);
-		//List<String> ramlFilePaths = retrieveFilePaths(ramlFiles, apiExtensions);
-		//ramlFilePaths.addAll(ramlsWithExtensionEnabledPaths);
 		List<String> ramlFilePaths = ramlsWithExtensionEnabledPaths;
 		List<String> muleXmlFiles = retrieveFilePaths(appDir, appExtensions);
 		SystemStreamLog log = new SystemStreamLog();
@@ -96,8 +94,8 @@ public class ODataScaffolderService implements ScaffolderService {
 		if (files != null) {
 			for (File file : files) {
 				if (isODataModel(file)) {
-					ramlFilePaths.add(generateApiRaml(file).getAbsolutePath());
 					copyRamlTemplateFiles(file);
+					ramlFilePaths.add(generateApiRaml(file).getAbsolutePath());
 				}
 			}
 			
