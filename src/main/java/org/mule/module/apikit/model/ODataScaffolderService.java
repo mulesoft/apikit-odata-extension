@@ -136,11 +136,8 @@ public class ODataScaffolderService implements ScaffolderService {
 		try {
 			FileUtils.createFolder(model.getParentFile().getAbsolutePath() + LIBRARIES_FOLDER);
 			ramlFiles.add(FileUtils.exportResource(LIBRARIES_ODATA_RAML, model.getParentFile().getAbsolutePath() + LIBRARIES_ODATA_RAML));
-
 		} catch (Exception e) {
-			SystemStreamLog log = new SystemStreamLog();
-			log.error("Error: " + e.getMessage());
-			throw new RuntimeException("Error: " + e.getMessage());
+			throw new RuntimeException("Error copying template files", e);
 		}
 
 		return ramlFiles;
