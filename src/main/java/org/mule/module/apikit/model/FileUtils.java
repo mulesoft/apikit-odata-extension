@@ -79,9 +79,7 @@ public class FileUtils {
 		OutputStream out = null;
 
 		try {
-			URL url = FileUtils.class.getResource(resourceName);
-			File file = new File(url.getPath());
-			in = new FileInputStream(file);
+			in = FileUtils.class.getResource(resourceName).openStream();
 
 			out = new FileOutputStream(targetPath);
 			
