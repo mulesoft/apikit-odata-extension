@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	
+
 	<!-- Version -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.mule.modules</groupId>
@@ -19,8 +19,8 @@
 
 	<!-- Properties -->
 	<properties>
-		<mule.version>3.8.1-SNAPSHOT</mule.version>
-		<apikit.version>3.8.1-SNAPSHOT</apikit.version>
+		<mule.version>3.8.1</mule.version>
+		<apikit.version>3.8.1</apikit.version>
 		<licensePath>LICENSE_HEADER.txt</licensePath>
 	</properties>
 
@@ -66,9 +66,9 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>			
+            </plugin>
 		</plugins>
-	</build> 
+	</build>
 
 	<dependencies>
 		<dependency>
@@ -88,7 +88,7 @@
 			<artifactId>mule-module-apikit</artifactId>
 			<version>${apikit.version}</version>
 			<scope>provided</scope>
-		</dependency> 
+		</dependency>
 		<dependency>
 			<groupId>org.mule.raml</groupId>
 			<artifactId>parser-interface-impl-v2</artifactId>
@@ -105,9 +105,9 @@
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-module-apikit-spi</artifactId>
 			<version>${apikit.version}</version>
-			<scope>provided</scope>			
+			<scope>provided</scope>
 		</dependency>
-			
+
         <!-- OData4J / Oreva -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
@@ -118,8 +118,8 @@
 			<groupId>org.jboss.oreva</groupId>
 			<artifactId>odata-core</artifactId>
 			<version>0.8.1</version>
-		</dependency>	
-		
+		</dependency>
+
 		<!-- Commons Lang -->
 		<dependency>
 			<groupId>commons-lang</groupId>
@@ -139,7 +139,7 @@
             <groupId>junit</groupId>
             <artifactId>junit-dep</artifactId>
             <version>4.10</version>
-        </dependency>		
+        </dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-library</artifactId>
@@ -161,7 +161,7 @@
 			<artifactId>json</artifactId>
 			<version>20140107</version>
 		</dependency>
-		 
+
 		<dependency>
             <groupId>org.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
@@ -201,7 +201,7 @@
             <layout>default</layout>
         </repository>
     </repositories>
-    
+
     <distributionManagement>
         <repository>
             <id>mulesoft-releases</id>
