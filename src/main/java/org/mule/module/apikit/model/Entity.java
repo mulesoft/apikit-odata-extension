@@ -9,11 +9,14 @@ package org.mule.module.apikit.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.atteo.evo.inflector.English;
+import org.jibx.schema.codegen.extend.DefaultNameConverter;
+import org.jibx.schema.codegen.extend.NameConverter;
 import org.mule.module.apikit.model.exception.InvalidModelException;
 
 public class Entity {
 
+	private NameConverter nameTools = new DefaultNameConverter();
+	
 	private String name;
 	private String remote;
 	private boolean hasProperties;
@@ -36,7 +39,7 @@ public class Entity {
 	}
 	
 	public String getCollectionName() {
-		return English.plural(name);
+		return ( name.endsWith("s") ? name : nameTools.pluralize(name) );
 	}
 	
 	public String getIdElementName() {
