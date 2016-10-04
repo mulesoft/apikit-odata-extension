@@ -6,11 +6,10 @@
  */
 package org.mule.module.apikit.odata;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.apikit.Configuration;
 import org.mule.module.apikit.HttpRestRequest;
@@ -25,7 +24,8 @@ import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatExcept
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 import org.mule.module.apikit.odata.processor.ODataRequestProcessor;
 import org.mule.module.apikit.spi.RouterService;
-import org.mule.processor.AbstractRequestResponseMessageProcessor;
+
+import java.util.List;
 
 public class ODataRouterService implements RouterService {
 
@@ -36,7 +36,7 @@ public class ODataRouterService implements RouterService {
 		return (event.getMessage().getOutboundProperty(CONTEXT_INITIALIZED) == null);
 	}
 
-	public MuleEvent processBlockingRequest(MuleEvent event, AbstractRequestResponseMessageProcessor abstractRouter) throws MuleException {
+	public MuleEvent processBlockingRequest(MuleEvent event, MessageProcessor abstractRouter) throws MuleException {
 		Logger.getLogger(ODataRouterService.class).info("Handling odata enabled request.");
 
 		Router router = (Router) abstractRouter;
