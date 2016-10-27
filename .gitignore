@@ -9,3 +9,4 @@ target
 .jar
 build.log
 .mule
+/target/

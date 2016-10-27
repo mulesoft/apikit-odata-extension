@@ -1,0 +1,20 @@
+#%RAML 1.0 Library
+uses:
+  odata: libraries/odataLibrary.raml
+
+types:
+  MyEntity:
+    (odata.remote): RemoteEntity
+    properties:
+      MyField:
+        type: number
+        (odata.key): true
+        (odata.nullable): false
+        (odata.precision): 2
+        (odata.scale): 2
+      MyField1:
+        type: number
+        (odata.key): false
+        (odata.nullable): true
+        (odata.precision): 2
+        (odata.scale): 2

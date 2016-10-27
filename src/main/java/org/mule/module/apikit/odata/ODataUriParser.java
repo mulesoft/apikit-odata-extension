@@ -10,10 +10,7 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 
 import org.mule.module.apikit.odata.context.OdataContext;
-import org.mule.module.apikit.odata.exception.ODataException;
-import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
-import org.mule.module.apikit.odata.exception.ODataInvalidUriException;
-import org.mule.module.apikit.odata.exception.ODataNotFoundException;
+import org.mule.module.apikit.odata.exception.*;
 import org.mule.module.apikit.odata.processor.ODataApikitProcessor;
 import org.mule.module.apikit.odata.processor.ODataMetadataProcessor;
 import org.mule.module.apikit.odata.processor.ODataRequestProcessor;
@@ -66,7 +63,7 @@ public class ODataUriParser {
 					if (ODataUriHelper.hasFormat(query)) // requests using $count can't
 																							 // have queries with $format
 					{
-						throw new ODataInvalidFormatException("Unsupported media type requested.");
+						throw new ODataUnsupportedMediaTypeException("Unsupported media type requested.");
 					}
 					if (!ODataUriHelper.isCollection(path)) // $count can only be used for
 																									// collections

@@ -1,0 +1,34 @@
+#%RAML 1.0 Library
+uses:
+  odata: libraries/odataLibrary.raml
+
+types:
+  entityA:
+    (odata.remote): entity_A
+    properties:
+      id:
+        type: integer
+        (odata.key): true
+        (odata.nullable): false
+      name:
+        type: string
+        (odata.nullable): false
+        (odata.key): true
+        maxLength: 200
+  entityB:
+    (odata.remote): entity_B
+    properties:
+      id:
+        type: integer
+        (odata.key): true
+        (odata.nullable): false
+      description:
+        type: string
+        (odata.nullable): true
+        (odata.key): false
+        maxLength: 200
+      name:
+        type: string
+        (odata.nullable): false
+        (odata.key): true
+        maxLength: 200

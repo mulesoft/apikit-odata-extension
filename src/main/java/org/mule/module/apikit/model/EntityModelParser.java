@@ -8,200 +8,100 @@ package org.mule.module.apikit.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.regex.Pattern;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.mule.module.apikit.model.exception.EntityModelParsingException;
+import org.mule.module.apikit.model.exception.InvalidModelException;
+import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
+import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
+import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
+import org.mule.module.apikit.odata.metadata.raml.RamlParserUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fge.jackson.JsonLoader;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.github.fge.jsonschema.main.JsonSchema;
-import com.github.fge.jsonschema.main.JsonSchemaFactory;
-
-/**
- * 
- * @author arielsegura
- */
 public class EntityModelParser {
 
-	private static final String[] FIELD_PROPERTIES = { "name", "type", "nullable", "key", "defaultValue", "maxLength", "fixedLength", "collation", "unicode", "precision", "scale" };
-	private static final String DEFAULT_JSON_SCHEMA = "model-schema.json";
+	static final String typesPattern = "^types:\\s*$";
+	static final Pattern elementPattern = Pattern.compile("^\\s{2}(\\w+):\\s*$");
+	static final Pattern remotePattern = Pattern.compile("^\\s{4}\\(odata.remote\\):\\s*(\\w+)\\s*$");
+	static final String propertiesPattern = "^\\s{4}properties:\\s*$";
+	static final Pattern fieldPattern = Pattern.compile("^\\s{6}(\\w+):\\s*$");
+	static final Pattern typePropertyPattern = Pattern.compile("^\\s{8}type:\\s*(\\w+)\\s*$");
+	static final Pattern keyPropertyPattern = Pattern.compile("^\\s{8}\\(odata.key\\):\\s*(\\w+)\\s*$");
+	static final Pattern nullablePropertyPattern = Pattern.compile("^\\s{8}\\(odata.nullable\\):\\s*(\\w+)\\s*$");
 
-	public EntityModelParser() {
+	/**
+	 * Parses the entities out of the RAML file and looks for required fields
+	 * @param pathToModel
+	 * @return
+	 * @throws IOException
+	 * @throws EntityModelParsingException
+	 */
+	public static List<Entity> getEntities(String pathToModel) throws IOException, EntityModelParsingException {
 
-	}
+		try {
+			RamlImpl10V2Wrapper model = RamlParserUtils.getRaml(pathToModel);
 
-	public ProcessingReport validateJson(JSONObject obj) throws JsonProcessingException, IOException, ProcessingException {
-		// Validate json data against json schema
-		ObjectMapper m = new ObjectMapper();
-		JsonNode fstabSchema = m.readTree(getClass().getClassLoader().getResource(DEFAULT_JSON_SCHEMA));
-
-		JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
-
-		JsonSchema schema = factory.getJsonSchema(fstabSchema);
-
-		JsonNode good = JsonLoader.fromString(obj.toString());
-
-		return schema.validate(good);
-	}
-
-	public List<Map<String, Object>> getEntities(JSONObject obj) throws IOException, ProcessingException, EntityModelParsingException {
-
-		ProcessingReport report;
-		report = validateJson(obj);
-
-		if (!report.isSuccess()) {
-			String msg = ValidationErrorsHandler.handle(report);
-			throw new EntityModelParsingException(msg);
+			return getEntities(model.getSchemas());
+		} catch (Exception e) {
+			throw new EntityModelParsingException(e.getMessage());
 		}
-
-		List<Map<String, Object>> entitySet = new ArrayList<Map<String, Object>>();
-
-		JSONArray schemas = obj.getJSONArray("entities");
-		for (int i = 0; i < schemas.length(); i++) {
-			JSONObject entityJson = (JSONObject) ((JSONObject) schemas.get(i)).get("entity");
-			String entityName = entityJson.getString("name");
-			String remoteName = entityJson.getString("remoteName");
-
-			Map<String, Object> entity = new HashMap<String, Object>();
-			entity.put("name", entityName);
-			entity.put("remoteName", remoteName);
-			entity.put("json", generateJsonSchema(entityJson));
-			Map<String, Object> parsedProperties = parseEntityProperties(entityJson.getJSONArray("properties"));
-			entity.put("properties", parsedProperties.get("properties"));
-			entity.put("keys", parsedProperties.get("keys"));
-			entitySet.add(entity);
-
-		}
-
-		return entitySet;
 	}
 
-	private JSONObject generateJsonSchema(JSONObject entityJson) {
-		JSONObject jsonSchema = new JSONObject();
+	private static List<Entity> getEntities(EntityDefinitionSet entityDefinitionSet) throws InvalidModelException {
+		List<Entity> entities = new ArrayList<Entity>();
+		boolean typesFound = false;
 
-		jsonSchema.put("properties", generateJsonSchemaProperties(entityJson.getJSONArray("properties")));
-		jsonSchema.put("edm.name", entityJson.getString("name"));
-		jsonSchema.put("edm.remoteName", entityJson.getString("remoteName"));
-		jsonSchema.put("$schema", "http://json-schema.org/draft-04/schema#");
-		jsonSchema.put("type", "object");
-		jsonSchema.put("required", generateJsonSchemaRequiredProperties(entityJson.getJSONArray("properties")));
-		jsonSchema.put("additionalProperties", false);
-
-		return jsonSchema;
-	}
-
-	private JSONArray generateJsonSchemaRequiredProperties(JSONArray properties) {
-		JSONArray required = new JSONArray();
-
-		for (int i = 0; i < properties.length(); i++) {
-			String name = (String) properties.getJSONObject(i).getJSONObject("field").get("name");
-			required.put(name);
-		}
-
-		return required;
-	}
-
-	private JSONObject generateJsonSchemaProperties(JSONArray jsonArray) {
-		JSONObject jsonProperties = new JSONObject();
-
-		for (int i = 0; i < jsonArray.length(); i++) {
-			JSONObject jsonProperty = jsonArray.getJSONObject(i).getJSONObject("field");
-			JSONObject jsonStructure = new JSONObject();
-
-			for (String prop : FIELD_PROPERTIES) {
-				try {
-					jsonStructure.put("edm." + prop, jsonProperty.get(prop));
-				} catch (Exception e) {
-					// ignore missing property
-				}
+		Entity entity;
+		Property property;
+		for (EntityDefinition entityDefinition : entityDefinitionSet.toList()) {
+			typesFound = true;
+			entity = new Entity(entityDefinition.getName());
+			entity.setRemote(entityDefinition.getRemoteEntity());
+			entity.setPropertiesFound(true);
+			for(EntityDefinitionProperty entityDefinitionProperty : entityDefinition.getProperties()){
+				property = new Property(entityDefinitionProperty.getName());
+				property.setKey(String.valueOf(entityDefinitionProperty.isKey()));
+				property.setNullable(String.valueOf(entityDefinitionProperty.isNullable()));
+				property.setType(entityDefinitionProperty.getType());
+				entity.addProperty(property);
 			}
-
-			// infer json schema type from edm.type
-			String type = (String) jsonProperty.get("type");
-
-			jsonStructure.put("type", getSchemaTypeFromEdmType(type));
-
-			jsonProperties.put(jsonProperty.getString("name"), jsonStructure);
+			entities.add(entity);
 		}
 
-		return jsonProperties;
+		if (!typesFound) {
+			throw new InvalidModelException("no types definition where found, please check the model");
+		}
+
+		return entities;
 	}
 
 	public static String getSchemaTypeFromEdmType(String edmType) {
 		String schemaType = "string";
 		switch (edmType) {
-		case "Edm.Boolean":
-			schemaType = "boolean";
-			break;
-		case "Edm.Decimal":
-		case "Edm.Double":
-		case "Edm.Single":
-			schemaType = "number";
-			break;
-		case "Edm.Int16":
-		case "Edm.Int32":
-		case "Edm.Int64":
-		case "Edm.SByte":
-			schemaType = "integer";
-			break;
-		case "Edm.Guid":
-		case "Edm.Binary":
-		case "Edm.DateTime":
-		case "Edm.String":
-		case "Edm.Time":
-		case "Edm.DateTimeOffset":
-			schemaType = "string";
-			break;
+			case "Edm.Boolean":
+				schemaType = "boolean";
+				break;
+			case "Edm.Decimal":
+			case "Edm.Double":
+			case "Edm.Single":
+				schemaType = "number";
+				break;
+			case "Edm.Int16":
+			case "Edm.Int32":
+			case "Edm.Int64":
+			case "Edm.SByte":
+				schemaType = "integer";
+				break;
+			case "Edm.Guid":
+			case "Edm.Binary":
+			case "Edm.DateTime":
+			case "Edm.String":
+			case "Edm.Time":
+			case "Edm.DateTimeOffset":
+				schemaType = "string";
+				break;
 		}
 		return schemaType;
 	}
 
-	/**
-	 * This method return a map with two keys: 'Properties' and 'Keys'. Properties
-	 * is instance of List<Map<String, Object>> Keys is instance of List<String>
-	 * 
-	 * @param properties
-	 * @return
-	 */
-	private Map<String, Object> parseEntityProperties(JSONArray properties) {
-		Map<String, Object> ret = new HashMap<String, Object>();
-		List<Map<String, Object>> entityProperties = new ArrayList<Map<String, Object>>();
-
-		List<String> keys = new ArrayList<String>();
-		ret.put("properties", entityProperties);
-		ret.put("keys", keys);
-
-		if (properties != null) {
-			for (int j = 0; j < properties.length(); j++) {
-				JSONObject propertyJson = properties.getJSONObject(j).getJSONObject("field");
-
-				Map<String, Object> property = new HashMap<String, Object>();
-
-				for (String prop : FIELD_PROPERTIES) {
-					try {
-						property.put(prop, propertyJson.get(prop));
-					} catch (Exception e) {
-						// ignore missing property
-					}
-				}
-
-				boolean isKey = (Boolean) propertyJson.get("key");
-				if (isKey) {
-					keys.add((String) propertyJson.get("name"));
-				}
-
-				entityProperties.add(property);
-			}
-		}
-		return ret;
-	}
-	
 }

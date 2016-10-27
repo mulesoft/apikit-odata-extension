@@ -1,0 +1,103 @@
+#%RAML 1.0 Library
+uses:
+  odata: libraries/odataLibrary.raml
+
+types:
+  orders:
+    type: object
+    (odata.remote): Orders
+    properties:
+      userId:
+        type: integer
+        (odata.key): true
+        (odata.nullable): false
+      ShipName:
+        type: string
+        (odata.nullable): false
+        (odata.key): false
+        maxLength: 200
+      ShipAddress:
+        type: string
+        (odata.nullable): true
+        (odata.key): false
+        default: "None"
+      Amount:
+        type: number
+        (odata.nullable): true
+        (odata.key): false
+        (odata.precision): 3
+        (odata.scale): 3
+      Quantity:
+        type: number
+        (odata.nullable): false
+        (odata.key): false
+      Delivered:
+        type: boolean
+        (odata.nullable): false
+        (odata.key): false
+        default: false
+      DeliverDate:
+        type: date-only
+        (odata.nullable): false
+        (odata.key): false
+  customers:
+    type: object
+    (odata.remote): Customers
+    properties:
+      age:
+        type: integer
+        (odata.key): true
+        (odata.nullable): false
+      zebra:
+        type: integer
+        (odata.key): true
+        (odata.nullable): false
+      Integer64:
+        type: integer
+        format: int64
+        (odata.key): false
+        (odata.nullable): false
+      Integer16:
+        type: integer
+        format: int16
+        (odata.key): false
+        (odata.nullable): false
+      IntegerByte:
+        type: integer
+        format: int8
+        (odata.key): false
+        (odata.nullable): false
+      GuidType:
+        type: string
+        (odata.type): guid
+        (odata.nullable): true
+        (odata.key): false
+      TimeType:
+        type: datetime
+        (odata.type): time
+        (odata.nullable): true
+        (odata.key): false
+      CompanyName:
+        type: string
+        (odata.nullable): true
+        (odata.key): false
+      name:
+        type: string
+        (odata.nullable): false
+        (odata.key): true
+      ContactTitle:
+        type: string
+        (odata.nullable): true
+        (odata.key): false
+  Weird-resource_NAMEs:
+    type: object
+    (odata.remote): Weird-resource_NAME
+    properties:
+      just-A_key:
+        type: string
+        (odata.key): true
+        (odata.nullable): true
+      ANOTHER-strange_Key:
+        type: integer
+        (odata.nullable): true
+        (odata.key): true

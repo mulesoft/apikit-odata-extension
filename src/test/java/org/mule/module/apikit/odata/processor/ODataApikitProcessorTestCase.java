@@ -9,14 +9,12 @@ package org.mule.module.apikit.odata.processor;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mule.DefaultMuleContext;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
@@ -24,7 +22,6 @@ import org.mule.api.config.MuleConfiguration;
 import org.mule.module.apikit.odata.exception.ClientErrorException;
 import org.mule.module.apikit.odata.exception.ODataBadRequestException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
-import org.mule.module.apikit.odata.util.FileUtils;
 
 public class ODataApikitProcessorTestCase {
 

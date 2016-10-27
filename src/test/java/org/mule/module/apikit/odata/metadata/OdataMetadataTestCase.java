@@ -38,7 +38,7 @@ public class OdataMetadataTestCase {
 	@Test
 	public void retrieveEntityPositive() throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataResourceNotFound,
 			OdataMetadataFormatException {
-		metadataManager.refreshMetadata("org/mule/module/apikit/odata/metadata/raml/datagateway-definition.raml", true);
+		metadataManager.refreshMetadata("org/mule/module/apikit/odata/metadata/datagateway-definition.raml", true);
 		Assert.assertEquals(metadataManager.getEntityByName("gateways"), mockEntitySet.toList().get(0));
 	}
 
@@ -47,7 +47,7 @@ public class OdataMetadataTestCase {
 			OdataMetadataEntityNotFoundException {
 		thrown.expect(OdataMetadataEntityNotFoundException.class);
 		thrown.expectMessage("Entity bla not found.");
-		metadataManager.refreshMetadata("org/mule/module/apikit/odata/metadata/raml/datagateway-definition.raml", true);
+		metadataManager.refreshMetadata("org/mule/module/apikit/odata/metadata/datagateway-definition.raml", true);
 		metadataManager.getEntityByName("bla");
 	}
 

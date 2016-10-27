@@ -24,6 +24,7 @@ import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ClientErrorException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFlowResponseException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
+import org.mule.module.apikit.odata.exception.ODataUnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.formatter.ODataApiKitFormatter;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
@@ -97,7 +98,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 				String count = String.valueOf(entries.size());
 				oDataPayload = new ODataPayload(count);
 			} else {
-				throw new ODataInvalidFormatException("Unsupported media type requested.");
+				throw new ODataUnsupportedMediaTypeException("Unsupported media type requested.");
 			}
 		} else {
 			oDataPayload = new ODataPayload(entries);

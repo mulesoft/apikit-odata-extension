@@ -6,11 +6,8 @@
  */
 package org.mule.module.apikit.odata.metadata;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
 import org.mule.module.apikit.AbstractConfiguration;
+import org.mule.module.apikit.model.RamlImpl10V2Wrapper;
 import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
@@ -20,7 +17,6 @@ import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 import org.mule.module.apikit.odata.metadata.raml.RamlParser;
 import org.mule.module.apikit.odata.metadata.raml.RamlParserUtils;
-import org.raml.model.Raml;
 
 /**
  * 
@@ -33,7 +29,7 @@ public class OdataMetadataManager {
 		entitySet = new EntityDefinitionSet();
 		lock = new Object();
 	}
-	private static Raml raml;
+	private static RamlImpl10V2Wrapper apiWrapper;
 	private RamlParser ramlParser;
 	private static Object lock;
 
@@ -47,12 +43,12 @@ public class OdataMetadataManager {
 	 * 
 	 * @return
 	 */
-	private boolean update(Raml newRaml, boolean forceUpdate) {
+	private boolean update(RamlImpl10V2Wrapper apiWrapper, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataFormatException {
 		if (forceUpdate)
 			return true;
-		if (raml == null)
+		if (this.apiWrapper == null)
 			return true;
-		if (newRaml != null && !RamlParserUtils.equalsRaml(raml, newRaml)) {
+		if (this.apiWrapper != null && !RamlParserUtils.equalsRaml(this.apiWrapper, apiWrapper)) {
 			return true;
 		}
 		if (entitySet == null) {
@@ -62,12 +58,12 @@ public class OdataMetadataManager {
 		return false;
 	}
 
-	private void performRefresh(Raml newRaml, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
+	private void performRefresh(RamlImpl10V2Wrapper apiWrapper, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
 			OdataMetadataFormatException {
 		synchronized (lock) {
-			if (update(newRaml, forceUpdate)) {
-				entitySet = ramlParser.getEntitiesFromRaml(newRaml);
-				raml = newRaml;
+			if (update(apiWrapper, forceUpdate)) {
+				this.apiWrapper = apiWrapper;
+				entitySet = apiWrapper.getSchemas();
 			}
 		}
 	}
@@ -89,22 +85,10 @@ public class OdataMetadataManager {
 		return entitySet;
 	}
 
-	public EntityDefinitionSet refreshMetadata(InputStream raml, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
-			OdataMetadataFormatException {
-		performRefresh(RamlParserUtils.getRaml(raml), forceUpdate);
-		return entitySet;
-	}
-
-	public EntityDefinitionSet refreshMetadata(URL url, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
-			OdataMetadataFormatException, IOException {
-		performRefresh(RamlParserUtils.getRaml(url), forceUpdate);
-		return entitySet;
-	}
-
-	public EntityDefinitionSet refreshMetadata(Raml raml, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
+	public EntityDefinitionSet refreshMetadata(RamlImpl10V2Wrapper apiWrapper, boolean forceUpdate) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
 			OdataMetadataFormatException {
 
-		performRefresh(raml, forceUpdate);
+		performRefresh(apiWrapper, forceUpdate);
 		return entitySet;
 	}
 
@@ -117,9 +101,9 @@ public class OdataMetadataManager {
 	public EntityDefinition getEntityByName(String entityName) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
 			OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		synchronized (lock) {
-			for (EntityDefinition EntityDefinition : entitySet.toList()) {
-				if (EntityDefinition.getName().equalsIgnoreCase(entityName)) {
-					return EntityDefinition;
+			for (EntityDefinition entityDefinition : entitySet.toList()) {
+				if (entityDefinition.getName().equalsIgnoreCase(entityName)) {
+					return entityDefinition;
 				}
 			}
 			throw new OdataMetadataEntityNotFoundException("Entity " + entityName + " not found.");
