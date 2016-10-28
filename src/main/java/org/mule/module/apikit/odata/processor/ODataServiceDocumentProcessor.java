@@ -24,7 +24,7 @@ public class ODataServiceDocumentProcessor extends ODataRequestProcessor {
 
 	public ODataPayload process(MuleEvent event, AbstractRouter router, List<Format> formats) throws Exception {
 		if ("GET".equalsIgnoreCase(super.oDataContext.getMethod())) {
-			String url = getUrl(event);
+			String url = getCompleteUrl(event);
 
 			ODataPayload result = new ODataPayload();
 			result.setFormatter(new ServiceDocumentPayloadFormatter(getMetadataManager(), url));

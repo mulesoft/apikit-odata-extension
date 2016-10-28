@@ -20,13 +20,14 @@ import org.odata4j.edm.EdmDataServices;
 import org.odata4j.format.FormatWriter;
 import org.odata4j.format.FormatWriterFactory;
 
-public class ServiceDocumentPayloadFormatter implements ODataPayloadFormatter {
+public class ServiceDocumentPayloadFormatter extends ODataPayloadFormatter {
 	private final String url;
 	private OdataMetadataManager odataMetadataManager;
 
 	public ServiceDocumentPayloadFormatter(OdataMetadataManager odataMetadataManager, String url) {
 		this.odataMetadataManager = odataMetadataManager;
 		this.url = url;
+		this.setSupportsAtom(false);
 	}
 
 	public String format(Format format) throws Exception {

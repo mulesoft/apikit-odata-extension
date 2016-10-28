@@ -17,16 +17,20 @@ public class ODataResponseTransformer {
 			event.getMessage().setOutboundProperty("Content-Type", "text/plain");
 			event.getMessage().setPayload(payload.getContent());
 		} else {
-			
+
 			boolean isJson = formats.contains(Format.Json) && !formats.contains(Format.Atom);
-			
+
 			String formatted = payload.getFormatter().format(isJson ? Format.Json : Format.Atom);
 			event.getMessage().setPayload(formatted);
-			
+
 			if (isJson) {
 				event.getMessage().setOutboundProperty("Content-Type", "application/json");
 			} else {
-				event.getMessage().setOutboundProperty("Content-Type", "application/xml");
+				if (payload.getFormatter().supportsAtom()) {
+					event.getMessage().setOutboundProperty("Content-Type", "application/atom+xml");
+				} else {
+					event.getMessage().setOutboundProperty("Content-Type", "application/xml");
+				}
 			}
 		}
 

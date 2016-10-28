@@ -6,10 +6,20 @@
  */
 package org.mule.module.apikit.odata.formatter;
 
-public interface ODataPayloadFormatter {
+public abstract class ODataPayloadFormatter {
 	public enum Format {
 		Json, Atom, Plain, Default
 	}
 
-	String format(Format format) throws Exception;
+	boolean supportsAtom = false;
+
+	abstract public String format(Format format) throws Exception;
+
+	public boolean supportsAtom() {
+		return supportsAtom;
+	}
+
+	public void setSupportsAtom(boolean supportsAtom) {
+		this.supportsAtom = supportsAtom;
+	}
 }
