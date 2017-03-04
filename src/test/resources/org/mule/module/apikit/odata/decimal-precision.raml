@@ -1,0 +1,20 @@
+#%RAML 1.0 Library
+uses:
+  odata: libraries/odataLibrary.raml
+
+types:
+  myType:
+    (odata.remote): MonthlySalesPlan
+    properties:
+      field1:
+        type: number
+        (odata.key): false
+        (odata.nullable): false
+        (odata.precision): 4
+        (odata.scale): 3
+      field2:
+        type: number
+        (odata.key): false
+        (odata.nullable): false
+        (odata.precision): 3
+        (odata.scale): 3
