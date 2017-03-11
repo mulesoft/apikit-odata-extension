@@ -29,7 +29,7 @@ import java.util.Iterator;
 public class BodyToJsonConverter {
 	public static String convertPayload(String entity, boolean isXMLFormat, String payloadAsString) throws ODataInvalidFormatException, ODataBadRequestException, OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
 		if (isXMLFormat){
-			return adaptBodyToJson(entity, payloadAsString).toString();
+			return adaptBodyToJson(payloadAsString).toString();
 		} else {
 			if(!isValidJson(payloadAsString)){
 				throw new ODataInvalidFormatException("Invalid format.");
