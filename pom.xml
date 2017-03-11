@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.mule.modules</groupId>
 	<artifactId>mule-module-apikit-odata</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<description>Module for creating API's using the OData service</description>
 
     <!-- Organization -->
@@ -20,7 +20,7 @@
 	<!-- Properties -->
 	<properties>
 		<mule.version>3.8.1</mule.version>
-		<apikit.version>3.8.2-SNAPSHOT</apikit.version>
+		<apikit.version>3.8.2</apikit.version>
 		<licensePath>LICENSE_HEADER.txt</licensePath>
 	</properties>
 

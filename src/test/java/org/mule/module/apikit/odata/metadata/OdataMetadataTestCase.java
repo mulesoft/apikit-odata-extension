@@ -20,6 +20,8 @@ import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 
+import static org.junit.Assert.assertEquals;
+
 public class OdataMetadataTestCase {
 
 	OdataMetadataManager metadataManager;
@@ -49,6 +51,16 @@ public class OdataMetadataTestCase {
 		thrown.expectMessage("Entity bla not found.");
 		metadataManager.refreshMetadata("org/mule/module/apikit/odata/metadata/datagateway-definition.raml", true);
 		metadataManager.getEntityByName("bla");
+	}
+
+	@Test
+	public void decimalPrecisionAndScaleTestCase() throws Exception {
+		metadataManager.refreshMetadata("org/mule/module/apikit/odata/decimal-precision.raml", true);
+		EntityDefinition myType = metadataManager.getEntityByName("myType");
+		for (EntityDefinitionProperty entityDefinitionProperty : myType.getProperties()) {
+			assertEquals("Edm.Decimal", entityDefinitionProperty.getType());
+		}
+
 	}
 
 	private EntityDefinitionSet mockEntitySet() {

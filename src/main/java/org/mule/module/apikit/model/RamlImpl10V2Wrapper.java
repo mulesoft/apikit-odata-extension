@@ -30,8 +30,6 @@ import static org.mule.module.apikit.model.OdataServiceConstants.ODATA_MODEL;
  * Created by arielsegura on 6/6/16.
  */
 public class RamlImpl10V2Wrapper {
-    private static final String FIXED_DECIMAL_SCALE = "3";
-    private static final String FIXED_DECIMAL_PRECISION = "3";
     RamlModelResult api;
 
     public RamlImpl10V2Wrapper(RamlModelResult api) {
@@ -139,7 +137,7 @@ public class RamlImpl10V2Wrapper {
                         String format = castedType.format();
                         if ("float".equals(format)) {
                             type = EDMTypeConverter.EDM_SINGLE;
-                        } else if(FIXED_DECIMAL_SCALE.equals(scale) && FIXED_DECIMAL_PRECISION.equals(precision)){
+                        } else if(scale != null && precision != null){
                             type = EDMTypeConverter.EDM_DECIMAL;
                         } else {
                             // process integer
