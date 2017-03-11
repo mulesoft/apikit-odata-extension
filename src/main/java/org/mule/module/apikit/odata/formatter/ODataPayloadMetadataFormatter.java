@@ -14,11 +14,12 @@ import org.mule.module.apikit.odata.util.Helper;
 import org.odata4j.edm.EdmDataServices;
 import org.odata4j.format.xml.EdmxFormatWriter;
 
-public class ODataPayloadMetadataFormatter implements ODataPayloadFormatter {
+public class ODataPayloadMetadataFormatter extends ODataPayloadFormatter {
 	private OdataMetadataManager odataMetadataManager;
 
 	public ODataPayloadMetadataFormatter(OdataMetadataManager odataMetadataManager) {
 		this.odataMetadataManager = odataMetadataManager;
+		this.setSupportsAtom(false);
 	}
 
 	public String format(Format format) throws Exception {

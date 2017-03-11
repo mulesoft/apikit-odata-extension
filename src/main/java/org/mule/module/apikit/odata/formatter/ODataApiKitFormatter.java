@@ -22,7 +22,7 @@ import org.odata4j.format.FormatWriter;
 import org.odata4j.format.FormatWriterFactory;
 import org.odata4j.producer.EntitiesResponse;
 
-public class ODataApiKitFormatter implements ODataPayloadFormatter {
+public class ODataApiKitFormatter extends ODataPayloadFormatter {
 	private List<Entry> entries;
 	private String entityName;
 	private String url;
@@ -33,6 +33,7 @@ public class ODataApiKitFormatter implements ODataPayloadFormatter {
 		this.entries = entities;
 		this.entityName = entityName;
 		this.url = url;
+		this.setSupportsAtom(true);
 	}
 
 	public String format(Format format) throws Exception {
