@@ -48,7 +48,8 @@ public class ODataUriHelper {
 	public static final String ODATA_PRIMITIVE_BINARY_REGEXP = "^binary'[A-Fa-f0-9]+$";
 	public static final String ODATA_PRIMITIVE_BYTE_REGEXP = "^\\d+$";
 	public static final String ODATA_PRIMITIVE_BOOLEAN_REGEXP = "^true|false$";
-	public static final String ODATA_PRIMITIVE_DATETIME_REGEXP = "^datetime'[0-9999]{1,4}\\-[1-12]{1,2}\\-[1-31]{1,2}T[0-23]{1,2}:[0-59]{1,2}(:[0-59]{1,2}(.\\d{1,8})?)?'$";
+	// from http://www.regexpal.com/1966
+	public static final String ODATA_PRIMITIVE_DATETIME_REGEXP = "^datetime'\\d\\d\\d\\d-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])T(00|[0-9]|1[0-9]|2[0-3]):([0-9]|[0-5][0-9]):([0-9]|[0-5][0-9])'$";
 	public static final String ODATA_PRIMITIVE_DECIMAL_REGEXP = "^\\-?\\d+(\\.\\d+)?(m|M)?$";
 	public static final String ODATA_PRIMITIVE_DOUBLE_REGEXP = "^\\-?\\d+(\\.\\d+)?(E(\\+|\\-)\\d+)?d$";
 	public static final String ODATA_PRIMITIVE_FLOAT_REGEXP = "^\\-?\\d+(\\.\\d+)?f$";
@@ -56,7 +57,7 @@ public class ODataUriHelper {
 	public static final String ODATA_PRIMITIVE_LONG_REGEXP = "^\\d+L$";
 	public static final String ODATA_PRIMITIVE_STRING_REGEXP = "^'([^']*)'$";
 	public static final String ODATA_PRIMITIVE_TIME_REGEXP = "^[0-23]{1,2}:[0-59]{1,2}:[0-59]{1,2}$";
-	public static final String ODATA_PRIMITIVE_DATETIME_OFFSET_REGEXP = "^[0-9999]{1,4}\\-[1-12]{1,2}\\-[1-31]{1,2}T[0-23]{1,2}:[0-59]{2}:[0-59]{2}Z$";
+	public static final String ODATA_PRIMITIVE_DATETIME_OFFSET_REGEXP = "^\\d\\d\\d\\d-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])T(00|[0-9]|1[0-9]|2[0-3]):([0-9]|[0-5][0-9]):([0-9]|[0-5][0-9])Z$";
 
 	public static final Pattern REST_ENTITY_PATTERN = Pattern.compile(REST_ENTITY_REGEXP);
 	public static final Pattern ODATA_RESOURCE_PATTERN = Pattern.compile(ODATA_RESOURCE_REGEXP);
