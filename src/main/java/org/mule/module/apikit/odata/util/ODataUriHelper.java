@@ -37,7 +37,8 @@ public class ODataUriHelper {
 	public static final String ODATA_FORMAT_REGEXP = "^(atom|json|xml)$";
 	public static final String ODATA_SELECT_REGEXP = "^(\\w|\\-)+(,\\s*(\\w|\\-)+)*$";
 	public static final String ODATA_INLINECOUNT_REGEXP = "^(allpages|none)$";
-	public static final String ODATA_FILTER_LOGICAL_OPERATOR_REGEXP = "^(.+)\\s+(eq|ne|gt|ge|lt|le|and|or)\\s+(.+)$";
+	public static final String ODATA_FILTER_LOGICAL_OPERATOR_REGEXP = "^(.+?)\\s+(and|or)\\s+(.+)$";
+	public static final String ODATA_FILTER_COMPARATOR_OPERATOR_REGEXP = "^(.+?)\\s+(eq|ne|gt|ge|lt|le)\\s+(.+)$";
 	public static final String ODATA_FILTER_ARITHMETIC_OPERATOR_REGEXP = "^(.+)\\s+(add|sub|mul|div|mod)\\s+(.+)$";
 	public static final String ODATA_FILTER_NEGATION_OPERATOR_REGEXP = "^not\\s+(.+)$";
 	public static final String ODATA_FILTER_GROUP_OPERATOR_REGEXP = "^\\((.*)\\)$";
@@ -73,6 +74,7 @@ public class ODataUriHelper {
 	public static final Pattern ODATA_SELECT_PATTERN = Pattern.compile(ODATA_SELECT_REGEXP);
 	public static final Pattern ODATA_INLINECOUNT_PATTERN = Pattern.compile(ODATA_INLINECOUNT_REGEXP);
 	public static final Pattern ODATA_FILTER_LOGICAL_OPERATOR_PATTERN = Pattern.compile(ODATA_FILTER_LOGICAL_OPERATOR_REGEXP);
+	public static final Pattern ODATA_FILTER_COMPARATOR_OPERATOR_PATTERN = Pattern.compile(ODATA_FILTER_COMPARATOR_OPERATOR_REGEXP);
 	public static final Pattern ODATA_FILTER_ARITHMETIC_OPERATOR_PATTERN = Pattern.compile(ODATA_FILTER_ARITHMETIC_OPERATOR_REGEXP);
 	public static final Pattern ODATA_FILTER_NEGATION_OPERATOR_PATTERN = Pattern.compile(ODATA_FILTER_NEGATION_OPERATOR_REGEXP);
 	public static final Pattern ODATA_FILTER_GROUP_OPERATOR_PATTERN = Pattern.compile(ODATA_FILTER_GROUP_OPERATOR_REGEXP);
@@ -394,6 +396,13 @@ public class ODataUriHelper {
 
 		// validate logical binary operators
 		m = ODATA_FILTER_LOGICAL_OPERATOR_PATTERN.matcher(filter);
+		if (m.matches()) {
+			String left = m.group(1);
+			String right = m.group(3);
+			return validFilter(left) && validFilter(right);
+		}
+
+		m = ODATA_FILTER_COMPARATOR_OPERATOR_PATTERN.matcher(filter);
 		if (m.matches()) {
 			String left = m.group(1);
 			String right = m.group(3);
