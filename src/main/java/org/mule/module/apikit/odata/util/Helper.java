@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.mule.module.apikit.model.Entity;
 import org.mule.module.apikit.odata.exception.ODataInvalidFlowResponseException;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
@@ -124,7 +125,9 @@ public class Helper {
 					}
 				}
 
-				String entityName = entityMetadata.getName();
+				Entity entity = new Entity(entityMetadata.getName());
+				String entityName = entity.getCollectionName();
+
 				EdmEntityType.Builder type = EdmEntityType.newBuilder().setNamespace(namespace).setName(entityName).addKeys(keys).addProperties(properties);
 				entityTypes.add(type);
 

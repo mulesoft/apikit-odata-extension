@@ -43,6 +43,11 @@ public class EntityModelTestCase {
 		Assert.assertEquals("Babies", e.getName());
 		Assert.assertEquals("Babies", e.getCollectionName());
 		Assert.assertEquals("Babies", e.getElementName());
+
+		e = new Entity("city");
+		Assert.assertEquals("city", e.getName());
+		Assert.assertEquals("cities", e.getCollectionName());
+		Assert.assertEquals("city", e.getElementName());
 	}
 
 }

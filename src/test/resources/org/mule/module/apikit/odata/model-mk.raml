@@ -101,3 +101,15 @@ types:
         type: integer
         (odata.nullable): true
         (odata.key): true
+  city:
+    type: object
+    (odata.remote): Cities
+    properties:
+      cityId:
+        type: integer
+        (odata.key): true
+        (odata.nullable): false
+      cityName:
+        type: string
+        (odata.nullable): false
+        (odata.key): false
