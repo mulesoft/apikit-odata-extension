@@ -15,7 +15,7 @@ import org.mule.module.apikit.model.exception.InvalidModelException;
 
 public class Entity {
 
-	private NameConverter nameTools = new DefaultNameConverter();
+	private static final NameConverter NAME_CONVERTER = new DefaultNameConverter();
 	
 	private String name;
 	private String remote;
@@ -39,7 +39,7 @@ public class Entity {
 	}
 	
 	public String getCollectionName() {
-		return ( name.endsWith("s") ? name : nameTools.pluralize(name) );
+		return pluralizeName(name);
 	}
 	
 	public String getIdElementName() {
@@ -85,5 +85,9 @@ public class Entity {
 		}
 
 		return keys;
+	}
+
+	public static String pluralizeName(String name) {
+		return ( name.endsWith("s") ? name : NAME_CONVERTER.pluralize(name) );
 	}
 }

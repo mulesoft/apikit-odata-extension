@@ -39,6 +39,8 @@ import org.odata4j.edm.EdmSchema;
 import org.odata4j.producer.EntitiesResponse;
 import org.odata4j.producer.Responses;
 
+import static org.mule.module.apikit.model.Entity.pluralizeName;
+
 public class Helper {
 
 	private static final OdataMetadataManager gwMetadataManager = new OdataMetadataManager();
@@ -124,11 +126,11 @@ public class Helper {
 					}
 				}
 
-				String entityName = entityMetadata.getName();
+				final String entityName = entityMetadata.getName();
 				EdmEntityType.Builder type = EdmEntityType.newBuilder().setNamespace(namespace).setName(entityName).addKeys(keys).addProperties(properties);
 				entityTypes.add(type);
 
-				entitySets.add(EdmEntitySet.newBuilder().setName(entityName).setEntityType(type));
+				entitySets.add(EdmEntitySet.newBuilder().setName(pluralizeName(entityName)).setEntityType(type));
 			}
 
 			EdmEntityContainer.Builder container = EdmEntityContainer.newBuilder().setName("ODataEntityContainer").setIsDefault(true).addEntitySets(entitySets);
