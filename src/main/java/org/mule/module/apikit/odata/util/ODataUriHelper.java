@@ -9,7 +9,6 @@ package org.mule.module.apikit.odata.util;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.exception.ODataInvalidUriException;
 import org.odata4j.expression.BoolCommonExpression;
-import org.odata4j.expression.FilterExpressionVisitor;
 import org.odata4j.producer.resources.OptionsQueryParser;
 
 import java.util.ArrayList;

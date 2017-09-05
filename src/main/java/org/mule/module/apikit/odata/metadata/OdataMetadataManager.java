@@ -18,6 +18,8 @@ import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 import org.mule.module.apikit.odata.metadata.raml.RamlParser;
 import org.mule.module.apikit.odata.metadata.raml.RamlParserUtils;
 
+import static org.mule.module.apikit.model.Entity.pluralizeName;
+
 /**
  * 
  * @author arielsegura
@@ -102,7 +104,8 @@ public class OdataMetadataManager {
 			OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		synchronized (lock) {
 			for (EntityDefinition entityDefinition : entitySet.toList()) {
-				if (entityDefinition.getName().equalsIgnoreCase(entityName)) {
+				final String entityDefinitionName = entityDefinition.getName();
+				if (entityDefinitionName.equalsIgnoreCase(entityName) || pluralizeName(entityDefinitionName).equalsIgnoreCase(entityName)) {
 					return entityDefinition;
 				}
 			}
