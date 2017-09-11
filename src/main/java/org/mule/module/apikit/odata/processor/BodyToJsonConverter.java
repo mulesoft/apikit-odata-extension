@@ -11,17 +11,15 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.mule.module.apikit.odata.exception.ODataBadRequestException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
-import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
-import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.util.EDMTypeConverter;
 import org.odata4j.edm.EdmSimpleType;
-import org.odata4j.edm.EdmType;
 
 import javax.annotation.Nullable;
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -121,6 +119,7 @@ public class BodyToJsonConverter {
 		final String key = "content";
 		try {
 			if (BOOLEAN.equals(type)) return object.getBoolean(key);
+			if (DECIMAL.equals(type)) return new BigDecimal(object.getString(key));
 			if (DOUBLE.equals(type)) return object.getDouble(key);
 			if (INT64.equals(type)) return object.getLong(key);
 			if (INT16.equals(type) || INT32.equals(type)) {
