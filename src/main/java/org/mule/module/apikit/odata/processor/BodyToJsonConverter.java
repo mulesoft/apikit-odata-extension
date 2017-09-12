@@ -135,11 +135,9 @@ public class BodyToJsonConverter {
 			if (DECIMAL.equals(type)) return new BigDecimal(object.getString(key));
 			if (DOUBLE.equals(type)) return object.getDouble(key);
 			if (INT64.equals(type)) return object.getLong(key);
-			if (INT16.equals(type) || INT32.equals(type)) {
-				return object.getInt(key);
-			} else {
-				return object.getString(key);
-			}
+			if (INT16.equals(type) || INT32.equals(type)) return object.getInt(key);
+
+			return object.getString(key);
 		} catch (final JSONException e) {
 			throw new ODataInvalidFormatException("Invalid format.");
 		}
