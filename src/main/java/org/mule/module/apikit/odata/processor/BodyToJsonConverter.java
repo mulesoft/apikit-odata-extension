@@ -6,6 +6,7 @@
  */
 package org.mule.module.apikit.odata.processor;
 
+import com.google.common.collect.ImmutableSet;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
@@ -21,12 +22,18 @@ import org.odata4j.edm.EdmSimpleType;
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.odata4j.edm.EdmSimpleType.*;
+import static com.google.common.collect.ImmutableSet.copyOf;
+import static org.odata4j.edm.EdmSimpleType.BOOLEAN;
+import static org.odata4j.edm.EdmSimpleType.DECIMAL;
+import static org.odata4j.edm.EdmSimpleType.DOUBLE;
+import static org.odata4j.edm.EdmSimpleType.INT16;
+import static org.odata4j.edm.EdmSimpleType.INT32;
+import static org.odata4j.edm.EdmSimpleType.INT64;
+import static org.odata4j.edm.EdmSimpleType.STRING;
 
 /*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
@@ -35,6 +42,11 @@ import static org.odata4j.edm.EdmSimpleType.*;
  * LICENSE.txt file.
  */
 public class BodyToJsonConverter {
+	private static final String XML_PREAMBLE_REGEX = "(<\\?[^<]*\\?>)?";
+	private static final String XMLNS_DECLARATION_REGEX = "xmlns.*?(\"|\').*?(\"|\')";
+	private static final String NAMESPACE_DECLARATION_REGEX = "xmlns:(\\w+)=.*?(\"|\').*?(\"|\')";
+	private static final Pattern NAMESPACE_DECLARATION_PATTERN = Pattern.compile(NAMESPACE_DECLARATION_REGEX);
+
 	public static String convertPayload(String entity, boolean isXMLFormat, String payloadAsString) throws ODataInvalidFormatException, ODataBadRequestException, OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
 		if (isXMLFormat){
 			return adaptBodyToJson(payloadAsString).toString();
@@ -60,14 +72,14 @@ public class BodyToJsonConverter {
 			xmlString = removeNamespace(xmlString, np);
 		}
 
-		return xmlString.replaceAll("(<\\?[^<]*\\?>)?", ""). /* remove preamble */
-				replaceAll("xmlns.*?(\"|\').*?(\"|\')", ""); /* remove xmlns declaration */
+		return xmlString.replaceAll(XML_PREAMBLE_REGEX, "") /* remove preamble */
+				.replaceAll(XMLNS_DECLARATION_REGEX, ""); /* remove xmlns declaration */
 
 	}
 
 	private static Set<String> getNamespaces(String xmlString) {
 		Set<String> namespaces = new HashSet<>();
-		Matcher m = Pattern.compile("xmlns:(\\w+)=.*?(\"|\').*?(\"|\')").matcher(xmlString);
+		Matcher m = NAMESPACE_DECLARATION_PATTERN.matcher(xmlString);
 		while (m.find()) {
 			namespaces.add(m.group(1));
 		}
@@ -95,15 +107,12 @@ public class BodyToJsonConverter {
 			JSONObject entry = jsonObject.getJSONObject("entry");
 			JSONObject content = entry.getJSONObject("content");
 			JSONObject properties = content.getJSONObject("properties");
-			Iterator<String> keyIterator = properties.keys();
 
-			while(keyIterator.hasNext()){
-				String key = keyIterator.next();
+			final ImmutableSet<String> keys = copyOf(properties.keySet());
+			for (final String key : keys) {
 				final Object value = properties.get(key);
 				if (value instanceof JSONObject) {
-					JSONObject object = properties.getJSONObject(key);
-					final EdmSimpleType type = getEdmType(object);
-					properties.put(key, getContent(object, type));
+					properties.put(key, getContent((JSONObject) value));
 				} else {
 					properties.put(key, value.toString());
 				}
@@ -115,9 +124,13 @@ public class BodyToJsonConverter {
 	}
 
 	@Nullable
-	private static Object getContent(JSONObject object, EdmSimpleType type) throws ODataInvalidFormatException {
+	private static Object getContent(JSONObject object) throws ODataInvalidFormatException {
 		final String key = "content";
+
+		if (isNull(object)) return null;
+
 		try {
+			final EdmSimpleType type = getEdmType(object);
 			if (BOOLEAN.equals(type)) return object.getBoolean(key);
 			if (DECIMAL.equals(type)) return new BigDecimal(object.getString(key));
 			if (DOUBLE.equals(type)) return object.getDouble(key);
@@ -128,12 +141,16 @@ public class BodyToJsonConverter {
 				return object.getString(key);
 			}
 		} catch (final JSONException e) {
-			boolean isNull = object.getBoolean("null");
-			if (isNull) return null;
+			throw new ODataInvalidFormatException("Invalid format.");
 		}
+	}
 
-		// if object is not null and content is not present throw an error
-		throw new ODataInvalidFormatException("Invalid format.");
+	private static boolean isNull(JSONObject object) {
+		try {
+			return object.getBoolean("null");
+		} catch (final JSONException e) {
+			return false;
+		}
 	}
 
 	private static EdmSimpleType getEdmType(JSONObject object) {
