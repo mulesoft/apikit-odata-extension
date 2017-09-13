@@ -42,12 +42,10 @@ import static org.odata4j.edm.EdmSimpleType.STRING;
  * LICENSE.txt file.
  */
 public class BodyToJsonConverter {
-	private static final String XML_PREAMBLE_REGEX = "(<\\?[^<]*\\?>)?";
-	private static final String XMLNS_DECLARATION_REGEX = "xmlns.*?(\"|\').*?(\"|\')";
-	private static final String NAMESPACE_DECLARATION_REGEX = "xmlns:(\\w+)=.*?(\"|\').*?(\"|\')";
+	private static final String NAMESPACE_DECLARATION_REGEX = "xmlns:(\\w+)=.*?([\"']).*?([\"'])";
 	private static final Pattern NAMESPACE_DECLARATION_PATTERN = Pattern.compile(NAMESPACE_DECLARATION_REGEX);
 
-	public static String convertPayload(String entity, boolean isXMLFormat, String payloadAsString) throws ODataInvalidFormatException, ODataBadRequestException, OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
+	public static String convertPayload(String entity, boolean isXMLFormat, String payloadAsString) throws ODataBadRequestException, OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
 		if (isXMLFormat){
 			return adaptBodyToJson(payloadAsString).toString();
 		} else {
@@ -85,6 +83,7 @@ public class BodyToJsonConverter {
 	}
 
 	private static JSONObject removeNamespaces(JSONObject jsonObject, Set<String> namespaces) {
+		//noinspection unchecked
 		final ImmutableSet<String> keys = copyOf(jsonObject.keySet());
 		for (final String key : keys) {
 
@@ -107,6 +106,7 @@ public class BodyToJsonConverter {
 			final JSONObject content = entry.getJSONObject("content");
 			final JSONObject properties = content.getJSONObject("properties");
 
+			//noinspection unchecked
 			final ImmutableSet<String> keys = copyOf(properties.keySet());
 			for (final String key : keys) {
 				final Object value = properties.get(key);
