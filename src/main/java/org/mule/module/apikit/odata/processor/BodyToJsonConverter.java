@@ -67,16 +67,6 @@ public class BodyToJsonConverter {
 		}
 	}
 
-	public static String removeXmlStringNamespaceAndPreamble(String xmlString) {
-		for (String np : getNamespaces(xmlString)) {
-			xmlString = removeNamespace(xmlString, np);
-		}
-
-		return xmlString.replaceAll(XML_PREAMBLE_REGEX, "") /* remove preamble */
-				.replaceAll(XMLNS_DECLARATION_REGEX, ""); /* remove xmlns declaration */
-
-	}
-
 	private static Set<String> getNamespaces(String xmlString) {
 		Set<String> namespaces = new HashSet<>();
 		Matcher m = NAMESPACE_DECLARATION_PATTERN.matcher(xmlString);
@@ -86,27 +76,36 @@ public class BodyToJsonConverter {
 		return namespaces;
 	}
 
-	private static String removeNamespace(String xmlString, String namespace) {
-		final String openingTagRegex = "(<[^<>]*)(" + namespace + ":)([^<>]+>)";
-		final String closingTagRegex = "(</[^<>]*)(" + namespace + ":)([^<>]+>)";
-
-		xmlString = xmlString.replaceAll(openingTagRegex, "$1$3") /* remove opening tag prefix */
-				.replaceAll(closingTagRegex, "$1$3"); /* remove closing tags prefix */
-
-		final Matcher m = Pattern.compile(openingTagRegex + "|" + closingTagRegex).matcher(xmlString);
-		if (m.find()) {
-			return removeNamespace(xmlString, namespace);
-		} else {
-			return xmlString;
+	private static String removeNamespaceFromKey(String key, Set<String> namespaces) {
+		for (final String namespace : namespaces) {
+			if (key.startsWith(namespace + ":")) return key.replaceFirst("^(" + namespace + ":)(\\w+)$", "$2");
 		}
+
+		return key;
+	}
+
+	private static JSONObject removeNamespaces(JSONObject jsonObject, Set<String> namespaces) {
+		final ImmutableSet<String> keys = copyOf(jsonObject.keySet());
+		for (final String key : keys) {
+
+			Object value = jsonObject.get(key);
+			if (value instanceof JSONObject) {
+				value = removeNamespaces((JSONObject) value, namespaces);
+			}
+
+			jsonObject.remove(key); // remove old key
+			jsonObject.put(removeNamespaceFromKey(key, namespaces), value); // add new key without namespaces
+		}
+
+		return jsonObject;
 	}
 
 	private static JSONObject adaptBodyToJson(String body) throws ODataInvalidFormatException, OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
 		try {
-			JSONObject jsonObject = XML.toJSONObject(removeXmlStringNamespaceAndPreamble(body));
-			JSONObject entry = jsonObject.getJSONObject("entry");
-			JSONObject content = entry.getJSONObject("content");
-			JSONObject properties = content.getJSONObject("properties");
+			final JSONObject jsonObject = removeNamespaces(XML.toJSONObject(body), getNamespaces(body));
+			final JSONObject entry = jsonObject.getJSONObject("entry");
+			final JSONObject content = entry.getJSONObject("content");
+			final JSONObject properties = content.getJSONObject("properties");
 
 			final ImmutableSet<String> keys = copyOf(properties.keySet());
 			for (final String key : keys) {
