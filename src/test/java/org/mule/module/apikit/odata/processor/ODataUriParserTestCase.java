@@ -26,7 +26,7 @@ public class ODataUriParserTestCase {
 
 		String actual = BodyToJsonConverter.convertPayload(null, true, xml).toString();
 
-		String expected = "{\"OrderID\":20000,\"ShipAddress\":\"ship-address-1\",\"ShipName\":\"ship-name-1\"}";
+		String expected = "{\"OrderID\":\"20000\",\"ShipAddress\":\"ship-address-1\",\"ShipName\":\"ship-name-1\"}";
 
 		JSONAssert.assertEquals(expected, actual, false);
 	}

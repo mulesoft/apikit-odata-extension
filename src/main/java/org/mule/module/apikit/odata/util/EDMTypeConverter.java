@@ -36,7 +36,7 @@ public class EDMTypeConverter {
 	public static final String EDM_GUID = "Edm.Guid";
 	public static final String EDM_SBYTE = "Edm.SByte";
 	
-	public static EdmType convert(String type) {
+	public static EdmSimpleType convert(String type) {
 
 		if (type.equals(EDM_STRING)) {
 		  return EdmSimpleType.STRING;

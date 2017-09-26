@@ -29,5 +29,6 @@ public class BodyToJsonConverterTestCase {
         assertTrue(jsonObject.get("ShipAddress").equals("Direccion"));
         assertTrue(Integer.compare((Integer)jsonObject.get("SmallInt"), 1) == 0);
         assertTrue(jsonObject.get("ShipName").equals("Testing"));
+        assertTrue(jsonObject.isNull("NullValue"));
     }
 }

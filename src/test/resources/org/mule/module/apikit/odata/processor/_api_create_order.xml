@@ -8,12 +8,13 @@
     <id />
     <content type="application/xml">
         <m:properties>
-            <d:Double>1.2</d:Double>
-            <d:Freight>32.01</d:Freight>
+            <d:Double m:type="Edm.Double">1.2</d:Double>
+            <d:Freight m:type="Edm.Double">32.01</d:Freight>
             <d:OrderDate m:type="Edm.DateTime">1996-08-05 00:00:00</d:OrderDate>
             <d:ShipAddress>Direccion</d:ShipAddress>
             <d:ShipName>Testing</d:ShipName>
-            <d:SmallInt>1</d:SmallInt>
+            <d:SmallInt m:type="Edm.Int32">1</d:SmallInt>
+            <d:NullValue m:type="Edm.Int32" m:null="true"></d:NullValue>
         </m:properties>
     </content>
 </entry>

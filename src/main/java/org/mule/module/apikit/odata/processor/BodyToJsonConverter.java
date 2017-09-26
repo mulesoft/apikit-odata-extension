@@ -6,19 +6,34 @@
  */
 package org.mule.module.apikit.odata.processor;
 
+import com.google.common.collect.ImmutableSet;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 import org.mule.module.apikit.odata.exception.ODataBadRequestException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
-import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
-import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
+import org.mule.module.apikit.odata.util.EDMTypeConverter;
+import org.odata4j.edm.EdmSimpleType;
 
-import java.util.Iterator;
+import javax.annotation.Nullable;
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.google.common.collect.ImmutableSet.copyOf;
+import static org.odata4j.edm.EdmSimpleType.BOOLEAN;
+import static org.odata4j.edm.EdmSimpleType.DECIMAL;
+import static org.odata4j.edm.EdmSimpleType.DOUBLE;
+import static org.odata4j.edm.EdmSimpleType.INT16;
+import static org.odata4j.edm.EdmSimpleType.INT32;
+import static org.odata4j.edm.EdmSimpleType.INT64;
+import static org.odata4j.edm.EdmSimpleType.STRING;
 
 /*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
@@ -27,7 +42,10 @@ import java.util.Iterator;
  * LICENSE.txt file.
  */
 public class BodyToJsonConverter {
-	public static String convertPayload(String entity, boolean isXMLFormat, String payloadAsString) throws ODataInvalidFormatException, ODataBadRequestException, OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
+	private static final String NAMESPACE_DECLARATION_REGEX = "xmlns:(\\w+)=.*?([\"']).*?([\"'])";
+	private static final Pattern NAMESPACE_DECLARATION_PATTERN = Pattern.compile(NAMESPACE_DECLARATION_REGEX);
+
+	public static String convertPayload(String entity, boolean isXMLFormat, String payloadAsString) throws ODataBadRequestException, OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
 		if (isXMLFormat){
 			return adaptBodyToJson(payloadAsString).toString();
 		} else {
@@ -47,33 +65,96 @@ public class BodyToJsonConverter {
 		}
 	}
 
-	public static String removeXmlStringNamespaceAndPreamble(String xmlString) {
-		return xmlString.replaceAll("(<\\?[^<]*\\?>)?", ""). /* remove preamble */
-		replaceAll("xmlns.*?(\"|\').*?(\"|\')", "") /* remove xmlns declaration */
-		.replaceAll("(<)(\\w+:)(.*?>)", "$1$3") /* remove opening tag prefix */
-		.replaceAll("(</)(\\w+:)(.*?>)", "$1$3"); /* remove closing tags prefix */
+	private static Set<String> getNamespaces(String xmlString) {
+		Set<String> namespaces = new HashSet<>();
+		Matcher m = NAMESPACE_DECLARATION_PATTERN.matcher(xmlString);
+		while (m.find()) {
+			namespaces.add(m.group(1));
+		}
+		return namespaces;
+	}
+
+	private static String removeNamespaceFromKey(String key, Set<String> namespaces) {
+		for (final String namespace : namespaces) {
+			if (key.startsWith(namespace + ":")) return key.replaceFirst("^(" + namespace + ":)(\\w+)$", "$2");
+		}
+
+		return key;
+	}
+
+	private static JSONObject removeNamespaces(JSONObject jsonObject, Set<String> namespaces) {
+		//noinspection unchecked
+		final ImmutableSet<String> keys = copyOf(jsonObject.keySet());
+		for (final String key : keys) {
+
+			Object value = jsonObject.get(key);
+			if (value instanceof JSONObject) {
+				value = removeNamespaces((JSONObject) value, namespaces);
+			}
+
+			jsonObject.remove(key); // remove old key
+			jsonObject.put(removeNamespaceFromKey(key, namespaces), value); // add new key without namespaces
+		}
+
+		return jsonObject;
 	}
 
 	private static JSONObject adaptBodyToJson(String body) throws ODataInvalidFormatException, OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
 		try {
-			JSONObject jsonObject = XML.toJSONObject(removeXmlStringNamespaceAndPreamble(body));
-			JSONObject entry = jsonObject.getJSONObject("entry");
-			JSONObject content = entry.getJSONObject("content");
-			JSONObject properties = content.getJSONObject("properties");
-			Iterator<String> keyIterator = properties.keys();
+			final JSONObject jsonObject = removeNamespaces(XML.toJSONObject(body), getNamespaces(body));
+			final JSONObject entry = jsonObject.getJSONObject("entry");
+			final JSONObject content = entry.getJSONObject("content");
+			final JSONObject properties = content.getJSONObject("properties");
 
-			while(keyIterator.hasNext()){
-				String key = keyIterator.next();
-				try {
-					JSONObject object = properties.getJSONObject(key);
-					properties.put(key, object.get("content"));
-				} catch (JSONException ex){
-					// not a json object? it's ok
+			//noinspection unchecked
+			final ImmutableSet<String> keys = copyOf(properties.keySet());
+			for (final String key : keys) {
+				final Object value = properties.get(key);
+				if (value instanceof JSONObject) {
+					properties.put(key, getContent((JSONObject) value));
+				} else {
+					properties.put(key, value.toString());
 				}
 			}
 			return properties;
 		} catch (JSONException e) {
 			throw new ODataInvalidFormatException("Invalid format.");
+		}
+	}
+
+	@Nullable
+	private static Object getContent(JSONObject object) throws ODataInvalidFormatException {
+		final String key = "content";
+
+		if (isNull(object)) return null;
+
+		try {
+			final EdmSimpleType type = getEdmType(object);
+			if (BOOLEAN.equals(type)) return object.getBoolean(key);
+			if (DECIMAL.equals(type)) return new BigDecimal(object.getString(key));
+			if (DOUBLE.equals(type)) return object.getDouble(key);
+			if (INT64.equals(type)) return object.getLong(key);
+			if (INT16.equals(type) || INT32.equals(type)) return object.getInt(key);
+
+			return object.getString(key);
+		} catch (final JSONException e) {
+			throw new ODataInvalidFormatException("Invalid format.");
+		}
+	}
+
+	private static boolean isNull(JSONObject object) {
+		try {
+			return object.getBoolean("null");
+		} catch (final JSONException e) {
+			return false;
+		}
+	}
+
+	private static EdmSimpleType getEdmType(JSONObject object) {
+		try {
+			return EDMTypeConverter.convert(object.getString("type"));
+		} catch (final JSONException e) {
+			return STRING;
 		}
 	}
 }
