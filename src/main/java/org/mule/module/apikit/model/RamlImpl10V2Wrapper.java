@@ -13,24 +13,48 @@ import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 import org.mule.module.apikit.odata.metadata.raml.RamlParser;
-import org.mule.module.apikit.odata.util.EDMTypeConverter;
 import org.raml.v2.api.RamlModelResult;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.api.Library;
-import org.raml.v2.api.model.v10.datamodel.*;
+import org.raml.v2.api.model.v10.datamodel.BooleanTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.DateTimeOnlyTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.DateTimeTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.DateTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.FileTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.IntegerTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.NullTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.NumberTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.TimeOnlyTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 import org.raml.v2.api.model.v10.declarations.AnnotationRef;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
 import static org.mule.module.apikit.model.OdataServiceConstants.ODATA_MODEL;
+import static org.mule.module.apikit.odata.metadata.raml.RamlParser.GUID;
+import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_BINARY;
+import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_BOOLEAN;
+import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_BYTE;
+import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_DATETIME;
+import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_DATETIMEOFFSET;
+import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_DECIMAL;
+import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_DOUBLE;
+import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_GUID;
+import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_INT16;
+import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_INT32;
+import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_INT64;
+import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_SINGLE;
+import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_STRING;
+import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_TIME;
 
-/**
- * Created by arielsegura on 6/6/16.
- */
 public class RamlImpl10V2Wrapper {
-    RamlModelResult api;
+    private RamlModelResult api;
 
     public RamlImpl10V2Wrapper(RamlModelResult api) {
         this.api = api;
@@ -38,13 +62,75 @@ public class RamlImpl10V2Wrapper {
 
     public EntityDefinitionSet getSchemas() throws OdataMetadataFieldsException, OdataMetadataFormatException {
 
-        EntityDefinitionSet entityDefinitionSet = new EntityDefinitionSet();
+        final EntityDefinitionSet entityDefinitionSet = new EntityDefinitionSet();
 
+        for (TypeDeclaration typeDeclaration : getTypes()) {
+            if (typeDeclaration instanceof ObjectTypeDeclaration) {
+                final EntityDefinition entityDefinition = buildEntityDefinition((ObjectTypeDeclaration) typeDeclaration);
+                entityDefinitionSet.addEntity(entityDefinition);
+            } else {
+                throw new OdataMetadataFormatException("Type not supported. " + typeDeclaration.name());
+            }
+        }
+
+        return entityDefinitionSet;
+    }
+
+    private EntityDefinition buildEntityDefinition(ObjectTypeDeclaration objectTypeDeclaration) throws OdataMetadataFormatException, OdataMetadataFieldsException {
+
+        if (objectTypeDeclaration.properties().isEmpty()) throw new OdataMetadataFormatException("No schemas found.");
+
+        // set entity properties
+        String entityName = objectTypeDeclaration.name();
+        String remoteName = getAnnotation(objectTypeDeclaration, RamlParser.NAMESPACE_REMOTE_NAME);
+        EntityDefinition entityDefinition = new EntityDefinition(entityName, remoteName);
+
+        for (TypeDeclaration propertyTypeDeclaration : objectTypeDeclaration.properties()) {
+            final TypeDeclaration scalarTypeDeclaration = getScalarTypeDeclaration(propertyTypeDeclaration);
+
+            final String propertyName = scalarTypeDeclaration.name();
+
+            notNull("Property \"name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", entityName);
+            notNull("Property \"remote name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", remoteName);
+
+            final String key = getAnnotation(scalarTypeDeclaration, RamlParser.NAMESPACE_KEY_PROPERTY);
+            notNull("Property \"key\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", key);
+            final boolean isKey = Boolean.valueOf(key);
+
+            final String nullable = getAnnotation(scalarTypeDeclaration, RamlParser.NAMESPACE_NULLABLE_PROPERTY);
+            notNull("Property \"nullable\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", nullable);
+            final boolean isNullable = Boolean.valueOf(nullable);
+
+            final String type = getOdataType(scalarTypeDeclaration);
+            notNull("Property \"type\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", type);
+
+            String maxLength = null;
+            if (EDM_STRING.equals(type)) {
+                Integer maxLengthInt = ((StringTypeDeclaration) scalarTypeDeclaration).maxLength();
+                maxLength = maxLengthInt != null ? String.valueOf(maxLengthInt) : null;
+            }
+
+            final String defaultValue = scalarTypeDeclaration.defaultValue();
+            final String precision = getAnnotation(scalarTypeDeclaration, RamlParser.NAMESPACE_PRECISION_PROPERTY);
+            final String scale = getAnnotation(scalarTypeDeclaration, RamlParser.NAMESPACE_SCALE_PROPERTY);
+
+            EntityDefinitionProperty entityDefinitionProperty = new EntityDefinitionProperty(propertyName, type, isNullable, isKey, defaultValue, maxLength, false, null, false, precision, scale);
+            entityDefinition.addProperty(entityDefinitionProperty);
+
+            if (!entityDefinition.hasPrimaryKey() && entityDefinitionProperty.isKey()) {
+                entityDefinition.setHasPrimaryKey(true);
+            }
+        }
+        return entityDefinition;
+    }
+
+    private List<TypeDeclaration> getTypes() throws OdataMetadataFormatException {
         List<TypeDeclaration> types = new ArrayList<>();
 
         if(api.getApiV10() == null) {
             // parsing a library
-            types = api.getLibrary().types();
+            final Library library = api.getLibrary();
+            if (library != null) types = library.types();
         } else {
             // types must be defined in the model library referenced in the root raml
             Api apiv10 = api.getApiV10();
@@ -60,153 +146,80 @@ public class RamlImpl10V2Wrapper {
             throw new OdataMetadataFormatException(format("No types defined in %s.", ODATA_MODEL));
         }
 
-        for (TypeDeclaration typeDeclaration : types) {
-            if (typeDeclaration instanceof ObjectTypeDeclaration) {
-                ObjectTypeDeclaration objectTypeDeclaration = (ObjectTypeDeclaration) typeDeclaration;
-                // set entity properties
-                String entityName = objectTypeDeclaration.name();
-                String remoteName = getRemoteName(objectTypeDeclaration);
-                EntityDefinition entityDefinition = new EntityDefinition(entityName, remoteName);
-
-                if (objectTypeDeclaration.properties().isEmpty()) {
-                    throw new OdataMetadataFormatException("No schemas found.");
-                }
-                for (TypeDeclaration propertyTypeDeclaration : objectTypeDeclaration.properties()) {
-                    String propertyName = propertyTypeDeclaration.name();
-                    String type = null;
-                    String defaultValue = propertyTypeDeclaration.defaultValue();
-                    String maxLength = null;
-                    String collation = null;
-                    String precision = null;
-                    String scale = null;
-                    Boolean nullable = null;
-                    Boolean key = null;
-                    Boolean fixedLength = false;
-                    Boolean unicode = false;
-                    for (AnnotationRef annotationRef : propertyTypeDeclaration.annotations()) {
-                        if (RamlParser.TYPE_PROPERTY.equals(annotationRef.name())) {
-                            type = annotationRef.structuredValue().value().toString();
-                        } else if (RamlParser.NAMESPACE_KEY_PROPERTY.equals(annotationRef.name())) {
-                            key = Boolean.valueOf(annotationRef.structuredValue().value().toString());
-                        } else if (RamlParser.NAMESPACE_NULLABLE_PROPERTY.equals(annotationRef.name())) {
-                            nullable = Boolean.valueOf(annotationRef.structuredValue().value().toString());
-                        } else if (RamlParser.NAMESPACE_PRECISION_PROPERTY.equals(annotationRef.name())) {
-                            precision = annotationRef.structuredValue().value().toString();
-                        } else if (RamlParser.NAMESPACE_SCALE_PROPERTY.equals(annotationRef.name())) {
-                            scale = annotationRef.structuredValue().value().toString();
-                        }
-                    }
-
-                    TypeDeclaration propTypeDeclaration = null;
-                    if(propertyTypeDeclaration instanceof UnionTypeDeclaration){
-                        UnionTypeDeclaration unionType = (UnionTypeDeclaration) propertyTypeDeclaration;
-                        for(TypeDeclaration unionSubType : unionType.of()){
-                            if(!(unionSubType instanceof NullTypeDeclaration)){
-                                propTypeDeclaration = unionSubType;
-                            }
-                        }
-                        if(propTypeDeclaration == null){
-                            throw new OdataMetadataFieldsException(format("Property %s cannot be just null.", propertyTypeDeclaration.name()));
-                        }
-                    } else {
-                        propTypeDeclaration = propertyTypeDeclaration;
-                    }
-
-                    if (propTypeDeclaration instanceof IntegerTypeDeclaration) {
-                        IntegerTypeDeclaration castedType = (IntegerTypeDeclaration) propertyTypeDeclaration;
-                        castedType.maximum();
-
-                        String format = castedType.format();
-                        type = processIntegerType(format);
-
-                    } else if (propTypeDeclaration instanceof BooleanTypeDeclaration) {
-                        BooleanTypeDeclaration castedType = (BooleanTypeDeclaration) propTypeDeclaration;
-                        castedType.defaultValue();
-                        type = EDMTypeConverter.EDM_BOOLEAN;
-                    } else if (propTypeDeclaration instanceof DateTimeOnlyTypeDeclaration) {
-                        DateTimeOnlyTypeDeclaration castedType = (DateTimeOnlyTypeDeclaration) propTypeDeclaration;
-                        type = EDMTypeConverter.EDM_DATETIME;
-                    } else if (propTypeDeclaration instanceof DateTimeTypeDeclaration) {
-                        DateTimeTypeDeclaration castedType = (DateTimeTypeDeclaration) propTypeDeclaration;
-                        type = EDMTypeConverter.EDM_DATETIME;
-                    } else if (propTypeDeclaration instanceof DateTypeDeclaration) {
-                        DateTypeDeclaration castedType = (DateTypeDeclaration) propTypeDeclaration;
-                        type = EDMTypeConverter.EDM_DATETIME;
-                    } else if (propTypeDeclaration instanceof NumberTypeDeclaration) {
-                        NumberTypeDeclaration castedType = (NumberTypeDeclaration) propTypeDeclaration;
-                        String format = castedType.format();
-                        if ("float".equals(format)) {
-                            type = EDMTypeConverter.EDM_SINGLE;
-                        } else if(scale != null && precision != null){
-                            type = EDMTypeConverter.EDM_DECIMAL;
-                        } else {
-                            // process integer
-                            type = processIntegerType(format);
-                        }
-                    } else if (propTypeDeclaration instanceof StringTypeDeclaration) {
-                        StringTypeDeclaration castedType = (StringTypeDeclaration) propTypeDeclaration;
-                        for (AnnotationRef annotation : castedType.annotations()) {
-                            if ("guid".equals(annotation.name())) {
-                                type = EDMTypeConverter.EDM_GUID;
-                            }
-                        }
-                        if (type == null) {
-                            Integer maxLengthInt = castedType.maxLength();
-                            maxLength = maxLengthInt != null ? String.valueOf(castedType.maxLength()) : null;
-                            type = EDMTypeConverter.EDM_STRING;
-                        }
-                    } else {
-                        throw new UnsupportedOperationException("Type not supported " + propTypeDeclaration.name());
-                    }
-
-                    notNull("Property \"remote name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", remoteName);
-                    notNull("Property \"name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", entityName);
-                    notNull("Property \"type\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", type);
-                    notNull("Property \"key\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", key);
-                    notNull("Property \"nullable\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", nullable);
-
-                    EntityDefinitionProperty entityDefinitionProperty = new EntityDefinitionProperty(propertyName, type, nullable, key, defaultValue, maxLength, fixedLength, collation, unicode, precision, scale);
-                    entityDefinition.addProperty(entityDefinitionProperty);
-
-                    if (!entityDefinition.hasPrimaryKey() && entityDefinitionProperty.isKey()) {
-                        entityDefinition.setHasPrimaryKey(true);
-                    }
-                }
-                entityDefinitionSet.addEntity(entityDefinition);
-            } else {
-                throw new OdataMetadataFormatException("Type not supported. " + typeDeclaration.name());
-            }
-        }
-        return entityDefinitionSet;
+        return types;
     }
 
-    private String processIntegerType(String format) {
-        String type;
-        if (RamlParser.INT64.equals(format)) {
-            type = EDMTypeConverter.EDM_INT64;
-        } else if (RamlParser.INT16.equals(format)) {
-            type = EDMTypeConverter.EDM_INT16;
-        } else if (RamlParser.INT8.equals(format)) {
-            type = EDMTypeConverter.EDM_BYTE;
-        } else {
-            type = EDMTypeConverter.EDM_INT32;
+    private String getOdataType(TypeDeclaration propertyTypeDeclaration) throws OdataMetadataFieldsException {
+        if (propertyTypeDeclaration instanceof BooleanTypeDeclaration) return EDM_BOOLEAN;
+        if (propertyTypeDeclaration instanceof TimeOnlyTypeDeclaration) return EDM_TIME;
+        if (propertyTypeDeclaration instanceof DateTimeOnlyTypeDeclaration) return EDM_DATETIME;
+        if (propertyTypeDeclaration instanceof DateTimeTypeDeclaration) return EDM_DATETIMEOFFSET;
+        if (propertyTypeDeclaration instanceof DateTypeDeclaration) return EDM_DATETIME;
+        if (propertyTypeDeclaration instanceof NumberTypeDeclaration) return getNumberType((NumberTypeDeclaration) propertyTypeDeclaration);
+        if (propertyTypeDeclaration instanceof StringTypeDeclaration) return getStringType((StringTypeDeclaration) propertyTypeDeclaration);
+        if (propertyTypeDeclaration instanceof FileTypeDeclaration) return EDM_BINARY;
+
+        throw new UnsupportedOperationException("Type not supported " + propertyTypeDeclaration.name());
+    }
+
+    private TypeDeclaration getScalarTypeDeclaration(TypeDeclaration propertyTypeDeclaration) throws OdataMetadataFieldsException {
+        if(propertyTypeDeclaration instanceof UnionTypeDeclaration){
+            UnionTypeDeclaration unionType = (UnionTypeDeclaration) propertyTypeDeclaration;
+            for(TypeDeclaration unionSubType : unionType.of()){
+                if(!(unionSubType instanceof NullTypeDeclaration)){
+                    return unionSubType;
+                }
+            }
+
+            throw new OdataMetadataFieldsException(format("Property %s cannot be just null.", propertyTypeDeclaration.name()));
         }
-        return type;
+
+        return propertyTypeDeclaration;
+    }
+
+    private String getNumberType(NumberTypeDeclaration propTypeDeclaration) throws OdataMetadataFieldsException {
+        String format = propTypeDeclaration.format();
+
+        if (format != null) {
+            switch (format) {
+                case RamlParser.INT64: return EDM_INT64;
+                case RamlParser.INT32: return EDM_INT32;
+                case RamlParser.INT16: return EDM_INT16;
+                case RamlParser.INT8: return EDM_BYTE;
+                case RamlParser.FLOAT: if (!(propTypeDeclaration instanceof IntegerTypeDeclaration)) return EDM_SINGLE;
+                default: throw new OdataMetadataFieldsException(format("Unexpected format %s for number type.", format));
+            }
+        }
+
+        if (propTypeDeclaration instanceof IntegerTypeDeclaration) return EDM_INT32;
+
+        final String scale = getAnnotation(propTypeDeclaration, RamlParser.NAMESPACE_SCALE_PROPERTY);
+        final String precision = getAnnotation(propTypeDeclaration, RamlParser.NAMESPACE_PRECISION_PROPERTY);
+        if (scale != null && precision != null) return EDM_DECIMAL;
+
+        return EDM_DOUBLE;
+    }
+
+    private String getStringType(StringTypeDeclaration stringTypeDeclaration) {
+        final String subType = getAnnotation(stringTypeDeclaration, RamlParser.NAMESPACE_TYPE_PROPERTY);
+
+        if (GUID.equals(subType)) return EDM_GUID;
+
+        return EDM_STRING;
     }
 
     private void notNull(String message, Object actual) throws OdataMetadataFieldsException {
-        if (actual == null || (actual != null && Strings.isNullOrEmpty(actual.toString()))) {
+        if (actual == null || Strings.isNullOrEmpty(actual.toString())) {
             throw new OdataMetadataFieldsException(message);
         }
     }
 
-    private String getRemoteName(ObjectTypeDeclaration objectTypeDeclaration) {
-        for (AnnotationRef annotationRef : objectTypeDeclaration.annotations()) {
-            if (RamlParser.NAMESPACE_REMOTE_NAME.equals(annotationRef.name())) {
-                return annotationRef.structuredValue().value().toString();
-            }
+    @Nullable private String getAnnotation(TypeDeclaration typeDeclaration, String annotationName) {
+        for (AnnotationRef annotation : typeDeclaration.annotations()) {
+            if (annotationName.equals(annotation.name())) return annotation.structuredValue().value().toString();
         }
-        return "";
+
+        return null;
     }
 
     public Api getApi() {

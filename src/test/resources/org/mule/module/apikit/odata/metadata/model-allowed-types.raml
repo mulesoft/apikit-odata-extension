@@ -1,6 +1,8 @@
 #%RAML 1.0 Library
+usage: |
+  Use to define an OData Entity Model
 uses:
-  odata: libraries/odataLibrary.raml
+  odata: odataLibrary.raml
 
 types:
   odataTypes:
@@ -8,7 +10,7 @@ types:
     properties:
       edmString:
         type: string
-        (odata.key): true
+        (odata.key): false
         (odata.nullable): false
       edmBoolean:
         type: boolean
