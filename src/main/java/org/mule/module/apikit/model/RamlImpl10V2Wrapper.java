@@ -37,7 +37,18 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static org.mule.module.apikit.model.OdataServiceConstants.ODATA_MODEL;
+import static org.mule.module.apikit.odata.metadata.raml.RamlParser.FLOAT;
 import static org.mule.module.apikit.odata.metadata.raml.RamlParser.GUID;
+import static org.mule.module.apikit.odata.metadata.raml.RamlParser.INT16;
+import static org.mule.module.apikit.odata.metadata.raml.RamlParser.INT32;
+import static org.mule.module.apikit.odata.metadata.raml.RamlParser.INT64;
+import static org.mule.module.apikit.odata.metadata.raml.RamlParser.INT8;
+import static org.mule.module.apikit.odata.metadata.raml.RamlParser.NAMESPACE_KEY_PROPERTY;
+import static org.mule.module.apikit.odata.metadata.raml.RamlParser.NAMESPACE_NULLABLE_PROPERTY;
+import static org.mule.module.apikit.odata.metadata.raml.RamlParser.NAMESPACE_PRECISION_PROPERTY;
+import static org.mule.module.apikit.odata.metadata.raml.RamlParser.NAMESPACE_REMOTE_NAME;
+import static org.mule.module.apikit.odata.metadata.raml.RamlParser.NAMESPACE_SCALE_PROPERTY;
+import static org.mule.module.apikit.odata.metadata.raml.RamlParser.NAMESPACE_TYPE_PROPERTY;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_BINARY;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_BOOLEAN;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_BYTE;
@@ -82,7 +93,7 @@ public class RamlImpl10V2Wrapper {
 
         // set entity properties
         String entityName = objectTypeDeclaration.name();
-        String remoteName = getAnnotation(objectTypeDeclaration, RamlParser.NAMESPACE_REMOTE_NAME);
+        String remoteName = getAnnotation(objectTypeDeclaration, NAMESPACE_REMOTE_NAME);
         EntityDefinition entityDefinition = new EntityDefinition(entityName, remoteName);
 
         for (TypeDeclaration propertyTypeDeclaration : objectTypeDeclaration.properties()) {
@@ -93,11 +104,11 @@ public class RamlImpl10V2Wrapper {
             notNull("Property \"name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", entityName);
             notNull("Property \"remote name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", remoteName);
 
-            final String key = getAnnotation(scalarTypeDeclaration, RamlParser.NAMESPACE_KEY_PROPERTY);
+            final String key = getAnnotation(scalarTypeDeclaration, NAMESPACE_KEY_PROPERTY);
             notNull("Property \"key\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", key);
             final boolean isKey = Boolean.valueOf(key);
 
-            final String nullable = getAnnotation(scalarTypeDeclaration, RamlParser.NAMESPACE_NULLABLE_PROPERTY);
+            final String nullable = getAnnotation(scalarTypeDeclaration, NAMESPACE_NULLABLE_PROPERTY);
             notNull("Property \"nullable\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", nullable);
             final boolean isNullable = Boolean.valueOf(nullable);
 
@@ -111,8 +122,8 @@ public class RamlImpl10V2Wrapper {
             }
 
             final String defaultValue = scalarTypeDeclaration.defaultValue();
-            final String precision = getAnnotation(scalarTypeDeclaration, RamlParser.NAMESPACE_PRECISION_PROPERTY);
-            final String scale = getAnnotation(scalarTypeDeclaration, RamlParser.NAMESPACE_SCALE_PROPERTY);
+            final String precision = getAnnotation(scalarTypeDeclaration, NAMESPACE_PRECISION_PROPERTY);
+            final String scale = getAnnotation(scalarTypeDeclaration, NAMESPACE_SCALE_PROPERTY);
 
             EntityDefinitionProperty entityDefinitionProperty = new EntityDefinitionProperty(propertyName, type, isNullable, isKey, defaultValue, maxLength, false, null, false, precision, scale);
             entityDefinition.addProperty(entityDefinitionProperty);
@@ -182,26 +193,26 @@ public class RamlImpl10V2Wrapper {
 
         if (format != null) {
             switch (format) {
-                case RamlParser.INT64: return EDM_INT64;
-                case RamlParser.INT32: return EDM_INT32;
-                case RamlParser.INT16: return EDM_INT16;
-                case RamlParser.INT8: return EDM_BYTE;
-                case RamlParser.FLOAT: if (!(propTypeDeclaration instanceof IntegerTypeDeclaration)) return EDM_SINGLE;
+                case INT64: return EDM_INT64;
+                case INT32: return EDM_INT32;
+                case INT16: return EDM_INT16;
+                case INT8: return EDM_BYTE;
+                case FLOAT: if (!(propTypeDeclaration instanceof IntegerTypeDeclaration)) return EDM_SINGLE;
                 default: throw new OdataMetadataFieldsException(format("Unexpected format %s for number type.", format));
             }
         }
 
         if (propTypeDeclaration instanceof IntegerTypeDeclaration) return EDM_INT32;
 
-        final String scale = getAnnotation(propTypeDeclaration, RamlParser.NAMESPACE_SCALE_PROPERTY);
-        final String precision = getAnnotation(propTypeDeclaration, RamlParser.NAMESPACE_PRECISION_PROPERTY);
+        final String scale = getAnnotation(propTypeDeclaration, NAMESPACE_SCALE_PROPERTY);
+        final String precision = getAnnotation(propTypeDeclaration, NAMESPACE_PRECISION_PROPERTY);
         if (scale != null && precision != null) return EDM_DECIMAL;
 
         return EDM_DOUBLE;
     }
 
     private String getStringType(StringTypeDeclaration stringTypeDeclaration) {
-        final String subType = getAnnotation(stringTypeDeclaration, RamlParser.NAMESPACE_TYPE_PROPERTY);
+        final String subType = getAnnotation(stringTypeDeclaration, NAMESPACE_TYPE_PROPERTY);
 
         if (GUID.equals(subType)) return EDM_GUID;
 
