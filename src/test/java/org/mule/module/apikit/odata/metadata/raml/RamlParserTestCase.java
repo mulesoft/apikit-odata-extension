@@ -6,7 +6,10 @@
  */
 package org.mule.module.apikit.odata.metadata.raml;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
@@ -15,13 +18,12 @@ import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 
-/**
- * 
- * @author arielsegura
- */
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 public class RamlParserTestCase {
 
-	RamlParser ramlParser;
+	private RamlParser ramlParser;
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
@@ -56,6 +58,24 @@ public class RamlParserTestCase {
 		entityDefinition.addProperty(new EntityDefinitionProperty("first_name", "Edm.String", false, false, null, null, null, null, null, null, null));
 		entityDefinition.addProperty(new EntityDefinitionProperty("last_name", "Edm.String", false, false, null, null, null, null, null, null, null));
 		entityDefinition.addProperty(new EntityDefinitionProperty("email", "Edm.String", false, false, null, null, null, null, null, null, null));
+		newEntitySet.addEntity(entityDefinition);
+
+		entityDefinition = new EntityDefinition("odataTypes", "odataTypes");
+		entityDefinition.setHasPrimaryKey(false);
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmString", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmBoolean", "Edm.Boolean", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmDouble", "Edm.Double", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmSingle", "Edm.Single", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmBinary", "Edm.Binary", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmDateTime", "Edm.DateTime", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmInt32", "Edm.Int32", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmInt64", "Edm.Int64", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmInt16", "Edm.Int16", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmByte", "Edm.Byte", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmDecimal", "Edm.Decimal", false, false, null, null, null, null, null, "3", "3"));
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmGuid", "Edm.Guid", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmTime", "Edm.Time", false, false, null, null, null, null, null, null, null));
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmDateTimeOffset", "Edm.DateTimeOffset", false, false, null, null, null, null, null, null, null));
 		newEntitySet.addEntity(entityDefinition);
 
 		return newEntitySet;
@@ -101,11 +121,7 @@ public class RamlParserTestCase {
 	public void schemasMultipleKey() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/schemas-multiple-keys.raml");
 		EntityDefinition entityDefinition = entitySet.toList().get(0);
-		for (int i = 0; i < mockEntitySet.toList().get(0).getProperties().size(); i++) {
-			EntityDefinitionProperty expectedProperty = mockEntitySet.toList().get(0).getProperties().get(i);
-			Assert.assertEquals(expectedProperty, entityDefinition.getProperties().get(i));
-		}
-		Assert.assertEquals(mockEntitySet.toList().get(0), entityDefinition);
+		assertThat(entityDefinition, is(getEntityByName("gateways")));
 	}
 
 	@Test
@@ -119,11 +135,21 @@ public class RamlParserTestCase {
 	public void testPositive() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
 		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/datagateway-definition.raml");
 		EntityDefinition entityDefinition = entitySet.toList().get(0);
-		for (int i = 0; i < mockEntitySet.toList().get(0).getProperties().size(); i++) {
-			EntityDefinitionProperty expectedProperty = mockEntitySet.toList().get(0).getProperties().get(i);
-			Assert.assertEquals(expectedProperty, entityDefinition.getProperties().get(i));
-		}
-		Assert.assertEquals(mockEntitySet.toList().get(0), entityDefinition);
+		assertThat(entityDefinition, is(getEntityByName("gateways")));
 	}
 
+	@Test
+	public void allowedTypes() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
+		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/model-allowed-types.raml");
+		EntityDefinition entityDefinition = entitySet.toList().get(0);
+		assertThat(entityDefinition, is(getEntityByName("odataTypes")));
+	}
+
+	private EntityDefinition getEntityByName(String name) {
+		for (EntityDefinition entityDefinition : mockEntitySet.toList()) {
+			if (entityDefinition.getName().equals(name)) return entityDefinition;
+		}
+
+		throw new RuntimeException("Entity not found in mock");
+	}
 }
