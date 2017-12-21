@@ -9,9 +9,7 @@ package org.mule.module.apikit.odata;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mule.module.apikit.odata.context.OdataContext;
-import org.mule.module.apikit.odata.exception.ODataBadRequestException;
 import org.mule.module.apikit.odata.exception.ODataException;
-import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.exception.ODataUnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.processor.ODataApikitProcessor;
@@ -22,7 +20,9 @@ import org.mule.module.apikit.odata.util.ODataUriHelper;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ODataUriParserTestCase {
 
@@ -30,9 +30,7 @@ public class ODataUriParserTestCase {
 
 	@BeforeClass
 	public static void setUp() throws ODataException {
-		OdataMetadataManager odataMetadataManager = new OdataMetadataManager();
-		String ramlPath = "src/test/resources/org/mule/module/apikit/odata/api-mk.raml";
-		odataMetadataManager.refreshMetadata(ramlPath, true);
+		final OdataMetadataManager odataMetadataManager = new OdataMetadataManager("src/test/resources/org/mule/module/apikit/odata/api-mk.raml", true);
 		oDataContext = new OdataContext(odataMetadataManager, "GET");
 	}
 
@@ -71,15 +69,14 @@ public class ODataUriParserTestCase {
 	// text/plain
 	@Test(expected = ODataUnsupportedMediaTypeException.class)
 	public void rejectUnsupportedFormatForCountRequest() throws ODataException {
-		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/orders/$count", "$format=json");
-//		fail("Exception expected");
+		ODataUriParser.parse(oDataContext, "/odata.svc/orders/$count", "$format=json");
 	}
 
 	// a non-collection resource should not accept a $count request
 	@Test
-	public void rejectCountForNonCollectionResourceRequest() throws ODataException {
+	public void rejectCountForNonCollectionResourceRequest() {
 		try {
-			ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/orders(1)/$count", "");
+			ODataUriParser.parse(oDataContext, "/odata.svc/orders(1)/$count", "");
 			fail("Exception expected");
 		} catch (Exception e) {
 			// Expected exception, doing nothing.
@@ -119,10 +116,9 @@ public class ODataUriParserTestCase {
 	// should reject a request to a resource with a key that's neither an int nor
 	// a string
 	@Test
-	public void rejectInvalidFormatKeyRequest() throws ODataException {
-		int a = 0;
+	public void rejectInvalidFormatKeyRequest() {
 		try {
-			ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/orders(broken)", "");
+			ODataUriParser.parse(oDataContext, "/odata.svc/orders(broken)", "");
 			fail("Exception expected");
 		} catch (Exception e) {
 			// Expected exception, doing nothing.
@@ -290,7 +286,7 @@ public class ODataUriParserTestCase {
 	// should parse uri in different OData and REST formats and return a string
 	// array with the entity and the id (if any)
 	@Test
-	public void parseOdataAndRestRequests() throws ODataException {
+	public void parseOdataAndRestRequests() {
 
 		String[] parsed = ODataUriHelper.parseRequest("/odata.svc/orders(1)");
 		assertEquals("orders", parsed[0]);
