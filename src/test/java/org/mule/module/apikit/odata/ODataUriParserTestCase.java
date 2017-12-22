@@ -103,6 +103,16 @@ public class ODataUriParserTestCase {
 		assertEquals("/orders/1", apikitProcessor.getPath());
 	}
 
+	// should parse a /orders(1234L) request and return an Apikit processor pointing to
+	// /orders/1234L
+	@Test
+	public void parseEntityRequestInt64Key() throws ODataException {
+		ODataRequestProcessor processor = ODataUriParser.parse(oDataContext, "/odata.svc/orders(1234L)", "");
+		assertTrue(processor instanceof ODataApikitProcessor);
+		ODataApikitProcessor apikitProcessor = (ODataApikitProcessor) processor;
+		assertEquals("/orders/1234", apikitProcessor.getPath());
+	}
+
 	// should parse a /orders('juan') request and return an Apikit processor
 	// pointing to /orders/juan
 	@Test

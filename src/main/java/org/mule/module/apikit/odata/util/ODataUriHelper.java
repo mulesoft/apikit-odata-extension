@@ -6,6 +6,7 @@
  */
 package org.mule.module.apikit.odata.util;
 
+import org.apache.logging.log4j.util.Strings;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.exception.ODataInvalidUriException;
 import org.odata4j.expression.BoolCommonExpression;
@@ -29,7 +30,7 @@ public class ODataUriHelper {
     public static final String ODATA_RESOURCE_REGEXP = "^/((\\w|\\-)+)(\\(((\\w|\\-)+|'[^']*'|(,?(\\w|\\-)+=((\\w|\\-)+|'[^']*'))+)\\))?(/|/\\$(\\w|\\-)+)?$";
     public static final String ODATA_ENTITY_REGEXP = "^/((\\w|\\-)+)((/|\\().*)?$";
     public static final String ODATA_COLLECTION_REGEXP = "^/((\\w|\\-)+)(/|/\\$(\\w|\\-)+)?$";
-    public static final String ODATA_SINGLE_KEY_REGEXP = "^(\\d+|'[^']*')$";
+    public static final String ODATA_SINGLE_KEY_REGEXP = "^(\\d+L{0,1}|'[^']*')$";
     public static final String ODATA_MULTIPLE_KEYS_REGEXP = "^(((\\w|\\-)+)=((\\w|\\-)+|'[^']*'),?)+$";
     public static final String ODATA_ORDERBY_REGEXP = "^((\\w|\\-)+(/\\w)?(\\s(desc|asc))?(,\\s*(\\w|\\-)+(/\\w)?(\\s(desc|asc))?)*)+$";
     public static final String ODATA_TOP_REGEXP = "^\\d+$";
@@ -39,6 +40,7 @@ public class ODataUriHelper {
     public static final String ODATA_SELECT_REGEXP = "^(\\w|\\-)+(,\\s*(\\w|\\-)+)*$";
     public static final String ODATA_INLINECOUNT_REGEXP = "^(allpages|none)$";
     public static final String ODATA_PRIMITIVE_STRING_REGEXP = "^'([^']*)'$";
+    public static final String ODATA_LONG_REGEXP = "^(\\d+L)$";
     public static final Pattern REST_ENTITY_PATTERN = Pattern.compile(REST_ENTITY_REGEXP);
     public static final Pattern ODATA_RESOURCE_PATTERN = Pattern.compile(ODATA_RESOURCE_REGEXP);
     public static final Pattern ODATA_ENTITY_PATTERN = Pattern.compile(ODATA_ENTITY_REGEXP);
@@ -53,6 +55,7 @@ public class ODataUriHelper {
     public static final Pattern ODATA_SELECT_PATTERN = Pattern.compile(ODATA_SELECT_REGEXP);
     public static final Pattern ODATA_INLINECOUNT_PATTERN = Pattern.compile(ODATA_INLINECOUNT_REGEXP);
     public static final Pattern ODATA_PRIMITIVE_STRING_PATTERN = Pattern.compile(ODATA_PRIMITIVE_STRING_REGEXP);
+    public static final Pattern ODATA_LONG_PATTERN = Pattern.compile(ODATA_LONG_REGEXP);
 
     public static boolean isMetadata(String path) {
         return path.contains("$metadata");
@@ -121,6 +124,10 @@ public class ODataUriHelper {
         }
     }
 
+    private static boolean matchPattern(Pattern pattern, String value) {
+        return pattern.matcher(value).matches();
+    }
+
     public static HashMap<String, Object> parseKeys(String path, String[] entityKeys) throws ODataInvalidUriException {
 
         HashMap<String, Object> keys = new HashMap<String, Object>();
@@ -128,25 +135,18 @@ public class ODataUriHelper {
         String[] parsedKeys;
 
         // parse raw keys
-        if (parsedId != null) {
-            Matcher m = ODATA_MULTIPLE_KEYS_PATTERN.matcher(parsedId);
-            if (m.matches()) {
+        if (!Strings.isEmpty(parsedId)) {
+            if (matchPattern(ODATA_MULTIPLE_KEYS_PATTERN, parsedId)) {
                 parsedKeys = parsedId.split(",");
-            } else {
-                if (parsedId.isEmpty()) {
-                    parsedKeys = new String[]{};
-                } else {
-                    m = ODATA_SINGLE_KEY_PATTERN.matcher(parsedId);
-                    if (m.matches()) {
-                        m = ODATA_PRIMITIVE_STRING_PATTERN.matcher(parsedId);
-                        if (m.matches()) {
-                            parsedId = parsedId.replace("'", "");
-                        }
-                        parsedKeys = new String[]{parsedId};
-                    } else {
-                        throw new ODataInvalidUriException("Invalid format for key value '" + parsedId + "' should be an int or a string wrapped in single quotes.");
-                    }
+            } else if (matchPattern(ODATA_SINGLE_KEY_PATTERN, parsedId)) {
+                if (matchPattern(ODATA_LONG_PATTERN, parsedId)) {
+                    parsedId = parsedId.substring(0, parsedId.length() - 1);
+                } else if (matchPattern(ODATA_PRIMITIVE_STRING_PATTERN, parsedId)) {
+                    parsedId = parsedId.replace("'", "");
                 }
+                parsedKeys = new String[]{parsedId};
+            } else {
+                throw new ODataInvalidUriException("Invalid format for key value '" + parsedId + "' should be an int or a string wrapped in single quotes.");
             }
         } else {
             parsedKeys = new String[]{};
