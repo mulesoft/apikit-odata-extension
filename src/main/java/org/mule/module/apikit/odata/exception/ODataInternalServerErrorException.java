@@ -6,7 +6,7 @@
  */
 package org.mule.module.apikit.odata.exception;
 
-import org.mule.transport.http.HttpConstants;
+import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 
 /**
  * Created by arielsegura on 10/1/15.
@@ -19,9 +19,9 @@ public class ODataInternalServerErrorException extends ODataException {
 	private static final long serialVersionUID = 5891700784326574919L;
 
 	public ODataInternalServerErrorException(String message) {
-        super(message, HttpConstants.SC_INTERNAL_SERVER_ERROR);
+        super(message, HttpStatus.INTERNAL_SERVER_ERROR.getStatusCode());
     }
     public ODataInternalServerErrorException(Exception ex) {
-        super(ex.getMessage(), ex, HttpConstants.SC_INTERNAL_SERVER_ERROR);
+        super(ex.getMessage(), ex, HttpStatus.INTERNAL_SERVER_ERROR.getStatusCode());
     }
 }

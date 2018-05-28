@@ -10,8 +10,11 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 
 import org.mule.module.apikit.odata.context.OdataContext;
-import org.mule.module.apikit.odata.exception.*;
-import org.mule.module.apikit.odata.processor.ODataApikitProcessor;
+import org.mule.module.apikit.odata.exception.ODataException;
+import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
+import org.mule.module.apikit.odata.exception.ODataInvalidUriException;
+import org.mule.module.apikit.odata.exception.ODataNotFoundException;
+import org.mule.module.apikit.odata.exception.ODataUnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.processor.ODataMetadataProcessor;
 import org.mule.module.apikit.odata.processor.ODataRequestProcessor;
 import org.mule.module.apikit.odata.processor.ODataServiceDocumentProcessor;
@@ -45,8 +48,7 @@ public class ODataUriParser {
 			}
 
 			// resource request
-			if (ODataUriHelper.isResourceRequest(path)) {
-
+			/*if (ODataUriHelper.isResourceRequest(path)) {
 				// parse entity
 				String entity = ODataUriHelper.parseEntity(path);
 
@@ -75,7 +77,8 @@ public class ODataUriParser {
 
 				return new ODataApikitProcessor(odataContext, entity, querystring, keys, count);
 
-			} else {
+			}*/ 
+			else {
 				String segment = ODataUriHelper.parseEntity(path);
 				throw new ODataNotFoundException("Resource not found for the segment '" + segment + "'.");
 			}

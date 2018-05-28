@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.mule.api.MuleEvent;
+import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.exception.ODataInvalidUriException;
@@ -37,12 +37,11 @@ public class ODataFormatHandler {
 	 * @throws ODataInvalidUriException
 	 * @throws ODataInvalidFormatException
 	 */
-	public static List<Format> getFormats(MuleEvent event) throws ODataException {
+	public static List<Format> getFormats(HttpRequestAttributes attributes) throws ODataException {
 		
 		List<Format> formats = new ArrayList<Format>();
-		
-		String acceptHeader = getAcceptHeader(event);
-		String formatQueryParam = getFormatQueryParam(event);
+		String acceptHeader = getAcceptHeader(attributes);
+		String formatQueryParam = getFormatQueryParam(attributes);
 
 		if (formatQueryParam != null) {
 			if (Arrays.asList(xmlFormatTypes).contains(formatQueryParam)) {
@@ -101,8 +100,9 @@ public class ODataFormatHandler {
 		return false;
 	}
 
-	private static String getAcceptHeader(MuleEvent event) {
-		String acceptHeader = event.getMessage().getInboundProperty("accept");
+	private static String getAcceptHeader(HttpRequestAttributes attributes) {
+		String acceptHeader = attributes.getHeaders().get("accept");
+//		String acceptHeader = event.getMessage().getInboundProperty("accept");
 		if (acceptHeader == null) {
 			acceptHeader = defaultMimeTypes[0];
 		}
@@ -116,9 +116,10 @@ public class ODataFormatHandler {
 	 * @param event
 	 * @return
 	 */
-	private static String getFormatQueryParam(MuleEvent event) {
+	private static String getFormatQueryParam(HttpRequestAttributes attributes) {
 		String formatQueryParam = null;
-		String queryString = URLDecoder.decode((String) event.getMessage().getInboundProperty("http.query.string"));
+//		String queryString = URLDecoder.decode((String) event.getMessage().getInboundProperty("http.query.string"));
+		String queryString = URLDecoder.decode((String) attributes.getQueryString());
 		if (queryString != null && queryString.contains("$format=")) {
 			String[] query = queryString.split("&");
 			for (String pair : query) {

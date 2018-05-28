@@ -8,13 +8,13 @@ package org.mule.module.apikit.odata.processor;
 
 import java.util.List;
 
-import org.mule.api.MuleEvent;
-import org.mule.module.apikit.AbstractRouter;
+import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
+import org.mule.module.apikit.odata.exception.ODataMethodNotAllowedException;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.formatter.ServiceDocumentPayloadFormatter;
-import org.mule.module.apikit.odata.exception.ODataMethodNotAllowedException;
+import org.mule.module.apikit.spi.EventProcessor;
 
 public class ODataServiceDocumentProcessor extends ODataRequestProcessor {
 
@@ -22,9 +22,9 @@ public class ODataServiceDocumentProcessor extends ODataRequestProcessor {
 		super(odataContext);
 	}
 
-	public ODataPayload process(MuleEvent event, AbstractRouter router, List<Format> formats) throws Exception {
+	public ODataPayload process(HttpRequestAttributes attributes, EventProcessor eventProcessor, List<Format> formats) throws Exception {
 		if ("GET".equalsIgnoreCase(super.oDataContext.getMethod())) {
-			String url = getCompleteUrl(event);
+			String url = getCompleteUrl(attributes);
 
 			ODataPayload result = new ODataPayload();
 			result.setFormatter(new ServiceDocumentPayloadFormatter(getMetadataManager(), url));

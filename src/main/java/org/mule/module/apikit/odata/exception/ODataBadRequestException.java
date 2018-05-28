@@ -6,7 +6,7 @@
  */
 package org.mule.module.apikit.odata.exception;
 
-import org.mule.transport.http.HttpConstants;
+import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 
 /**
  * Created by arielsegura on 10/1/15.
@@ -15,12 +15,12 @@ public class ODataBadRequestException extends ODataException {
 
 
     public ODataBadRequestException(String message) {
-        super(message, HttpConstants.SC_BAD_REQUEST);
+        super(message, HttpStatus.BAD_REQUEST.getStatusCode());
     }
 	public ODataBadRequestException() {
-        super("Bad request", HttpConstants.SC_BAD_REQUEST);
+        super("Bad request", HttpStatus.BAD_REQUEST.getStatusCode());
     }
     public ODataBadRequestException(String message, Throwable cause) {
-        super(message, cause, HttpConstants.SC_BAD_REQUEST);
+        super(message, cause, HttpStatus.BAD_REQUEST.getStatusCode());
     }
 }

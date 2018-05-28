@@ -6,14 +6,14 @@
  */
 package org.mule.module.apikit.odata.exception;
 
-import org.mule.transport.http.HttpConstants;
+import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 
 /**
  * Created by arielsegura on 10/21/15.
  */
 public class ODataNotAcceptableException extends ODataException  {
     public ODataNotAcceptableException() {
-        super("Not acceptable", HttpConstants.SC_NOT_ACCEPTABLE);
+        super("Not acceptable", HttpStatus.NOT_ACCEPTABLE.getStatusCode());
     }
 }
 

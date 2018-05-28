@@ -8,37 +8,37 @@ package org.mule.module.apikit.odata;
 
 import java.util.List;
 
-import org.mule.api.MuleEvent;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.MediaType;
 
 public class ODataResponseTransformer {
-	public static MuleEvent transform(MuleEvent event, ODataPayload payload, List<Format> formats) throws Exception {
-		if (payload.getContent() != null) {
-			event.getMessage().setOutboundProperty("Content-Type", "text/plain");
-			event.getMessage().setPayload(payload.getContent());
-		} else {
+	public static Message transform( ODataPayload payload, List<Format> formats) throws Exception {
+		String formatted = null ;
+		MediaType mediaType = null;
+		
+	    if (payload.getContent() != null) {
+	    	mediaType = MediaType.TEXT;
+	    	formatted = payload.getContent();
+	} else {
 
 			boolean isJson = formats.contains(Format.Json) && !formats.contains(Format.Atom);
-
-			String formatted = payload.getFormatter().format(isJson ? Format.Json : Format.Atom);
-			event.getMessage().setPayload(formatted);
+			 formatted = payload.getFormatter().format(isJson ? Format.Json : Format.Atom);
 
 			if (isJson) {
-				event.getMessage().setOutboundProperty("Content-Type", "application/json");
+				mediaType = MediaType.APPLICATION_JSON;
 			} else {
 				if (payload.getFormatter().supportsAtom()) {
-					event.getMessage().setOutboundProperty("Content-Type", "application/atom+xml");
+					mediaType = MediaType.ATOM;
+
 				} else {
-					event.getMessage().setOutboundProperty("Content-Type", "application/xml");
+					mediaType = MediaType.APPLICATION_XML;
 				}
 			}
-		}
+		}	
 
-		if (event.getMessage().getOutboundProperty("http.status") == null) {
-			event.getMessage().setOutboundProperty("http.status", 200);
-		}
 
-		return event;
+	    return Message.builder().value(formatted).mediaType(mediaType).build();
 	}
 
 }

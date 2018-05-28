@@ -6,7 +6,7 @@
  */
 package org.mule.module.apikit.odata.exception;
 
-import org.mule.transport.http.HttpConstants;
+import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 
 /**
  * Created by arielsegura on 10/1/15.
@@ -14,6 +14,6 @@ import org.mule.transport.http.HttpConstants;
 public class ODataNotFoundException extends ODataException {
 
     public ODataNotFoundException(String message) {
-        super(message, HttpConstants.SC_NOT_FOUND);
+        super(message, HttpStatus.NOT_FOUND.getStatusCode());
     }
 }
