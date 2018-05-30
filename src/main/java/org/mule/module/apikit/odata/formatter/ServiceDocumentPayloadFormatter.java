@@ -24,6 +24,8 @@ public class ServiceDocumentPayloadFormatter extends ODataPayloadFormatter {
 	private final String url;
 	private OdataMetadataManager odataMetadataManager;
 
+	static { System.setProperty("javax.ws.rs.ext.RuntimeDelegate","org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl");}
+
 	public ServiceDocumentPayloadFormatter(OdataMetadataManager odataMetadataManager, String url) {
 		this.odataMetadataManager = odataMetadataManager;
 		this.url = url;
