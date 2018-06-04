@@ -12,6 +12,7 @@ import org.mule.runtime.api.exception.MuleException;
 
 import org.apache.log4j.Logger;
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.module.apikit.api.exception.MuleRestException;
 import org.mule.module.apikit.helpers.EventHelper;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
@@ -25,6 +26,7 @@ import org.mule.module.apikit.spi.RouterService;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.odata4j.exceptions.BadRequestException;
 
 public class ODataRouterService implements RouterService {
 
@@ -32,6 +34,10 @@ public class ODataRouterService implements RouterService {
 	private static final String CONTEXT_INITIALIZED = "contextInitialized";
 
 	private Logger logger = Logger.getLogger(ODataRouterService.class);
+
+	static { 
+		System.setProperty("javax.ws.rs.ext.RuntimeDelegate","org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl"); // Workaround for issue while loading class javax.ws.rs.ext.RuntimeDelegate embedded in odata4j
+	}																									  	  // https://stackoverflow.com/questions/30316829/classnotfoundexception-org-glassfish-jersey-internal-runtimedelegateimpl-cannot
 	
 	public boolean isExecutable(CoreEvent event) {
 	    HttpRequestAttributes attributes = ((HttpRequestAttributes) event.getMessage().getAttributes().getValue());
@@ -106,11 +112,12 @@ public class ODataRouterService implements RouterService {
 	}
 
 	
-	protected static CompletableFuture<Event> processODataRequest(HttpRequestAttributes attributes,EventProcessor eventProcessor ,OdataContext oDataContext, CoreEvent event){
+	protected static CompletableFuture<Event> processODataRequest(HttpRequestAttributes attributes,EventProcessor eventProcessor ,OdataContext oDataContext, CoreEvent event) throws MuleException {
 		List<Format> formats = null;
 		CompletableFuture<Event> completableFuture = new CompletableFuture<Event>();
 		try {
-			String path = attributes.getRelativePath();
+			String listenerPath = attributes.getListenerPath().substring( 0,attributes.getListenerPath().lastIndexOf("/*"));
+			String path = attributes.getRelativePath().replaceAll(listenerPath, "");
 			String query = attributes.getQueryString();
 			
 			// URIParser
@@ -120,7 +127,7 @@ public class ODataRouterService implements RouterService {
 			formats = ODataFormatHandler.getFormats(attributes);
 			
 			// Request processor
-			ODataPayload odataPayload = odataRequestProcessor.process(attributes, eventProcessor, formats);
+			ODataPayload odataPayload = odataRequestProcessor.process(event, eventProcessor, formats);
 
 			// Response transformer
 			Message message = ODataResponseTransformer.transform( odataPayload, formats);			
@@ -131,7 +138,7 @@ public class ODataRouterService implements RouterService {
 			completableFuture.complete(newEvent);
 			
 		} catch (Exception ex) {
-			throw new RuntimeException("Error processing odata request");
+			throw  new BadRequestException(ex);
 		}
 
 		return completableFuture;

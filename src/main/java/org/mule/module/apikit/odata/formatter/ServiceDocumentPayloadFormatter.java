@@ -24,11 +24,6 @@ public class ServiceDocumentPayloadFormatter extends ODataPayloadFormatter {
 	private final String url;
 	private OdataMetadataManager odataMetadataManager;
 
-	static { 
-		System.setProperty("javax.ws.rs.ext.RuntimeDelegate","org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl"); // Workaround for issue while loading class javax.ws.rs.ext.RuntimeDelegate embedded in odata4j
-	}																									  	  // https://stackoverflow.com/questions/30316829/classnotfoundexception-org-glassfish-jersey-internal-runtimedelegateimpl-cannot
-	
-
 	public ServiceDocumentPayloadFormatter(OdataMetadataManager odataMetadataManager, String url) {
 		this.odataMetadataManager = odataMetadataManager;
 		this.url = url;

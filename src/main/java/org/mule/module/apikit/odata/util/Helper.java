@@ -6,6 +6,14 @@
  */
 package org.mule.module.apikit.odata.util;
 
+import static org.mule.module.apikit.model.Entity.pluralizeName;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mule.module.apikit.odata.exception.ODataInvalidFlowResponseException;
@@ -13,6 +21,7 @@ import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 import org.mule.module.apikit.odata.model.Entry;
+import org.mule.runtime.api.util.MultiMap;
 import org.odata4j.core.OEntities;
 import org.odata4j.core.OEntity;
 import org.odata4j.core.OEntityKey;
@@ -26,14 +35,6 @@ import org.odata4j.edm.EdmProperty.Builder;
 import org.odata4j.edm.EdmSchema;
 import org.odata4j.producer.EntitiesResponse;
 import org.odata4j.producer.Responses;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import static org.mule.module.apikit.model.Entity.pluralizeName;
 
 public class Helper {
 
@@ -134,8 +135,8 @@ public class Helper {
 		}
 	}
 
-	public static Map<String, String> queryToMap(String query) {
-		Map<String, String> queryMap = new HashMap<>();
+	public static MultiMap<String, String> queryToMap(String query) {
+		MultiMap<String, String> queryMap = new MultiMap<>();
 
 		if (query != null && !"".equals(query)) {
 			String[] queries = query.split("&");
