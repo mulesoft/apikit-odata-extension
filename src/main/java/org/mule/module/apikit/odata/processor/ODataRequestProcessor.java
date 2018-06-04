@@ -33,15 +33,11 @@ public abstract class ODataRequestProcessor {
 	}
 
 	protected String getProtocol(HttpRequestAttributes attributes) {
-
 		String protocol = attributes.getScheme();
-//		String protocol = event.getMessage().getInboundProperty("http.scheme");
 
 		// workaround to handle old http/https connector
 		if (protocol == null) {
-			
-//			String uri = event.getMessage().getInboundProperty("http.context.uri");
-			String uri = attributes.getRequestUri();
+						String uri = attributes.getRequestUri();
 			Matcher m = Pattern.compile("^(http|https|.+)://.*$").matcher(uri);
 			if (m.matches()) {
 				protocol = m.group(1);
@@ -54,8 +50,6 @@ public abstract class ODataRequestProcessor {
 	}
 
 	protected String getHost(HttpRequestAttributes attributes) {
-		
-//		String host = event.getMessage().getInboundProperty("host");
 		String host = attributes.getRemoteAddress();
 		return host;
 	}
@@ -66,8 +60,6 @@ public abstract class ODataRequestProcessor {
 	}
 
 	protected String getCompleteUrl(HttpRequestAttributes attributes) {
-		
-//		String path = event.getMessage().getInboundProperty("http.request.path");
 		String path =attributes.getRequestPath();
 		String url = getProtocol(attributes) + "://" + getHost(attributes) + path;
 		return url;

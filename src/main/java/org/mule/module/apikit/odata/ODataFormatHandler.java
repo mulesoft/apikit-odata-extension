@@ -102,7 +102,6 @@ public class ODataFormatHandler {
 
 	private static String getAcceptHeader(HttpRequestAttributes attributes) {
 		String acceptHeader = attributes.getHeaders().get("accept");
-//		String acceptHeader = event.getMessage().getInboundProperty("accept");
 		if (acceptHeader == null) {
 			acceptHeader = defaultMimeTypes[0];
 		}
@@ -118,8 +117,7 @@ public class ODataFormatHandler {
 	 */
 	private static String getFormatQueryParam(HttpRequestAttributes attributes) {
 		String formatQueryParam = null;
-//		String queryString = URLDecoder.decode((String) event.getMessage().getInboundProperty("http.query.string"));
-		String queryString = URLDecoder.decode((String) attributes.getQueryString());
+		String queryString = URLDecoder.decode(attributes.getQueryString());
 		if (queryString != null && queryString.contains("$format=")) {
 			String[] query = queryString.split("&");
 			for (String pair : query) {

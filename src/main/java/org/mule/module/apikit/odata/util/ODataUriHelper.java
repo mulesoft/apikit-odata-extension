@@ -17,6 +17,8 @@ import org.mule.module.apikit.odata.exception.ODataInvalidUriException;
 import org.odata4j.expression.BoolCommonExpression;
 import org.odata4j.producer.resources.OptionsQueryParser;
 
+import com.google.common.base.Strings;
+
 /**
  * @author juancazala
  */
@@ -73,7 +75,7 @@ public class ODataUriHelper {
     }
 
     public static boolean isServiceDocument(String path) {
-        return path.isEmpty() || path.equals("/") || path.equals("/api") || path.equals("/api/");
+        return path.isEmpty() || path.equals("/") ;
     }
 
     public static boolean isResourceRequest(String path) {
@@ -134,7 +136,7 @@ public class ODataUriHelper {
         String[] parsedKeys;
 
         // parse raw keys
-        if (!isEmpty(parsedId)) {
+        if (!Strings.isNullOrEmpty(parsedId)) {
             if (matchPattern(ODATA_MULTIPLE_KEYS_PATTERN, parsedId)) {
                 parsedKeys = parsedId.split(",");
             } else if (matchPattern(ODATA_SINGLE_KEY_PATTERN, parsedId)) {
@@ -215,12 +217,6 @@ public class ODataUriHelper {
 
         return keys;
     }
-
-    private static boolean isEmpty(String parsedId) {
-		if(parsedId != null && parsedId != "")
-			return false;
-		return true;
-	}
 
 	public static boolean allowedQuery(String path, String query) throws ODataInvalidUriException {
 
