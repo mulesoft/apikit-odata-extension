@@ -144,30 +144,6 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		} else {
 			message = Message.builder(event.getMessage()).attributesValue(httpRequestAttributesBuilder.build()).build();
 		}
-		
-		
-//		String httpQueryString = this.query;
-//		event.getMessage().setProperty("http.request", httpRequest, PropertyScope.INBOUND);
-//		event.getMessage().setProperty("http.request.path", httpRequestPath, PropertyScope.INBOUND);
-//		event.getMessage().setProperty("http.query.string", httpQueryString, PropertyScope.INBOUND);
-//		event.getMessage().setProperty("http.query.params", httpQueryParams, PropertyScope.INBOUND);
-//		event.getMessage().setProperty("http.relative.path", this.path, PropertyScope.INBOUND);
-//		event.getMessage().setProperty("accept", "application/json", PropertyScope.INBOUND);
-
-//		String httpMethod = event.getMessage().getInboundProperty("http.method").toString().toLowerCase();
-//
-//		if (Arrays.asList(methodsWithBody).contains(httpMethod.toUpperCase())) {
-//			String payloadAsString = event.getMessage().getPayloadAsString();
-//			if(event.getMessage().getPayload() instanceof NullPayload){
-//				payloadAsString = "";
-//			}
-//			boolean isXMLFormat = !formats.contains(Format.Json);
-//			event.getMessage().setPayload(BodyToJsonConverter.convertPayload(entity, isXMLFormat, payloadAsString));
-//			// Setting again encoding and mimetype. For some reason encoding is set to null and mimetype to */* after setPayload
-//			event.getMessage().getDataType().setEncoding(event.getEncoding());
-//			event.getMessage().getDataType().setMimeType("application/json");
-//			event.getMessage().setProperty("content-type", "application/json", PropertyScope.INBOUND);
-//		}
 
 		CompletableFuture<Event> response = eventProcessor.processEvent(CoreEvent.builder(event).message(message).build());
 
@@ -182,7 +158,6 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 
 		try {
 			CoreEvent event;
-//			event = fromFuture(response).cast(CoreEvent.class);
 			event = (CoreEvent) response.get();
 
 //			checkResponseHttpStatus(event); TODO:Check how to validate the response

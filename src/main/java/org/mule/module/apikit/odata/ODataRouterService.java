@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.module.apikit.exception.ApikitRuntimeException;
 import org.mule.module.apikit.odata.context.OdataContext;
+import org.mule.module.apikit.odata.error.ODataErrorHandler;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
@@ -100,7 +101,7 @@ public class ODataRouterService implements RouterService {
 			CoreEvent newEvent  = CoreEvent.builder(event).message(message).build();
 			completableFuture.complete(newEvent);
 		} catch (Exception ex) {
-			throw  new BadRequestException(ex);
+			return ODataErrorHandler.handle(event, ex, formats);
 		}
 
 		return completableFuture;
