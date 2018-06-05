@@ -8,6 +8,7 @@ package org.mule.module.apikit.odata.util;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 public class CoreEventUtils {
@@ -17,17 +18,17 @@ public class CoreEventUtils {
 		return  (HttpRequestAttributes) event.getMessage().getAttributes().getValue();
 	}
 
-	
 	public static HttpResponseAttributes getHttpResponseAttributes(CoreEvent event) {
 		
 		return  (HttpResponseAttributes) event.getMessage().getAttributes().getValue();
 	}
 	
-
-
-
 	public static String getPayloadAsString(CoreEvent event) {
+		TypedValue<?> payload= event.getMessage().getPayload();
 		
-		return event.getMessage().getPayload().getValue().toString();
+		if(payload != null && payload.getValue() != null)
+			return payload.getValue().toString();
+		
+		return null;
 	}
 }

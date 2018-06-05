@@ -75,7 +75,7 @@
 		<dependency>
 			<groupId>org.mule.runtime</groupId>
 			<artifactId>mule-core</artifactId>
-			<version>4.1.1</version>
+			<version>${mule.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>junit</groupId>

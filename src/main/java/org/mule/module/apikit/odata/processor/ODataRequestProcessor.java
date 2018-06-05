@@ -7,8 +7,6 @@
 package org.mule.module.apikit.odata.processor;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.module.apikit.odata.ODataPayload;
@@ -34,18 +32,7 @@ public abstract class ODataRequestProcessor {
 
 	protected String getProtocol(HttpRequestAttributes attributes) {
 		String protocol = attributes.getScheme();
-
-		// workaround to handle old http/https connector
-		if (protocol == null) {
-						String uri = attributes.getRequestUri();
-			Matcher m = Pattern.compile("^(http|https|.+)://.*$").matcher(uri);
-			if (m.matches()) {
-				protocol = m.group(1);
-			} else {
-				protocol = "http";
-			}
-		}
-
+		
 		return protocol;
 	}
 

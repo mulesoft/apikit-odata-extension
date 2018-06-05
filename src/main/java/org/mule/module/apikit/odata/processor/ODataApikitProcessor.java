@@ -166,18 +166,12 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 			EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
 			List<Entry> entries;
 
-//			String message = response.getMessageAsString();
-//			Object payload = response.getMessage().getPayload();
-//			if (payload instanceof NullPayload) {
-//				entries = new ArrayList<Entry>();
-//			} else if (message != null ) {
-//				entries = Helper.transformJsonToEntryList(message);
+
 			String payload = CoreEventUtils.getPayloadAsString(event);
-			if(payload != null || payload != "") {
-				entries = Helper.transformJsonToEntryList(payload);
-			} else {
+			if(payload == null || payload == "") 
 				throw new ODataInvalidFlowResponseException("The payload of the response should be a valid json.");
-			}
+			
+			entries = Helper.transformJsonToEntryList(payload);
 
 			int entryNumber = 1;
 			for (Entry entry : entries) {
