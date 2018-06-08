@@ -40,14 +40,13 @@ public class ODataErrorHandler {
 	private static final String JSON_ERROR_ENVELOPE = "{\"odata.error\":{\"code\":\"\",\"message\":{\"lang\":\"en-US\",\"value\":\"%%ERRORMSG%%\"}}}";
 	private static final String ERROR_MSG_PLACEHOLDER = "%%ERRORMSG%%";
 
-	public static  CompletableFuture<Event> handle(CoreEvent event, Exception ex) {
+	public static  Event handle(CoreEvent event, Exception ex) {
 		return handle(event, ex, null);
 	}
 
-	public static  CompletableFuture<Event> handle(CoreEvent event, Exception ex, List<Format> formats) {
+	public static  Event handle(CoreEvent event, Exception ex, List<Format> formats) {
 		Exception exceptionToBeThrown;
 		Throwable cause = ExceptionUtils.getMessagingExceptionCause(ex);
-		CompletableFuture<Event> newEvent = new CompletableFuture<Event>();
 		exceptionToBeThrown = cause != null ? (Exception)cause : ex;
 		if (exceptionToBeThrown instanceof MuleException) {
 			// Exception thrown by APIkit
@@ -70,10 +69,8 @@ public class ODataErrorHandler {
 		if (exceptionToBeThrown instanceof ODataException) {
 			httpStatus = ((ODataException) exceptionToBeThrown).getHttpStatus();
 		}
-		
 
-		newEvent.complete(CoreEvent.builder(event).message(message).addVariable("httpStatus", httpStatus).build());
-		return newEvent;
+		return CoreEvent.builder(event).message(message).addVariable("httpStatus", httpStatus).build();
 	}
 
 	/**

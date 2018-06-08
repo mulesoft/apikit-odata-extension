@@ -24,6 +24,10 @@ public class OdataContext {
         setMethod(method);
     }
 
+    public OdataContext(OdataMetadataManager odataMetadataManager) {
+        setOdataMetadataManager(odataMetadataManager);
+    }
+    
     public OdataMetadataManager getOdataMetadataManager() {
         return odataMetadataManager;
     }

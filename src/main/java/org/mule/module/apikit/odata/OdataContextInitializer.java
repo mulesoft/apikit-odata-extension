@@ -21,12 +21,12 @@ public class OdataContextInitializer {
 
 	private static final Logger logger = Logger.getLogger(OdataContextInitializer.class);
 
-	public OdataContext initializeContext(String ramlPath,String method) throws OdataMetadataFieldsException,
+	public OdataContext initializeContext(String ramlPath) throws OdataMetadataFieldsException,
 			OdataMetadataFormatException, OdataMetadataEntityNotFoundException {
 		
 		final OdataMetadataManager odataMetadataManager = new OdataMetadataManager(ramlPath);
 
-		return new OdataContext(odataMetadataManager, method);
+		return new OdataContext(odataMetadataManager);
 	}
 
 	private List<String> getFieldsAsList(List<EntityDefinitionProperty> properties) {
