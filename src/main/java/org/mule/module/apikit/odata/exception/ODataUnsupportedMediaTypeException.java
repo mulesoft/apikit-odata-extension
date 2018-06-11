@@ -6,7 +6,7 @@
  */
 package org.mule.module.apikit.odata.exception;
 
-import org.mule.transport.http.HttpConstants;
+import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 
 /**
  * Created by arielsegura on 10/1/15.
@@ -14,10 +14,10 @@ import org.mule.transport.http.HttpConstants;
 public class ODataUnsupportedMediaTypeException extends ODataException {
 
     public ODataUnsupportedMediaTypeException(String message) {
-        super(message, HttpConstants.SC_UNSUPPORTED_MEDIA_TYPE);
+        super(message, HttpStatus.UNSUPPORTED_MEDIA_TYPE.getStatusCode());
     }
     
     public ODataUnsupportedMediaTypeException(String message, Throwable cause) {
-        super(message, cause, HttpConstants.SC_UNSUPPORTED_MEDIA_TYPE);
+        super(message, cause, HttpStatus.UNSUPPORTED_MEDIA_TYPE.getStatusCode());
     }
 }

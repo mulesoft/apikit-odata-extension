@@ -6,24 +6,24 @@
  */
 package org.mule.module.apikit.odata.processor;
 
+import static reactor.core.publisher.Mono.fromFuture;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONObject;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
-import org.mule.module.apikit.AbstractRouter;
+import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.HttpRequestAttributesBuilder;
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ClientErrorException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFlowResponseException;
-import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.exception.ODataUnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.formatter.ODataApiKitFormatter;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
@@ -35,8 +35,14 @@ import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotF
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.model.Entry;
+import org.mule.module.apikit.odata.util.CoreEventUtils;
 import org.mule.module.apikit.odata.util.Helper;
-import org.mule.transport.NullPayload;
+import org.mule.module.apikit.spi.EventProcessor;
+import org.mule.runtime.api.event.Event;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 public class ODataApikitProcessor extends ODataRequestProcessor {
 	private String path;
@@ -84,13 +90,13 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 	}
 
 	@Override
-	public ODataPayload process(MuleEvent event, AbstractRouter router, List<Format> formats) throws Exception {
-		String oDataURL = getCompleteUrl(event);
+	public ODataPayload process(CoreEvent event, EventProcessor eventProcessor, List<Format> formats) throws Exception {
+		String oDataURL = getCompleteUrl(CoreEventUtils.getHttpRequestAttributes(event));
 
 		// truncate the URL at the entity
 		oDataURL = oDataURL.substring(0, oDataURL.indexOf(entity));
 
-		List<Entry> entries = processEntityRequest(event, router, formats);
+		List<Entry> entries = processEntityRequest(event, eventProcessor, formats);
 		ODataPayload oDataPayload;
 
 		if (isEntityCount()) {
@@ -108,65 +114,61 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		return oDataPayload;
 	}
 
-	public List<Entry> processEntityRequest(MuleEvent event, AbstractRouter router, List<Format> formats) throws Exception {
+	public List<Entry> processEntityRequest(CoreEvent event, EventProcessor eventProcessor, List<Format> formats) throws Exception {
 		List<Entry> entries = new ArrayList<Entry>();
-
-		String uri = event.getMessage().getInboundProperty("http.request.path");
+		HttpRequestAttributes attributes =CoreEventUtils.getHttpRequestAttributes(event);
+		String uri = attributes.getRelativePath();;
 		String basePath = uri.substring(0, uri.toLowerCase().indexOf("/odata.svc"));
 		String httpRequest = basePath + this.path + "?" + this.query;
 		String httpRequestPath = basePath + this.path;
 
-		String httpQueryString = this.query;
-		Map<String, String> httpQueryParams = Helper.queryToMap(query);
+		
+		HttpRequestAttributesBuilder httpRequestAttributesBuilder =  new HttpRequestAttributesBuilder(attributes);
+		httpRequestAttributesBuilder.requestPath(httpRequestPath);
+		httpRequestAttributesBuilder.requestUri(httpRequest);
+		httpRequestAttributesBuilder.queryString(this.query);
+		httpRequestAttributesBuilder.relativePath(this.path);
+		
+		MultiMap<String, String> httpQueryParams = Helper.queryToMap(query);
+		httpRequestAttributesBuilder.queryParams(httpQueryParams);
 
-		event.getMessage().setProperty("http.request", httpRequest, PropertyScope.INBOUND);
-		event.getMessage().setProperty("http.request.path", httpRequestPath, PropertyScope.INBOUND);
-		event.getMessage().setProperty("http.query.string", httpQueryString, PropertyScope.INBOUND);
-		event.getMessage().setProperty("http.query.params", httpQueryParams, PropertyScope.INBOUND);
-		event.getMessage().setProperty("http.relative.path", this.path, PropertyScope.INBOUND);
-		event.getMessage().setProperty("accept", "application/json", PropertyScope.INBOUND);
-
-		String httpMethod = event.getMessage().getInboundProperty("http.method").toString().toLowerCase();
-
-		if (Arrays.asList(methodsWithBody).contains(httpMethod.toUpperCase())) {
-			String payloadAsString = event.getMessage().getPayloadAsString();
-			if(event.getMessage().getPayload() instanceof NullPayload){
+		Message message = null;
+		if (Arrays.asList(methodsWithBody).contains(attributes.getMethod().toUpperCase())) {
+			String payloadAsString = CoreEventUtils.getPayloadAsString(event);
+			if(payloadAsString == null){
 				payloadAsString = "";
 			}
 			boolean isXMLFormat = !formats.contains(Format.Json);
-			event.getMessage().setPayload(BodyToJsonConverter.convertPayload(entity, isXMLFormat, payloadAsString));
-			// Setting again encoding and mimetype. For some reason encoding is set to null and mimetype to */* after setPayload
-			event.getMessage().getDataType().setEncoding(event.getEncoding());
-			event.getMessage().getDataType().setMimeType("application/json");
-			event.getMessage().setProperty("content-type", "application/json", PropertyScope.INBOUND);
+			payloadAsString = BodyToJsonConverter.convertPayload(entity, isXMLFormat, payloadAsString);
+			message = Message.builder().value(payloadAsString).mediaType(MediaType.APPLICATION_JSON).attributesValue(httpRequestAttributesBuilder.build()).build();
+		} else {
+			message = Message.builder(event.getMessage()).attributesValue(httpRequestAttributesBuilder.build()).build();
 		}
 
-		MuleEvent response = router.process(event);
+		CompletableFuture<Event> response = eventProcessor.processEvent(CoreEvent.builder(event).message(message).build());
 
 		entries = verifyFlowResponse(response);
 
 		return entries;
 	}
 
-	private List<Entry> verifyFlowResponse(MuleEvent response) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
+	private List<Entry> verifyFlowResponse(CompletableFuture<Event> response) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
 			OdataMetadataResourceNotFound, OdataMetadataFormatException, ODataInvalidFlowResponseException, ClientErrorException {
-		checkResponseHttpStatus(response.getMessage());
+		
 
 		try {
+			CoreEvent event;
+			event = (CoreEvent) response.get();
+			
 			OdataMetadataManager metadataManager = getMetadataManager();
 			EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
 			List<Entry> entries;
 
-			String message = response.getMessageAsString();
-			Object payload = response.getMessage().getPayload();
-
-			if (payload instanceof NullPayload) {
-				entries = new ArrayList<Entry>();
-			} else if (message != null ) {
-				entries = Helper.transformJsonToEntryList(message);
-			} else {
+			String payload = CoreEventUtils.getPayloadAsString(event);
+			if(payload == null || payload == "") 
 				throw new ODataInvalidFlowResponseException("The payload of the response should be a valid json.");
-			}
+			
+			entries = Helper.transformJsonToEntryList(payload);
 
 			int entryNumber = 1;
 			for (Entry entry : entries) {
@@ -183,28 +185,11 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 			}
 
 			return entries;
-		} catch (MuleException me) {
-			throw new ODataInvalidFlowResponseException(me.getMessage());
+		} catch (InterruptedException | ExecutionException e) {
+			throw new ODataInvalidFlowResponseException(e.getMessage());
 		}
 	}
 
-	protected static void checkResponseHttpStatus(MuleMessage response) throws ClientErrorException {
-		String status = response.getOutboundProperty("http.status").toString();
-		int httpStatus = 0;
-
-		try {
- 			httpStatus = Integer.valueOf(status.toString());
-		} catch (Exception e) {
-			// do nothing...
-		}
-
-		if(httpStatus >= 400){
-			// If there was an error, it makes no sense to return a list of entry
-			// just raise an exception
-			Object payload = response.getPayload();
-			throw new ClientErrorException(payload != null ? payload.toString() : "", httpStatus);
-		}
-	}
 
 	public String getPath() {
 		return path;

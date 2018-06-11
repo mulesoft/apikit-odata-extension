@@ -6,17 +6,18 @@
  */
 package org.mule.module.apikit.odata.util;
 
-import org.apache.logging.log4j.util.Strings;
-import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
-import org.mule.module.apikit.odata.exception.ODataInvalidUriException;
-import org.odata4j.expression.BoolCommonExpression;
-import org.odata4j.producer.resources.OptionsQueryParser;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
+import org.mule.module.apikit.odata.exception.ODataInvalidUriException;
+import org.odata4j.expression.BoolCommonExpression;
+import org.odata4j.producer.resources.OptionsQueryParser;
+
+import com.google.common.base.Strings;
 
 /**
  * @author juancazala
@@ -74,7 +75,7 @@ public class ODataUriHelper {
     }
 
     public static boolean isServiceDocument(String path) {
-        return path.isEmpty() || path.equals("/");
+        return path.isEmpty() || path.equals("/") ;
     }
 
     public static boolean isResourceRequest(String path) {
@@ -135,7 +136,7 @@ public class ODataUriHelper {
         String[] parsedKeys;
 
         // parse raw keys
-        if (!Strings.isEmpty(parsedId)) {
+        if (!Strings.isNullOrEmpty(parsedId)) {
             if (matchPattern(ODATA_MULTIPLE_KEYS_PATTERN, parsedId)) {
                 parsedKeys = parsedId.split(",");
             } else if (matchPattern(ODATA_SINGLE_KEY_PATTERN, parsedId)) {
@@ -217,7 +218,7 @@ public class ODataUriHelper {
         return keys;
     }
 
-    public static boolean allowedQuery(String path, String query) throws ODataInvalidUriException {
+	public static boolean allowedQuery(String path, String query) throws ODataInvalidUriException {
 
         if (query.isEmpty()) {
             return true;

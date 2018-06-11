@@ -6,18 +6,33 @@
  */
 package org.mule.module.apikit.odata.error;
 
-import org.mule.api.MuleException;
-import org.mule.module.apikit.exception.*;
-import org.mule.module.apikit.odata.exception.*;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
-
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-import org.mule.api.MuleEvent;
+import org.mule.extension.http.internal.temporary.HttpConnector;
+import org.mule.module.apikit.api.exception.BadRequestException;
+import org.mule.module.apikit.exception.MethodNotAllowedException;
+import org.mule.module.apikit.exception.NotAcceptableException;
+import org.mule.module.apikit.exception.NotFoundException;
+import org.mule.module.apikit.exception.UnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.ODataFormatHandler;
+import org.mule.module.apikit.odata.exception.ODataBadRequestException;
+import org.mule.module.apikit.odata.exception.ODataException;
+import org.mule.module.apikit.odata.exception.ODataInternalServerErrorException;
+import org.mule.module.apikit.odata.exception.ODataMethodNotAllowedException;
+import org.mule.module.apikit.odata.exception.ODataNotAcceptableException;
+import org.mule.module.apikit.odata.exception.ODataNotFoundException;
+import org.mule.module.apikit.odata.exception.ODataUnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
-import org.mule.util.ExceptionUtils;
+import org.mule.module.apikit.odata.util.CoreEventUtils;
+import org.mule.runtime.api.event.Event;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.util.ExceptionUtils;
+import org.mule.runtime.http.api.HttpConstants;
+import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 
 public class ODataErrorHandler {
 
@@ -25,35 +40,37 @@ public class ODataErrorHandler {
 	private static final String JSON_ERROR_ENVELOPE = "{\"odata.error\":{\"code\":\"\",\"message\":{\"lang\":\"en-US\",\"value\":\"%%ERRORMSG%%\"}}}";
 	private static final String ERROR_MSG_PLACEHOLDER = "%%ERRORMSG%%";
 
-	public static MuleEvent handle(MuleEvent event, Exception ex) {
+	public static  Event handle(CoreEvent event, Exception ex) {
 		return handle(event, ex, null);
 	}
 
-	public static MuleEvent handle(MuleEvent event, Exception ex, List<Format> formats) {
+	public static  Event handle(CoreEvent event, Exception ex, List<Format> formats) {
 		Exception exceptionToBeThrown;
-		Throwable cause = ExceptionUtils.getRootCause(ex);
+		Throwable cause = ExceptionUtils.getMessagingExceptionCause(ex);
 		exceptionToBeThrown = cause != null ? (Exception)cause : ex;
 		if (exceptionToBeThrown instanceof MuleException) {
 			// Exception thrown by APIkit
 			exceptionToBeThrown = processMuleException((MuleException) exceptionToBeThrown);
 		}
 		
+		String payload = null;
+		MediaType mediaType = null;
 		if (isJsonFormat(formats, event)) {
-			event.getMessage().setOutboundProperty("Content-Type", "application/json");
-			event.getMessage().setPayload(JSON_ERROR_ENVELOPE.replace(ERROR_MSG_PLACEHOLDER, (exceptionToBeThrown.getMessage() != null) ? exceptionToBeThrown.getMessage().replace('"', '\'') : ""));
+			payload = JSON_ERROR_ENVELOPE.replace(ERROR_MSG_PLACEHOLDER, (exceptionToBeThrown.getMessage() != null) ? exceptionToBeThrown.getMessage().replace('"', '\'') : "");
+			mediaType = MediaType.APPLICATION_JSON;
 		} else {
-			event.getMessage().setOutboundProperty("Content-Type", "application/xml");
-			event.getMessage().setPayload(ATOM_ERROR_ENVELOPE.replace(ERROR_MSG_PLACEHOLDER, (exceptionToBeThrown.getMessage() != null) ? exceptionToBeThrown.getMessage() : exceptionToBeThrown.getClass().getName()));
+			payload = ATOM_ERROR_ENVELOPE.replace(ERROR_MSG_PLACEHOLDER, (exceptionToBeThrown.getMessage() != null) ? exceptionToBeThrown.getMessage() : exceptionToBeThrown.getClass().getName());
+			mediaType = MediaType.APPLICATION_XML;
 		}
+		Message message = Message.builder().value(payload).mediaType(mediaType).build();
 
 		
+		int httpStatus = HttpStatus.INTERNAL_SERVER_ERROR.getStatusCode();
 		if (exceptionToBeThrown instanceof ODataException) {
-			event.getMessage().setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, ((ODataException) exceptionToBeThrown).getHttpStatus());
-		} else {
-			event.getMessage().setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_INTERNAL_SERVER_ERROR);
+			httpStatus = ((ODataException) exceptionToBeThrown).getHttpStatus();
 		}
 
-		return event;
+		return CoreEvent.builder(event).message(message).addVariable("httpStatus", httpStatus).build();
 	}
 
 	/**
@@ -77,10 +94,10 @@ public class ODataErrorHandler {
 		}
 	}
 
-	private static boolean isJsonFormat(List<Format> formats, MuleEvent event) {
+	private static boolean isJsonFormat(List<Format> formats, CoreEvent event) {
 		try {
 			if (formats == null) {
-				formats = ODataFormatHandler.getFormats(event);
+				formats = ODataFormatHandler.getFormats(CoreEventUtils.getHttpRequestAttributes(event));
 			}
 			return formats.contains(Format.Json) && !formats.contains(Format.Atom);
 		} catch (ODataException e) {
