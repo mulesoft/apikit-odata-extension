@@ -159,13 +159,10 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		try {
 			CoreEvent event;
 			event = (CoreEvent) response.get();
-
-//			checkResponseHttpStatus(event); TODO:Check how to validate the response
 			
 			OdataMetadataManager metadataManager = getMetadataManager();
 			EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
 			List<Entry> entries;
-
 
 			String payload = CoreEventUtils.getPayloadAsString(event);
 			if(payload == null || payload == "") 
@@ -193,21 +190,6 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		}
 	}
 
-	protected static void checkResponseHttpStatus(CoreEvent response) throws ClientErrorException {
-		
-		HttpResponseAttributes attributes = CoreEventUtils.getHttpResponseAttributes(response);
-		
-		int httpStatus = attributes.getStatusCode();
-
-
-
-		if(httpStatus >= 400){
-			// If there was an error, it makes no sense to return a list of entry
-			// just raise an exception
-			String payload = CoreEventUtils.getPayloadAsString(response);
-			throw new ClientErrorException(payload != null ? payload.toString() : "", httpStatus);
-		}
-	}
 
 	public String getPath() {
 		return path;
