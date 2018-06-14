@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.module.apikit.exception.ApikitRuntimeException;
+import org.mule.module.apikit.api.exception.ApikitRuntimeException;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.error.ODataErrorHandler;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;

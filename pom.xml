@@ -21,7 +21,7 @@
 	<!-- Properties -->
 	<properties>
 		<mule.version>4.1.1</mule.version>
-		<apikit.version>1.1.2-SNAPSHOT</apikit.version>
+		<apikit.version>1.2.0-SNAPSHOT</apikit.version>
 		<licensePath>LICENSE_HEADER.txt</licensePath>
 	</properties>
 
@@ -98,7 +98,12 @@
 			<version>${mule.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
+		
+		<dependency>
+            <groupId>org.raml</groupId>
+            <artifactId>raml-parser-2</artifactId>
+            <version>1.0.22</version>
+        </dependency>
 
 		<!-- OData4J / Oreva -->
 		<dependency>
