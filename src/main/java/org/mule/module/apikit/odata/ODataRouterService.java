@@ -40,11 +40,11 @@ public class ODataRouterService implements RouterService {
 	}																									  	  // https://stackoverflow.com/questions/30316829/classnotfoundexception-org-glassfish-jersey-internal-runtimedelegateimpl-cannot
 	
 	@Override
-	public CompletableFuture<Event> process(CoreEvent event, EventProcessor router,String ramlPath) throws MuleException {
+	public CompletableFuture<Event> process(CoreEvent event, EventProcessor router) throws MuleException {
 		logger.info("Handling odata enabled request.");
 		
 		HttpRequestAttributes attributes = CoreEventUtils.getHttpRequestAttributes(event);
-		OdataContext oDataContext = getOdataContext(ramlPath);
+		OdataContext oDataContext = getOdataContext(router.getRamlHandler().getRamlV1());
 		oDataContext.setMethod(attributes.getMethod());
 		String path = attributes.getRelativePath();
 			

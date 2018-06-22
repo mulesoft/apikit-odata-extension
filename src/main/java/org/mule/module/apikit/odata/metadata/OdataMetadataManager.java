@@ -17,9 +17,13 @@ import org.mule.module.apikit.odata.metadata.raml.RamlParserUtils;
 
 import static org.mule.module.apikit.model.Entity.pluralizeName;
 
+import java.util.concurrent.ExecutionException;
+
+import org.mule.module.apikit.model.AMFWrapper;
+
 public class OdataMetadataManager {
 
-	private static RamlImpl10V2Wrapper apiWrapper = null;
+	private static AMFWrapper apiWrapper = null;
 	private static EntityDefinitionSet entitySet = null;
 	private static final Object lock = new Object();
 
@@ -33,7 +37,11 @@ public class OdataMetadataManager {
 		if (apiWrapper == null) {
 			synchronized (lock) {
 				if (apiWrapper == null) {
-					apiWrapper = RamlParserUtils.getRaml(ramlPath);
+					try {
+						apiWrapper = new AMFWrapper(ramlPath);
+					} catch (Exception e) {
+						throw new OdataMetadataFormatException(e.getMessage());
+					}
 				}
 			}
 		}
