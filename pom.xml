@@ -22,7 +22,7 @@
 	<properties>
 		<mule.version>4.1.1</mule.version>
 		<apikit.version>1.2.0-SNAPSHOT</apikit.version>
-		<amfVersion>1.4.0-SNAPSHOT</amfVersion>
+		<amfVersion>1.6.0-SNAPSHOT</amfVersion>
 		<licensePath>LICENSE_HEADER.txt</licensePath>
 	</properties>
 
@@ -92,19 +92,23 @@
 			<version>${apikit.version}</version>
 			<classifier>mule-plugin</classifier>
 			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>xerces2-xsd11</artifactId>
-					<groupId>org.mule.apache</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
+
 		<dependency>
 			<groupId>org.mule.runtime</groupId>
 			<artifactId>mule-service-http-api</artifactId>
 			<version>${mule.version}</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.mule.tools</groupId>
+			<artifactId>mule-apikit-scaffolder</artifactId>
+			<version>${apikit.version}</version>
+			<scope>provided</scope>
+
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.raml</groupId>
@@ -115,7 +119,7 @@
 		<!-- <dependency> <groupId>org.mule.amf</groupId> <artifactId>amf-core_2.12</artifactId> 
 			<version>${amfVersion}</version> <scope>provided</scope> </dependency> -->
 		<dependency>
-			<groupId>org.mule.amf</groupId>
+			<groupId>com.github.amlorg</groupId>
 			<artifactId>amf-client_2.12</artifactId>
 			<version>${amfVersion}</version>
 			<!-- <exclusions> <exclusion> <artifactId>xerces2-xsd11</artifactId> <groupId>org.mule.apache</groupId> 
@@ -166,6 +170,15 @@
 			<version>1.10.19</version>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+		    <groupId>org.hamcrest</groupId>
+		    <artifactId>hamcrest-all</artifactId>
+		    <version>1.3</version>
+		    <scope>test</scope>
+		    
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.freemarker</groupId>

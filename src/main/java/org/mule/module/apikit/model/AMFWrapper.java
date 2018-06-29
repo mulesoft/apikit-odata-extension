@@ -71,20 +71,42 @@ import amf.client.AMF;
 import amf.client.model.document.Module;
 import amf.client.model.domain.DomainElement;
 import amf.client.model.domain.DomainExtension;
+import amf.client.model.domain.FileShape;
 import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.PropertyShape;
+import amf.client.model.domain.ScalarNode;
 import amf.client.model.domain.ScalarShape;
 import amf.client.model.domain.Shape;
 import amf.client.model.domain.UnionShape;
+import amf.plugins.features.validation.AMFValidatorPlugin;
+import amf.plugins.xml.XmlValidationPlugin;
 
 public class AMFWrapper {
 	private Module module = null;
 	private Map<String,NodeShape> shapes = new HashMap<String,NodeShape>();
 	private EntityDefinitionSet entityDefinitionSet = new EntityDefinitionSet();
 	
+	public static final String AMF_STRING = "http://www.w3.org/2001/XMLSchema#string";
+	public static final String AMF_BOOLEAN = "http://www.w3.org/2001/XMLSchema#boolean";
+	public static final String AMF_NUMBER = "http://raml.org/vocabularies/shapes#number";
+	public static final String AMF_FLOAT = "http://www.w3.org/2001/XMLSchema#float";
+	public static final String AMF_DATE_TIME_ONLY = "http://raml.org/vocabularies/shapes#dateTimeOnly";
+	public static final String AMF_INTEGER = "http://www.w3.org/2001/XMLSchema#integer";
+	public static final String AMF_TIME = "http://www.w3.org/2001/XMLSchema#time";
+	public static final String AMF_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
+	public static final String AMF_DATE_ONLY = "http://www.w3.org/2001/XMLSchema#date";
+	
+	
 	public AMFWrapper(String ramlPath) throws InterruptedException, ExecutionException, OdataMetadataFormatException, OdataMetadataFieldsException {
+		try {
+		      AMF.init().get();
+		      AMFValidatorPlugin.withEnabledValidation(true);
+		      amf.core.AMF.registerPlugin(new XmlValidationPlugin());
+		    } catch (final Exception e) {
+		      e.printStackTrace();
+		    }		 	
 		
-		module = (Module) AMF.resolveRaml10( AMF.raml10Parser().parseStringAsync(ramlPath).get() );
+		module = (Module) AMF.raml10Parser().parseFileAsync("file://" + ramlPath).get() ;
 				
 		for(DomainElement domainElement :module.declares()) {
 			if(domainElement instanceof NodeShape) {
@@ -117,85 +139,74 @@ public class AMFWrapper {
         EntityDefinition entityDefinition = new EntityDefinition(entityName, remoteName);
 
         for (PropertyShape propertyShape : nodeShape.properties()) {
-            final ScalarShape scalarShape = getScalarShape(propertyShape.range());
+            //Handle unions 
+        	final Shape shape = getScalarShape(propertyShape.range());
+        	final String propertyName = propertyShape.name().value();
+        	
+        	notNull("Property \"name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", entityName);
+        	notNull("Property \"remote name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", remoteName);
+        	
+        	EntityDefinitionProperty entityDefinitionProperty = null;
+        	
+        	final String key = getAnnotation(shape, NAMESPACE_KEY_PROPERTY);
+        	notNull("Property \"key\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", key);
+        	final boolean isKey = Boolean.valueOf(key);
+        	
+        	final String nullable = getAnnotation(shape, NAMESPACE_NULLABLE_PROPERTY);
+        	notNull("Property \"nullable\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", nullable);
+        	final boolean isNullable = Boolean.valueOf(nullable);
 
-            final String propertyName = scalarShape.name().value();
-
-            notNull("Property \"name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", entityName);
-            notNull("Property \"remote name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", remoteName);
-
-            final String key = getAnnotation(scalarShape, NAMESPACE_KEY_PROPERTY);
-            notNull("Property \"key\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", key);
-            final boolean isKey = Boolean.valueOf(key);
-
-            final String nullable = getAnnotation(scalarShape, NAMESPACE_NULLABLE_PROPERTY);
-            notNull("Property \"nullable\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", nullable);
-            final boolean isNullable = Boolean.valueOf(nullable);
-
-            final String type = getOdataType(scalarShape);
-            notNull("Property \"type\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", type);
-
-            String maxLength = null;
-            if (EDM_STRING.equals(type)) {
+        	final String defaultValue = (propertyShape.defaultValue() != null ? propertyShape.defaultValue().name().value() : null);
+            if(shape instanceof ScalarShape) {
+            	final ScalarShape scalarShape = (ScalarShape) shape;	            
+	
+	            final String type = getOdataType(scalarShape);
+	            notNull("Property \"type\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", type);
+	
+	            String maxLength = null;
+	            if (EDM_STRING.equals(type)) {
+	            
+	                Integer maxLengthInt = 	scalarShape.maxLength().value();;
+	                maxLength = maxLengthInt != 0 ? String.valueOf(maxLengthInt) : null;
+	            }
+	            
+	            
+	            final String precision = getAnnotation(scalarShape, NAMESPACE_PRECISION_PROPERTY);
+	            final String scale = getAnnotation(scalarShape, NAMESPACE_SCALE_PROPERTY);
+	
+	            entityDefinitionProperty = new EntityDefinitionProperty(propertyName, type, isNullable, isKey, defaultValue, maxLength, false, null, false, precision, scale);
+	        } else if (shape instanceof FileShape) {
+	            entityDefinitionProperty = new EntityDefinitionProperty(propertyName, EDM_BINARY, isNullable, isKey, defaultValue, null, false, null, false, null,null);
+	        }else {
+	        	 throw new OdataMetadataFieldsException("Type not supported of property " + propertyName );
+	        }
             
-                Integer maxLengthInt = 	scalarShape.maxLength().value();;
-                maxLength = maxLengthInt != null ? String.valueOf(maxLengthInt) : null;
-            }
-            
-            
-            final String defaultValue = propertyShape.defaultValue().toString();
-            final String precision = getAnnotation(scalarShape, NAMESPACE_PRECISION_PROPERTY);
-            final String scale = getAnnotation(scalarShape, NAMESPACE_SCALE_PROPERTY);
-
-            EntityDefinitionProperty entityDefinitionProperty = new EntityDefinitionProperty(propertyName, type, isNullable, isKey, defaultValue, maxLength, false, null, false, precision, scale);
             entityDefinition.addProperty(entityDefinitionProperty);
-
             if (!entityDefinition.hasPrimaryKey() && entityDefinitionProperty.isKey()) {
-                entityDefinition.setHasPrimaryKey(true);
+            	entityDefinition.setHasPrimaryKey(true);
             }
         }
         return entityDefinition;
     }
 
-//    private List<TypeDeclaration> getTypes() throws OdataMetadataFormatException {
-//        List<TypeDeclaration> types = new ArrayList<>();
-//
-//        if(api.getApiV10() == null) {
-//            // parsing a library
-//            final Library library = api.getLibrary();
-//            if (library != null) types = library.types();
-//        } else {
-//            // types must be defined in the model library referenced in the root raml
-//            Api apiv10 = api.getApiV10();
-//            for(Library library: apiv10.uses()){
-//                if(library.name().equals(ODATA_MODEL)){
-//                    types = library.types();
-//                    break;
-//                }
-//            }
-//        }
-//
-//        if (types.isEmpty()) {
-//            throw new OdataMetadataFormatException(format("No types defined in %s.", ODATA_MODEL));
-//        }
-//
-//        return types;
-//    }
-
     private String getOdataType(ScalarShape scalarShape) throws OdataMetadataFieldsException {
-//        if (scalarShape instanceof Boolean.) return EDM_BOOLEAN;
-        if (scalarShape instanceof TimeOnlyTypeDeclaration) return EDM_TIME;
-        if (scalarShape instanceof DateTimeOnlyTypeDeclaration) return EDM_DATETIME;
-        if (scalarShape instanceof DateTimeTypeDeclaration) return EDM_DATETIMEOFFSET;
-        if (scalarShape instanceof DateTypeDeclaration) return EDM_DATETIME;
-        if (scalarShape instanceof NumberTypeDeclaration) return getNumberType((NumberTypeDeclaration) scalarShape);
-        if (scalarShape instanceof StringTypeDeclaration) return getStringType((StringTypeDeclaration) scalarShape);
-        if (scalarShape instanceof FileTypeDeclaration) return EDM_BINARY;
+    	String dataType = scalarShape.dataType().value();
 
-        throw new UnsupportedOperationException("Type not supported " + scalarShape.name());
+    	if (dataType.equals(AMF_BOOLEAN) ) return EDM_BOOLEAN;
+        if (dataType.equals(AMF_STRING)) return getStringType(scalarShape);
+        if (dataType.equals(AMF_NUMBER)) return getNumberType(scalarShape);
+        if (dataType.equals(AMF_FLOAT)) return EDM_SINGLE;
+        if (dataType.equals(AMF_DATE_TIME_ONLY)) return EDM_DATETIME;
+        if (dataType.equals(AMF_INTEGER)) return  getNumberType(scalarShape);    
+        if (dataType.equals(AMF_TIME)) return EDM_TIME;
+        if (dataType.equals(AMF_DATE_TIME)) return EDM_DATETIME;
+        if (dataType.equals(AMF_DATE_ONLY)) return EDM_DATETIMEOFFSET;
+
+        
+        throw new UnsupportedOperationException("Type not supported " + dataType + " of property "+scalarShape.name());
     }
 
-    private ScalarShape getScalarShape(Shape shape) throws OdataMetadataFieldsException {
+    private Shape getScalarShape(Shape shape) throws OdataMetadataFieldsException {
         if(shape instanceof UnionShape){
         	UnionShape unionShape = (UnionShape) shape;
             for(Shape unionSubShape : unionShape.anyOf()){
@@ -206,12 +217,11 @@ public class AMFWrapper {
 
             throw new OdataMetadataFieldsException(format("Property %s cannot be just null.", shape.name()));
         }
-        //TODO:Validar si un shape es un scalar shape o un unionshape ,,, o puede ser otra cosa
-        return (ScalarShape) shape;
+        return  shape;
     }
 
-    private String getNumberType(NumberTypeDeclaration propTypeDeclaration) throws OdataMetadataFieldsException {
-        String format = propTypeDeclaration.format();
+    private String getNumberType(ScalarShape scalarShape) throws OdataMetadataFieldsException {
+        String format = scalarShape.format().value();
 
         if (format != null) {
             switch (format) {
@@ -219,24 +229,23 @@ public class AMFWrapper {
                 case INT32: return EDM_INT32;
                 case INT16: return EDM_INT16;
                 case INT8: return EDM_BYTE;
-                case FLOAT: if (!(propTypeDeclaration instanceof IntegerTypeDeclaration)) return EDM_SINGLE;
                 default: throw new OdataMetadataFieldsException(format("Unexpected format %s for number type.", format));
             }
         }
 
-        if (propTypeDeclaration instanceof IntegerTypeDeclaration) return EDM_INT32;
+        if (scalarShape.dataType().value().equals(AMF_INTEGER)) return EDM_INT32;
 
-//        final String scale = getAnnotation(propTypeDeclaration, NAMESPACE_SCALE_PROPERTY);
-//        final String precision = getAnnotation(propTypeDeclaration, NAMESPACE_PRECISION_PROPERTY);
-//        if (scale != null && precision != null) return EDM_DECIMAL;
+        final String scale = getAnnotation(scalarShape, NAMESPACE_SCALE_PROPERTY);
+        final String precision = getAnnotation(scalarShape, NAMESPACE_PRECISION_PROPERTY);
+        if (scale != null && precision != null) return EDM_DECIMAL;
 
         return EDM_DOUBLE;
     }
 
-    private String getStringType(StringTypeDeclaration stringTypeDeclaration) {
-//        final String subType = getAnnotation(stringTypeDeclaration, NAMESPACE_TYPE_PROPERTY);
-//
-//        if (GUID.equals(subType)) return EDM_GUID;
+    private String getStringType(ScalarShape scalarShape) {
+        final String subType = getAnnotation(scalarShape, NAMESPACE_TYPE_PROPERTY);
+
+        if (GUID.equals(subType)) return EDM_GUID;
 
         return EDM_STRING;
     }
@@ -249,7 +258,7 @@ public class AMFWrapper {
 
     @Nullable private String getAnnotation(Shape nodeShape, String annotationName) {
         for (DomainExtension annotation : nodeShape.customDomainProperties()) {
-            if (annotationName.equals(annotation.name().value())) return annotation.extension().toString();
+            if (annotationName.equals(annotation.name().value())) return ((ScalarNode)annotation.extension()).value();
         }
 
         return null;
