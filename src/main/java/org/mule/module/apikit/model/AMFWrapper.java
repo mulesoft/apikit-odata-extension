@@ -97,14 +97,18 @@ public class AMFWrapper {
 	public static final String AMF_DATE_ONLY = "http://www.w3.org/2001/XMLSchema#date";
 	
 	
-	public AMFWrapper(String ramlPath) throws InterruptedException, ExecutionException, OdataMetadataFormatException, OdataMetadataFieldsException {
+	static {
 		try {
 		      AMF.init().get();
 		      AMFValidatorPlugin.withEnabledValidation(true);
 		      amf.core.AMF.registerPlugin(new XmlValidationPlugin());
 		    } catch (final Exception e) {
 		      e.printStackTrace();
-		    }		 	
+		    }		
+	}
+	
+	public AMFWrapper(String ramlPath) throws InterruptedException, ExecutionException, OdataMetadataFormatException, OdataMetadataFieldsException {
+	 	
 		
 		module = (Module) AMF.raml10Parser().parseFileAsync("file://" + ramlPath).get() ;
 				
