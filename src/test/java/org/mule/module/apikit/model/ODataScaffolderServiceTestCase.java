@@ -98,4 +98,30 @@ public class ODataScaffolderServiceTestCase {
 		Assert.assertFalse(api.exists());
 	}
 
+	
+	@Test
+	public void noKeyError() {
+
+
+		File api = getResource("valid/app/api.xml");
+		
+		Assert.assertFalse(api.exists());
+		
+		List<File> ramlFiles = new ArrayList<File>();
+
+		File modelJson = getResource("nokeyerror/api/odata.raml");
+		File appDir = getResource("invalid/app");
+		File domainDir = getResource("invalid/domain");
+
+
+		ramlFiles.add(modelJson);
+		try {
+			scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "3.8.0");
+		} catch (Exception e) {
+			Assert.assertEquals("Error: Entity defition must have a primary key.", e.getMessage());			
+		}
+		
+
+	}
+
 }

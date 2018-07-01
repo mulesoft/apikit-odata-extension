@@ -120,6 +120,7 @@ public class AMFWrapper {
 			}
 		}
 		
+		
 	}
 	
 	public List<PropertyShape> getEntityProperties(String entity){
@@ -190,6 +191,10 @@ public class AMFWrapper {
             	entityDefinition.setHasPrimaryKey(true);
             }
         }
+        
+        if(!entityDefinition.hasPrimaryKey())
+        	 throw new OdataMetadataFieldsException("Entity defition must have a primary key.");
+        
         return entityDefinition;
     }
 

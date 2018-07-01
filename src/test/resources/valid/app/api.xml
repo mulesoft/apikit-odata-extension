@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd ">
+    <http:listener-config name="api-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="api-config" raml="api.raml" extensionEnabled="true" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="api-main">
+        <http:listener config-ref="api-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="api-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+                <set-payload value="{ &quot;message&quot;: &quot;Bad request&quot; }" />
+                <set-variable variableName="httpStatus" value="400" />
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+                <set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" />
+                <set-variable variableName="httpStatus" value="404" />
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+                <set-payload value="{ &quot;message&quot;: &quot;Method not allowed&quot; }" />
+                <set-variable variableName="httpStatus" value="405" />
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+                <set-payload value="{ &quot;message&quot;: &quot;Not acceptable&quot; }" />
+                <set-variable variableName="httpStatus" value="406" />
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+                <set-payload value="{ &quot;message&quot;: &quot;Unsupported media type&quot; }" />
+                <set-variable variableName="httpStatus" value="415" />
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+                <set-payload value="{ &quot;message&quot;: &quot;Not Implemented&quot; }" />
+                <set-variable variableName="httpStatus" value="501" />
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="api-console">
+        <http:listener config-ref="api-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="api-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+                <set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" />
+                <set-variable variableName="httpStatus" value="404" />
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\odataTypes\(edmString):application\json:api-config">
+        <set-variable xmlns="" value="#[attributes.uriParams.edmString]" variableName="edmString" />
+        <logger level="INFO" message="put:\odataTypes\(edmString):application\json:api-config" />
+    </flow>
+    <flow name="delete:\odataTypes\(edmString):api-config">
+        <set-variable xmlns="" value="#[attributes.uriParams.edmString]" variableName="edmString" />
+        <logger level="INFO" message="delete:\odataTypes\(edmString):api-config" />
+    </flow>
+    <flow name="get:\odataTypes\(edmString):api-config">
+        <set-variable xmlns="" value="#[attributes.uriParams.edmString]" variableName="edmString" />
+        <logger level="INFO" message="get:\odataTypes\(edmString):api-config" />
+    </flow>
+    <flow name="get:\odataTypes:api-config">
+        <logger level="INFO" message="get:\odataTypes:api-config" />
+    </flow>
+    <flow name="post:\odataTypes:application\json:api-config">
+        <logger level="INFO" message="post:\odataTypes:application\json:api-config" />
+    </flow>
+</mule>
