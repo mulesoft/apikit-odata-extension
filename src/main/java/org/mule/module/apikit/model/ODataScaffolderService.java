@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.mule.module.apikit.spi.ScaffolderService;
+import org.mule.tools.apikit.ParserType;
 import org.mule.tools.apikit.Scaffolder;
 
 public class ODataScaffolderService implements ScaffolderService {
@@ -51,7 +52,7 @@ public class ODataScaffolderService implements ScaffolderService {
 		}
 		Scaffolder scaffolder;
 		try {			
-			scaffolder = Scaffolder.createScaffolder(log, appDir, ramlFilePaths, muleXmlFiles, domain, muleVersion, null, ramlsWithExtensionEnabledPaths);
+			scaffolder = Scaffolder.createScaffolder(log, appDir, ramlFilePaths, muleXmlFiles, domain, muleVersion, null, ramlsWithExtensionEnabledPaths, ParserType.defaultType());
 		} catch (Exception e) {
 			throw new RuntimeException("Error executing scaffolder", e);
 		}
