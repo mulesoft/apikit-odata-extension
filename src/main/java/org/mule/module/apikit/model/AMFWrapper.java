@@ -7,8 +7,6 @@
 package org.mule.module.apikit.model;
 
 import static java.lang.String.format;
-import static org.mule.module.apikit.model.OdataServiceConstants.ODATA_MODEL;
-import static org.mule.module.apikit.odata.metadata.raml.RamlParser.FLOAT;
 import static org.mule.module.apikit.odata.metadata.raml.RamlParser.GUID;
 import static org.mule.module.apikit.odata.metadata.raml.RamlParser.INT16;
 import static org.mule.module.apikit.odata.metadata.raml.RamlParser.INT32;
@@ -35,7 +33,6 @@ import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_SINGLE;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_STRING;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_TIME;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,22 +45,6 @@ import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatExcept
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
-import org.raml.v2.api.model.v10.api.Api;
-import org.raml.v2.api.model.v10.api.Library;
-import org.raml.v2.api.model.v10.datamodel.BooleanTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.DateTimeOnlyTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.DateTimeTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.DateTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.FileTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.IntegerTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.NullTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.NumberTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TimeOnlyTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
-import org.raml.v2.api.model.v10.declarations.AnnotationRef;
 
 import com.google.common.base.Strings;
 
@@ -122,13 +103,6 @@ public class AMFWrapper {
 		
 		
 	}
-	
-	public List<PropertyShape> getEntityProperties(String entity){
-		NodeShape shape = shapes.get(entity);
-		
-		return shape.properties();
-		
-	}
 
     public EntityDefinitionSet getSchemas() {
         return entityDefinitionSet;
@@ -160,8 +134,8 @@ public class AMFWrapper {
         	final String nullable = getAnnotation(shape, NAMESPACE_NULLABLE_PROPERTY);
         	notNull("Property \"nullable\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", nullable);
         	final boolean isNullable = Boolean.valueOf(nullable);
-
-        	final String defaultValue = (propertyShape.defaultValue() != null ? propertyShape.defaultValue().name().value() : null);
+        	
+        	final String defaultValue = propertyShape.defaultValue().name().option().orElse(null);
             if(shape instanceof ScalarShape) {
             	final ScalarShape scalarShape = (ScalarShape) shape;	            
 	
@@ -220,7 +194,7 @@ public class AMFWrapper {
         	UnionShape unionShape = (UnionShape) shape;
             for(Shape unionSubShape : unionShape.anyOf()){
                 if(unionSubShape instanceof ScalarShape){
-                    return (ScalarShape) unionSubShape;
+                    return unionSubShape;
                 }
             }
 

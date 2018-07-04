@@ -116,14 +116,10 @@
 			<version>1.0.22</version>
 		</dependency>
 
-		<!-- <dependency> <groupId>org.mule.amf</groupId> <artifactId>amf-core_2.12</artifactId> 
-			<version>${amfVersion}</version> <scope>provided</scope> </dependency> -->
 		<dependency>
 			<groupId>com.github.amlorg</groupId>
 			<artifactId>amf-client_2.12</artifactId>
 			<version>${amfVersion}</version>
-			<!-- <exclusions> <exclusion> <artifactId>xerces2-xsd11</artifactId> <groupId>org.mule.apache</groupId> 
-				</exclusion> </exclusions> -->
 		</dependency>
 		<!-- OData4J / Oreva -->
 		<dependency>
