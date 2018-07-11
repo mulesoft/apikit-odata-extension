@@ -22,7 +22,7 @@
 	<properties>
 		<mule.version>4.1.1</mule.version>
 		<apikit.version>1.2.0-SNAPSHOT</apikit.version>
-		<amfVersion>1.6.0-SNAPSHOT</amfVersion>
+		<amfVersion>1.7.0-SNAPSHOT</amfVersion>
 		<licensePath>LICENSE_HEADER.txt</licensePath>
 	</properties>
 
