@@ -25,12 +25,12 @@ public class RamlParser {
 	public static final String PRECISION_PROPERTY = "precision";
 	public static final String SCALE_PROPERTY = "scale";
 
-	public static final String NAMESPACE_REMOTE_NAME = format("(%s.%s)", NAMESPACE, REMOTE_NAME);
-	public static final String NAMESPACE_NULLABLE_PROPERTY = format("(%s.%s)", NAMESPACE, NULLABLE_PROPERTY);
-	public static final String NAMESPACE_KEY_PROPERTY = format("(%s.%s)", NAMESPACE, KEY_PROPERTY);
-	public static final String NAMESPACE_PRECISION_PROPERTY = format("(%s.%s)", NAMESPACE, PRECISION_PROPERTY);
-	public static final String NAMESPACE_SCALE_PROPERTY = format("(%s.%s)", NAMESPACE, SCALE_PROPERTY);
-	public static final String NAMESPACE_TYPE_PROPERTY = format("(%s.%s)", NAMESPACE, TYPE_PROPERTY);
+	public static final String NAMESPACE_REMOTE_NAME = format("%s.%s", NAMESPACE, REMOTE_NAME);
+	public static final String NAMESPACE_NULLABLE_PROPERTY = format("%s.%s", NAMESPACE, NULLABLE_PROPERTY);
+	public static final String NAMESPACE_KEY_PROPERTY = format("%s.%s", NAMESPACE, KEY_PROPERTY);
+	public static final String NAMESPACE_PRECISION_PROPERTY = format("%s.%s", NAMESPACE, PRECISION_PROPERTY);
+	public static final String NAMESPACE_SCALE_PROPERTY = format("%s.%s", NAMESPACE, SCALE_PROPERTY);
+	public static final String NAMESPACE_TYPE_PROPERTY = format("%s.%s", NAMESPACE, TYPE_PROPERTY);
 
 	public static final String INT64 = "int64";
 	public static final String INT32 = "int32";

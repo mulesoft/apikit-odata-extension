@@ -39,9 +39,9 @@ public class EntityModelParser {
 	public static List<Entity> getEntities(String pathToModel) throws IOException, EntityModelParsingException {
 
 		try {
-			RamlImpl10V2Wrapper model = RamlParserUtils.getRaml(pathToModel);
-
-			return getEntities(model.getSchemas());
+			AMFWrapper amfWrapper =  new AMFWrapper(pathToModel);
+			
+			return getEntities(amfWrapper.getSchemas());
 		} catch (Exception e) {
 			throw new EntityModelParsingException(e.getMessage());
 		}
