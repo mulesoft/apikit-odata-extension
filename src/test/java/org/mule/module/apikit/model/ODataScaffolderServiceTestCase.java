@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mule.tools.apikit.model.RuntimeEdition;
 
 /**
  * 
@@ -68,7 +69,7 @@ public class ODataScaffolderServiceTestCase {
 
 		ramlFiles.add(model);
 
-		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "3.8.0");
+		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "4.0.0", RuntimeEdition.EE);
 		
 		api = getResource("valid/app/api.xml");
 		
@@ -91,7 +92,7 @@ public class ODataScaffolderServiceTestCase {
 		ramlFiles.add(modelJson);
 
 		thrown.expect(RuntimeException.class);
-		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "3.8.0");
+		scaffolder.executeScaffolder(ramlFiles, appDir, domainDir,"4.0.0", RuntimeEdition.EE);
 
 		api = getResource("valid/app/api.xml");
 		
@@ -116,7 +117,7 @@ public class ODataScaffolderServiceTestCase {
 
 		ramlFiles.add(modelJson);
 		try {
-			scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "3.8.0");
+			scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "4.0.0", RuntimeEdition.EE);
 		} catch (Exception e) {
 			Assert.assertEquals("Error: Entity defition must have a primary key.", e.getMessage());			
 		}
