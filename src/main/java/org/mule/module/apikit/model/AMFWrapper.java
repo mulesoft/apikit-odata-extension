@@ -40,6 +40,10 @@ import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
 
+import amf.ProfileName;
+import amf.ProfileNames;
+import amf.client.parse.Raml10Parser;
+import amf.client.validate.ValidationResult;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
@@ -87,12 +91,27 @@ public class AMFWrapper {
 		      e.printStackTrace();
 		    }		
 	}
+
+	private void validateOdataRaml(Raml10Parser parser) throws  InterruptedException, ExecutionException, OdataMetadataFieldsException{
+        List<ValidationResult> validationResults= parser.reportValidation(ProfileNames.RAML()).get().results();
+
+        if(validationResults.isEmpty())
+            return;
+
+	    String errorMessage = "Parse of odata.raml file failed: ";
+        for(ValidationResult validationResult : validationResults){
+            errorMessage = errorMessage.concat( validationResult.message() + "\n");
+        }
+        throw new OdataMetadataFieldsException(errorMessage);
+    }
 	
 	public AMFWrapper(String ramlPath) throws InterruptedException, ExecutionException, OdataMetadataFormatException, OdataMetadataFieldsException {
-	 	
-		
-		module = (Module) AMF.raml10Parser().parseFileAsync("file://" + ramlPath).get() ;
-				
+
+
+        Raml10Parser parser = AMF.raml10Parser();
+        module = (Module) parser.parseFileAsync("file://" + ramlPath).get() ;
+        validateOdataRaml(parser);
+
 		for(DomainElement domainElement :module.declares()) {
 			if(domainElement instanceof NodeShape) {
 				NodeShape shape = (NodeShape)domainElement;
