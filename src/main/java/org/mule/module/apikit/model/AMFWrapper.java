@@ -110,7 +110,7 @@ public class AMFWrapper {
 
         Raml10Parser parser = AMF.raml10Parser();
         module = (Module) parser.parseFileAsync("file://" + ramlPath).get() ;
-        validateOdataRaml(parser);
+        //validateOdataRaml(parser); TODO: ODATA-37 on hold until xerces issue is fixed
 
 		for(DomainElement domainElement :module.declares()) {
 			if(domainElement instanceof NodeShape) {
