@@ -69,9 +69,9 @@ public class AMFWrapper {
 	
 	public static final String AMF_STRING = "http://www.w3.org/2001/XMLSchema#string";
 	public static final String AMF_BOOLEAN = "http://www.w3.org/2001/XMLSchema#boolean";
-	public static final String AMF_NUMBER = "http://raml.org/vocabularies/shapes#number";
+	public static final String AMF_NUMBER = "http://a.ml/vocabularies/shapes#number";
 	public static final String AMF_FLOAT = "http://www.w3.org/2001/XMLSchema#float";
-	public static final String AMF_DATE_TIME_ONLY = "http://raml.org/vocabularies/shapes#dateTimeOnly";
+	public static final String AMF_DATE_TIME_ONLY = "http://a.ml/vocabularies/shapes#dateTimeOnly";
 	public static final String AMF_INTEGER = "http://www.w3.org/2001/XMLSchema#integer";
 	public static final String AMF_TIME = "http://www.w3.org/2001/XMLSchema#time";
 	public static final String AMF_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
@@ -135,7 +135,7 @@ public class AMFWrapper {
         	notNull("Property \"nullable\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", nullable);
         	final boolean isNullable = Boolean.valueOf(nullable);
         	
-        	final String defaultValue = propertyShape.defaultValue().name().option().orElse(null);
+        	final String defaultValue =  (propertyShape.defaultValue() != null ? propertyShape.defaultValue().name().value() : null);
             if(shape instanceof ScalarShape) {
             	final ScalarShape scalarShape = (ScalarShape) shape;	            
 	

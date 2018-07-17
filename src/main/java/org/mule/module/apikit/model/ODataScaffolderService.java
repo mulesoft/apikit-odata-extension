@@ -22,6 +22,7 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.mule.module.apikit.spi.ScaffolderService;
 import org.mule.tools.apikit.ParserType;
 import org.mule.tools.apikit.Scaffolder;
+import org.mule.tools.apikit.model.RuntimeEdition;
 
 public class ODataScaffolderService implements ScaffolderService {
 
@@ -35,7 +36,7 @@ public class ODataScaffolderService implements ScaffolderService {
   private final static String ODATA_MODEL_FILE = "odata.raml";
   private final static String FINAL_RAML_FILE = "api.raml";
   
-	public void executeScaffolder(List<File> ramlFiles, File appDir, File domainDir, String muleVersion) {
+	public void executeScaffolder(List<File> ramlFiles, File appDir, File domainDir, String muleVersion, RuntimeEdition runtimeEdition) {
 		List<String> ramlsWithExtensionEnabledPaths = processDataModelFiles(ramlFiles);
 		List<String> ramlFilePaths = ramlsWithExtensionEnabledPaths;
 		List<String> muleXmlFiles = retrieveFilePaths(appDir, appExtensions);
@@ -52,7 +53,7 @@ public class ODataScaffolderService implements ScaffolderService {
 		}
 		Scaffolder scaffolder;
 		try {			
-			scaffolder = Scaffolder.createScaffolder(log, appDir, ramlFilePaths, muleXmlFiles, domain, muleVersion, null, ramlsWithExtensionEnabledPaths, ParserType.defaultType());
+			scaffolder = Scaffolder.createScaffolder(log, appDir, ramlFilePaths, muleXmlFiles, domain, muleVersion, runtimeEdition, ramlsWithExtensionEnabledPaths, ParserType.defaultType());
 		} catch (Exception e) {
 			throw new RuntimeException("Error executing scaffolder", e);
 		}

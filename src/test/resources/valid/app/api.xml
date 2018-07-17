@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd ">
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd ">
     <http:listener-config name="api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8081" />
     </http:listener-config>
@@ -17,34 +17,82 @@
         <apikit:router config-ref="api-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:BAD_REQUEST">
-                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
-                <set-payload value="{ &quot;message&quot;: &quot;Bad request&quot; }" />
-                <set-variable variableName="httpStatus" value="400" />
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:NOT_FOUND">
-                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
-                <set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" />
-                <set-variable variableName="httpStatus" value="404" />
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
-                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
-                <set-payload value="{ &quot;message&quot;: &quot;Method not allowed&quot; }" />
-                <set-variable variableName="httpStatus" value="405" />
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
-                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
-                <set-payload value="{ &quot;message&quot;: &quot;Not acceptable&quot; }" />
-                <set-variable variableName="httpStatus" value="406" />
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
-                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
-                <set-payload value="{ &quot;message&quot;: &quot;Unsupported media type&quot; }" />
-                <set-variable variableName="httpStatus" value="415" />
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
-                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
-                <set-payload value="{ &quot;message&quot;: &quot;Not Implemented&quot; }" />
-                <set-variable variableName="httpStatus" value="501" />
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
             </on-error-propagate>
         </error-handler>
     </flow>
@@ -61,22 +109,42 @@
         <apikit:console config-ref="api-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:NOT_FOUND">
-                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
-                <set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" />
-                <set-variable variableName="httpStatus" value="404" />
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
             </on-error-propagate>
         </error-handler>
     </flow>
     <flow name="put:\odataTypes\(edmString):application\json:api-config">
-        <set-variable xmlns="" value="#[attributes.uriParams.edmString]" variableName="edmString" />
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="edmString">attributes.uriParams.edmString</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
         <logger level="INFO" message="put:\odataTypes\(edmString):application\json:api-config" />
     </flow>
     <flow name="delete:\odataTypes\(edmString):api-config">
-        <set-variable xmlns="" value="#[attributes.uriParams.edmString]" variableName="edmString" />
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="edmString">attributes.uriParams.edmString</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
         <logger level="INFO" message="delete:\odataTypes\(edmString):api-config" />
     </flow>
     <flow name="get:\odataTypes\(edmString):api-config">
-        <set-variable xmlns="" value="#[attributes.uriParams.edmString]" variableName="edmString" />
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="edmString">attributes.uriParams.edmString</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
         <logger level="INFO" message="get:\odataTypes\(edmString):api-config" />
     </flow>
     <flow name="get:\odataTypes:api-config">
