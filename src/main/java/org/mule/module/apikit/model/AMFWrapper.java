@@ -92,7 +92,7 @@ public class AMFWrapper {
 		    }		
 	}
 
-	private void validateOdataRaml(Raml10Parser parser) throws  InterruptedException, ExecutionException, OdataMetadataFieldsException{
+/*	private void validateOdataRaml(Raml10Parser parser) throws  InterruptedException, ExecutionException, OdataMetadataFieldsException{
         List<ValidationResult> validationResults= parser.reportValidation(ProfileNames.RAML()).get().results();
 
         if(validationResults.isEmpty())
@@ -103,14 +103,14 @@ public class AMFWrapper {
             errorMessage = errorMessage.concat( validationResult.message() + "\n");
         }
         throw new OdataMetadataFieldsException(errorMessage);
-    }
+    }*/
 	
 	public AMFWrapper(String ramlPath) throws InterruptedException, ExecutionException, OdataMetadataFormatException, OdataMetadataFieldsException {
 
 
         Raml10Parser parser = AMF.raml10Parser();
         module = (Module) parser.parseFileAsync("file://" + ramlPath).get() ;
-        //validateOdataRaml(parser); TODO: ODATA-37 on hold until xerces issue is fixed
+        // validateOdataRaml(parser); //TODO: ODATA-37 on hold until xerces issue is fixed
 
 		for(DomainElement domainElement :module.declares()) {
 			if(domainElement instanceof NodeShape) {

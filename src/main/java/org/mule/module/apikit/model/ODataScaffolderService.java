@@ -53,7 +53,7 @@ public class ODataScaffolderService implements ScaffolderService {
 		}
 		Scaffolder scaffolder;
 		try {			
-			scaffolder = Scaffolder.createScaffolder(log, appDir, ramlFilePaths, muleXmlFiles, domain, muleVersion, runtimeEdition, ramlsWithExtensionEnabledPaths, ParserType.defaultType());
+			scaffolder = Scaffolder.createScaffolder(log, appDir, ramlFilePaths, muleXmlFiles, domain, muleVersion, runtimeEdition, ramlsWithExtensionEnabledPaths, ParserType.defaultType()); //TODO: Change parserType to AMF
 		} catch (Exception e) {
 			throw new RuntimeException("Error executing scaffolder", e);
 		}
