@@ -132,6 +132,10 @@ public class RamlImpl10V2Wrapper {
                 entityDefinition.setHasPrimaryKey(true);
             }
         }
+
+        if(!entityDefinition.hasPrimaryKey())
+            throw new OdataMetadataFieldsException("Entity definition must have a primary key.");
+
         return entityDefinition;
     }
 
