@@ -86,7 +86,7 @@ public class AMFWrapper {
 		try {
 		      AMF.init().get();
 		      AMFValidatorPlugin.withEnabledValidation(true);
-		      amf.core.AMF.registerPlugin(new XmlValidationPlugin());
+//		      amf.core.AMF.registerPlugin(new XmlValidationPlugin());
 		    } catch (final Exception e) {
 		      e.printStackTrace();
 		    }		

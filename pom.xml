@@ -9,6 +9,7 @@
 	<version>2.0.0-SNAPSHOT</version>
 	<description>Module for creating API's using the OData service</description>
 
+	<packaging>mule-plugin</packaging>
 	<!-- Organization -->
 	<organization>
 		<name>MuleSoft, Inc.</name>
@@ -22,6 +23,7 @@
 	<properties>
 		<mule.version>4.1.1</mule.version>
 		<apikit.version>1.2.0-SNAPSHOT</apikit.version>
+		<mule.plugin.maven.plugin.version>1.2.0-SNAPSHOT</mule.plugin.maven.plugin.version>
 		<amfVersion>1.8.0-SNAPSHOT</amfVersion>
 		<licensePath>LICENSE_HEADER.txt</licensePath>
 	</properties>
@@ -30,6 +32,33 @@
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<plugins>
+			<plugin>
+				<groupId>org.mule.runtime.plugins</groupId>
+				<artifactId>mule-plugin-maven-plugin</artifactId>
+				<extensions>true</extensions>
+				<version>${mule.plugin.maven.plugin.version}</version>
+			</plugin>
+			<!--TODO (MULE-10540) parent pom for mule plugins -->
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>mule-plugin</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<classifier>mule-plugin</classifier>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
@@ -108,18 +137,19 @@
 			<scope>provided</scope>
 		</dependency>
 
-
 		<dependency>
-			<groupId>org.raml</groupId>
-			<artifactId>raml-parser-2</artifactId>
-			<version>1.0.22</version>
+		        <groupId>org.raml</groupId>
+		        <artifactId>raml-parser-2</artifactId>
+		        <version>1.0.22</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.amlorg</groupId>
-			<artifactId>amf-client_2.12</artifactId>
-			<version>${amfVersion}</version>
+		        <groupId>com.github.amlorg</groupId>
+		        <artifactId>amf-client_2.12</artifactId>
+		        <version>${amfVersion}</version>
 		</dependency>
+
+
 		<!-- OData4J / Oreva -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>

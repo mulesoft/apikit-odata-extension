@@ -44,7 +44,7 @@ public class ODataRouterService implements RouterService {
 		logger.info("Handling odata enabled request.");
 		
 		HttpRequestAttributes attributes = CoreEventUtils.getHttpRequestAttributes(event);
-		OdataContext oDataContext = getOdataContext(router.getRamlHandler().getRootRamlLocationForV2());
+		OdataContext oDataContext = getOdataContext("/home/jbrasca/test/test/src/main/resources/api/api.raml");
 		oDataContext.setMethod(attributes.getMethod());
 		String path = attributes.getRelativePath();
 			
