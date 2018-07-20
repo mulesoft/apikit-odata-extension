@@ -6,17 +6,16 @@
  */
 package org.mule.module.apikit.model;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import org.mule.module.apikit.model.exception.EntityModelParsingException;
 import org.mule.module.apikit.model.exception.InvalidModelException;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
-import org.mule.module.apikit.odata.metadata.raml.RamlParserUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class EntityModelParser {
 

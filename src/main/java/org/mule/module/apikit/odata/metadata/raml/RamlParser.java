@@ -6,11 +6,10 @@
  */
 package org.mule.module.apikit.odata.metadata.raml;
 
-import org.mule.module.apikit.model.RamlImpl10V2Wrapper;
+import org.mule.module.apikit.model.AMFWrapper;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
-import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
-import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
+
 
 import static java.lang.String.format;
 
@@ -41,21 +40,20 @@ public class RamlParser {
 	public static final String GUID = "guid";
 
 
-	public EntityDefinitionSet getEntitiesFromRaml(String path) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
-			OdataMetadataFormatException {
-		return getEntitiesFromRaml(RamlParserUtils.getRaml(path));
+	public EntityDefinitionSet getEntitiesFromRaml(String path) throws OdataMetadataFieldsException {
+		AMFWrapper amfWrapper;
+
+		try {
+			amfWrapper = new AMFWrapper(path);
+		} catch (Exception e) {
+			throw new OdataMetadataFieldsException(e.getMessage());
+		}
+
+		return getEntitiesFromRaml(amfWrapper);
 	}
 
-	public EntityDefinitionSet getEntitiesFromRaml(RamlImpl10V2Wrapper apiWrapper) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
-			OdataMetadataFormatException {
+	public EntityDefinitionSet getEntitiesFromRaml(AMFWrapper apiWrapper)  {
 		return (apiWrapper.getSchemas());
 	}
-
-	private void notNull(String message, Object actual) throws OdataMetadataFieldsException {
-		if (actual == null) {
-			throw new OdataMetadataFieldsException(message);
-		}
-	}
-
 
 }

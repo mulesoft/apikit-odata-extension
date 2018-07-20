@@ -138,12 +138,6 @@
 		</dependency>
 
 		<dependency>
-		        <groupId>org.raml</groupId>
-		        <artifactId>raml-parser-2</artifactId>
-		        <version>1.0.22</version>
-		</dependency>
-
-		<dependency>
 		        <groupId>com.github.amlorg</groupId>
 		        <artifactId>amf-client_2.12</artifactId>
 		        <version>${amfVersion}</version>

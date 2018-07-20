@@ -40,7 +40,6 @@ import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
 
-import amf.ProfileName;
 import amf.ProfileNames;
 import amf.client.parse.Raml10Parser;
 import amf.client.validate.ValidationResult;
@@ -64,7 +63,6 @@ import amf.client.model.domain.ScalarShape;
 import amf.client.model.domain.Shape;
 import amf.client.model.domain.UnionShape;
 import amf.plugins.features.validation.AMFValidatorPlugin;
-import amf.plugins.xml.XmlValidationPlugin;
 
 public class AMFWrapper {
 	private Module module = null;
@@ -86,13 +84,12 @@ public class AMFWrapper {
 		try {
 		      AMF.init().get();
 		      AMFValidatorPlugin.withEnabledValidation(true);
-//		      amf.core.AMF.registerPlugin(new XmlValidationPlugin());
 		    } catch (final Exception e) {
 		      e.printStackTrace();
 		    }		
 	}
 
-/*	private void validateOdataRaml(Raml10Parser parser) throws  InterruptedException, ExecutionException, OdataMetadataFieldsException{
+	private void validateOdataRaml(Raml10Parser parser) throws  InterruptedException, ExecutionException, OdataMetadataFieldsException{
         List<ValidationResult> validationResults= parser.reportValidation(ProfileNames.RAML()).get().results();
 
         if(validationResults.isEmpty())
@@ -103,14 +100,14 @@ public class AMFWrapper {
             errorMessage = errorMessage.concat( validationResult.message() + "\n");
         }
         throw new OdataMetadataFieldsException(errorMessage);
-    }*/
+    }
 	
 	public AMFWrapper(String ramlPath) throws InterruptedException, ExecutionException, OdataMetadataFormatException, OdataMetadataFieldsException {
 
 
         Raml10Parser parser = AMF.raml10Parser();
         module = (Module) parser.parseFileAsync("file://" + ramlPath).get() ;
-        // validateOdataRaml(parser); //TODO: ODATA-37 on hold until xerces issue is fixed
+        validateOdataRaml(parser);
 
 		for(DomainElement domainElement :module.declares()) {
 			if(domainElement instanceof NodeShape) {
