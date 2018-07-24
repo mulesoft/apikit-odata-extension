@@ -17,6 +17,7 @@ import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotF
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
+import org.mule.module.apikit.odata.util.FileUtils;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -61,8 +62,8 @@ public class RamlParserTestCase {
 		newEntitySet.addEntity(entityDefinition);
 
 		entityDefinition = new EntityDefinition("odataTypes", "odataTypes");
-		entityDefinition.setHasPrimaryKey(false);
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmString", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.setHasPrimaryKey(true);
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmString", "Edm.String", false, true, null, null, null, null, null, null, null));
 		entityDefinition.addProperty(new EntityDefinitionProperty("edmBoolean", "Edm.Boolean", false, false, null, null, null, null, null, null, null));
 		entityDefinition.addProperty(new EntityDefinitionProperty("edmDouble", "Edm.Double", false, false, null, null, null, null, null, null, null));
 		entityDefinition.addProperty(new EntityDefinitionProperty("edmSingle", "Edm.Single", false, false, null, null, null, null, null, null, null));
@@ -82,65 +83,66 @@ public class RamlParserTestCase {
 	}
 
 	@Test
-	public void incompleteSchemaTest() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
+	public void incompleteSchemaTest() throws OdataMetadataFieldsException, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFieldsException.class);
 		thrown.expectMessage("Property \"nullable\" is missing in field \"draft\" in entity \"gateways\"");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/incomplete-schema.raml");
+		ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-incomplete-schema.raml"));
 	}
 
 	@Ignore // this test no longer makes sense since the trait is in the library
 	@Test
-	public void withSomeTraitsTest() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
+	public void withSomeTraitsTest() throws OdataMetadataFieldsException, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFormatException.class);
 		thrown.expectMessage("RAML is invalid. See log list.");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/with-some-traits.raml");
+		ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/with-some-traits.raml"));
 	}
 
 	@Ignore // this test no longer makes sense since the trait is in the library
 	@Test
-	public void withoutTraitsTest() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
+	public void withoutTraitsTest() throws OdataMetadataFieldsException, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFormatException.class);
 		thrown.expectMessage("RAML is invalid. See log list.");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/without-traits.raml");
+		ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/without-traits.raml"));
 	}
 
+	@Ignore // this test no longer makes sense since extension focus on the odata.raml and delagates the api.raml validations to apikit
 	@Test
-	public void withoutSchemas() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
+	public void withoutSchemas() throws OdataMetadataFieldsException, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFormatException.class);
 		thrown.expectMessage("Type not supported. gateways");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/without-schemas.raml");
+		ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/without-schemas.raml"));
 	}
 
 	@Test
-	public void withSchemasKey() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
+	public void withSchemasKey() throws OdataMetadataFieldsException, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFieldsException.class);
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/with-schemas-key.raml");
+		ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-with-schemas-key.raml"));
 	}
 
 	@Test
-	public void schemasMultipleKey() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
-		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/schemas-multiple-keys.raml");
+	public void schemasMultipleKey() throws OdataMetadataFieldsException, OdataMetadataFormatException {
+		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-multiple-keys.raml"));
 		EntityDefinition entityDefinition = entitySet.toList().get(0);
 		assertThat(entityDefinition, is(getEntityByName("gateways")));
 	}
 
 	@Test
-	public void schemasWithoutProperties() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
+	public void schemasWithoutProperties() throws OdataMetadataFieldsException, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFormatException.class);
 		thrown.expectMessage("No schemas found.");
-		ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/schema-without-properties.raml");
+		ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-without-properties.raml"));
 	}
 
 	@Test
-	public void testPositive() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
-		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/datagateway-definition.raml");
+	public void testPositive() throws OdataMetadataFieldsException, OdataMetadataFormatException {
+		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/odata.raml"));
 		EntityDefinition entityDefinition = entitySet.toList().get(0);
 		assertThat(entityDefinition, is(getEntityByName("gateways")));
 	}
 
 	@Test
-	public void allowedTypes() throws OdataMetadataFieldsException, OdataMetadataResourceNotFound, OdataMetadataFormatException {
-		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml("src/test/resources/org/mule/module/apikit/odata/metadata/model-allowed-types.raml");
+	public void allowedTypes() throws OdataMetadataFieldsException, OdataMetadataFormatException {
+		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-allowed-types.raml"));
 		EntityDefinition entityDefinition = entitySet.toList().get(0);
 		assertThat(entityDefinition, is(getEntityByName("odataTypes")));
 	}
@@ -152,4 +154,5 @@ public class RamlParserTestCase {
 
 		throw new RuntimeException("Entity not found in mock");
 	}
+
 }
