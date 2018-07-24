@@ -22,6 +22,7 @@ import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatExcept
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 import org.mule.module.apikit.odata.processor.ODataRequestProcessor;
 import org.mule.module.apikit.odata.util.CoreEventUtils;
+import org.mule.module.apikit.odata.util.FileUtils;
 import org.mule.module.apikit.spi.EventProcessor;
 import org.mule.module.apikit.spi.RouterService;
 import org.mule.runtime.api.event.Event;
@@ -44,7 +45,7 @@ public class ODataRouterService implements RouterService {
 		logger.info("Handling odata enabled request.");
 		
 		HttpRequestAttributes attributes = CoreEventUtils.getHttpRequestAttributes(event);
-        OdataContext oDataContext = getOdataContext(this.getClass().getClassLoader().getResource("api/odata.raml").getPath());
+        OdataContext oDataContext = getOdataContext(FileUtils.getAbsolutePath("api/api.raml"));
 		oDataContext.setMethod(attributes.getMethod());
 		String path = attributes.getRelativePath();
 			

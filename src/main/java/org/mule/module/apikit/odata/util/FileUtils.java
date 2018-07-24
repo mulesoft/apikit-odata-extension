@@ -32,4 +32,8 @@ public class FileUtils {
 		return writer.toString();
 	}
 
+	public static String getAbsolutePath(String relativePath){
+
+		return Thread.currentThread().getContextClassLoader().getResource(relativePath).toString();
+	}
 }

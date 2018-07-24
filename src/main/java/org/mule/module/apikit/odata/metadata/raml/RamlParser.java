@@ -8,6 +8,7 @@ package org.mule.module.apikit.odata.metadata.raml;
 
 import org.mule.module.apikit.model.AMFWrapper;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
+import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 
 
@@ -40,14 +41,10 @@ public class RamlParser {
 	public static final String GUID = "guid";
 
 
-	public EntityDefinitionSet getEntitiesFromRaml(String path) throws OdataMetadataFieldsException {
+	public EntityDefinitionSet getEntitiesFromRaml(String path) throws OdataMetadataFieldsException, OdataMetadataFormatException {
 		AMFWrapper amfWrapper;
 
-		try {
-			amfWrapper = new AMFWrapper(path);
-		} catch (Exception e) {
-			throw new OdataMetadataFieldsException(e.getMessage());
-		}
+		amfWrapper = new AMFWrapper(path);
 
 		return getEntitiesFromRaml(amfWrapper);
 	}
