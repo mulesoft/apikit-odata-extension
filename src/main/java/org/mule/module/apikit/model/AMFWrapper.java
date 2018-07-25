@@ -112,7 +112,7 @@ public class AMFWrapper {
         }catch ( ExecutionException | InterruptedException e){
             throw new OdataMetadataFormatException("RAML is invalid. See log list.");
         }
-        
+
 		for(NodeShape nodeShape : nodeShapesList) {
             shapes.put(nodeShape.name().value(), nodeShape);
             entityDefinitionSet.addEntity( buildEntityDefinition(nodeShape));
