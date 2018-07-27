@@ -140,6 +140,10 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 			}
 			boolean isXMLFormat = !formats.contains(Format.Json);
 			payloadAsString = BodyToJsonConverter.convertPayload(entity, isXMLFormat, payloadAsString);
+			MultiMap<String,String> headers = new MultiMap<>();
+			headers.put("host", attributes.getRemoteAddress());
+			headers.put("content-type",MediaType.APPLICATION_JSON.toString());
+			httpRequestAttributesBuilder.headers(headers);
 			message = Message.builder().value(payloadAsString).mediaType(MediaType.APPLICATION_JSON).attributesValue(httpRequestAttributesBuilder.build()).build();
 		} else {
 			message = Message.builder(event.getMessage()).attributesValue(httpRequestAttributesBuilder.build()).build();

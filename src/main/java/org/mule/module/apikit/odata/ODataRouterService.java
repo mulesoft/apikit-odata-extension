@@ -8,6 +8,7 @@ package org.mule.module.apikit.odata;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
@@ -35,6 +36,7 @@ public class ODataRouterService implements RouterService {
 
 	private  Logger logger = Logger.getLogger(ODataRouterService.class);
 
+	private static final ExecutorService executorService = Executors.newCachedThreadPool();
 	static { 
 		System.setProperty("javax.ws.rs.ext.RuntimeDelegate","org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl"); // Workaround for issue while loading class javax.ws.rs.ext.RuntimeDelegate embedded in odata4j
 	}																									  	  // https://stackoverflow.com/questions/30316829/classnotfoundexception-org-glassfish-jersey-internal-runtimedelegateimpl-cannot
@@ -79,8 +81,8 @@ public class ODataRouterService implements RouterService {
 	
 	protected static CompletableFuture<Event> processODataRequest(HttpRequestAttributes attributes,EventProcessor eventProcessor ,OdataContext oDataContext, CoreEvent event) throws MuleException {
 		CompletableFuture<Event> completableFuture = new CompletableFuture<Event>();
-		
-		Executors.newCachedThreadPool().submit(()->{ 
+
+		executorService.submit(()->{
 			List<Format> formats = null;
 			try {
 				String listenerPath = attributes.getListenerPath().substring( 0,attributes.getListenerPath().lastIndexOf("/*"));
