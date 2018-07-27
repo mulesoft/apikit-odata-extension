@@ -33,6 +33,7 @@ import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_SINGLE;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_STRING;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_TIME;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +41,9 @@ import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
 
-import amf.ProfileName;
 import amf.ProfileNames;
+import amf.client.model.document.BaseUnit;
+import amf.client.model.document.Document;
 import amf.client.parse.Raml10Parser;
 import amf.client.validate.ValidationResult;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
@@ -64,10 +66,9 @@ import amf.client.model.domain.ScalarShape;
 import amf.client.model.domain.Shape;
 import amf.client.model.domain.UnionShape;
 import amf.plugins.features.validation.AMFValidatorPlugin;
-import amf.plugins.xml.XmlValidationPlugin;
 
 public class AMFWrapper {
-	private Module module = null;
+    private List<NodeShape> nodeShapesList;
 	private Map<String,NodeShape> shapes = new HashMap<String,NodeShape>();
 	private EntityDefinitionSet entityDefinitionSet = new EntityDefinitionSet();
 	
@@ -86,7 +87,6 @@ public class AMFWrapper {
 		try {
 		      AMF.init().get();
 		      AMFValidatorPlugin.withEnabledValidation(true);
-		      amf.core.AMF.registerPlugin(new XmlValidationPlugin());
 		    } catch (final Exception e) {
 		      e.printStackTrace();
 		    }		
@@ -104,29 +104,55 @@ public class AMFWrapper {
         }
         throw new OdataMetadataFieldsException(errorMessage);
     }
-	
-	public AMFWrapper(String ramlPath) throws InterruptedException, ExecutionException, OdataMetadataFormatException, OdataMetadataFieldsException {
 
+	public AMFWrapper(String ramlPath) throws OdataMetadataFormatException, OdataMetadataFieldsException {
+
+        try {
+            initNodeShapesList(ramlPath);
+        } catch (Exception e){
+            throw new OdataMetadataFormatException("RAML is invalid. See log list.");
+        }
+
+		for(NodeShape nodeShape : nodeShapesList) {
+            shapes.put(nodeShape.name().value(), nodeShape);
+            entityDefinitionSet.addEntity( buildEntityDefinition(nodeShape));
+		}
+
+
+	}
+
+    private void initNodeShapesList(String ramlPath) throws ExecutionException, InterruptedException, OdataMetadataFieldsException {
+        nodeShapesList = new ArrayList<>();
 
         Raml10Parser parser = AMF.raml10Parser();
-        module = (Module) parser.parseFileAsync("file://" + ramlPath).get() ;
-        //validateOdataRaml(parser); TODO: ODATA-37 on hold until xerces issue is fixed
+        Object object = parser.parseFileAsync(ramlPath).get();
+        validateOdataRaml(parser);
 
-		for(DomainElement domainElement :module.declares()) {
-			if(domainElement instanceof NodeShape) {
-				NodeShape shape = (NodeShape)domainElement;
-				shapes.put(shape.name().value(), shape);
-				entityDefinitionSet.addEntity( buildEntityDefinition(shape));
-			}
-		}
-		
-		
-	}
+        if(object instanceof Module){
+            addNodeShapes((Module) object);
+        }else if(object instanceof Document){
+            Document document = (Document) object;
+            for(BaseUnit baseUnit :document.references()){
+                if(baseUnit instanceof Module)
+                    addNodeShapes((Module)baseUnit);
+            }
+        }
+
+        if(nodeShapesList.isEmpty())
+            throw new OdataMetadataFieldsException("odata.raml must declare at least one type");
+    }
+
+    private void addNodeShapes(Module module){
+        for(DomainElement domainElement :module.declares()) {
+            if (domainElement instanceof NodeShape)
+                nodeShapesList.add((NodeShape) domainElement);
+        }
+    }
 
     public EntityDefinitionSet getSchemas() {
         return entityDefinitionSet;
     }
-	
+
 	private EntityDefinition buildEntityDefinition(NodeShape nodeShape) throws OdataMetadataFormatException, OdataMetadataFieldsException {
 
         if (nodeShape.properties().isEmpty()) throw new OdataMetadataFormatException("No schemas found.");

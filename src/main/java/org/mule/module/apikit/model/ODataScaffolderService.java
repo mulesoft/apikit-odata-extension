@@ -20,13 +20,11 @@ import java.util.List;
 
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.mule.module.apikit.spi.ScaffolderService;
-import org.mule.tools.apikit.ParserType;
 import org.mule.tools.apikit.Scaffolder;
 import org.mule.tools.apikit.model.RuntimeEdition;
 
 public class ODataScaffolderService implements ScaffolderService {
 
-  private final static List<String> apiExtensions = Arrays.asList(".yaml", ".raml", ".yml");
   private final static List<String> appExtensions = Arrays.asList(".xml");
 
   private static final String LIBRARIES_FOLDER = "/libraries";
@@ -53,7 +51,7 @@ public class ODataScaffolderService implements ScaffolderService {
 		}
 		Scaffolder scaffolder;
 		try {			
-			scaffolder = Scaffolder.createScaffolder(log, appDir, ramlFilePaths, muleXmlFiles, domain, muleVersion, runtimeEdition, ramlsWithExtensionEnabledPaths, ParserType.defaultType());
+			scaffolder = Scaffolder.createScaffolder(log, appDir, ramlFilePaths, muleXmlFiles, domain, muleVersion, runtimeEdition, ramlsWithExtensionEnabledPaths);
 		} catch (Exception e) {
 			throw new RuntimeException("Error executing scaffolder", e);
 		}
@@ -121,7 +119,7 @@ public class ODataScaffolderService implements ScaffolderService {
 		File raml = null;
 
 		try {
-			String ramlContents = ramlGenerator.generate(model.getAbsolutePath());
+			String ramlContents = ramlGenerator.generate(model.toURI().toString());
 			String path = model.getCanonicalPath().replace(ODATA_MODEL_FILE, FINAL_RAML_FILE);
 			raml = FileUtils.stringToFile(path, ramlContents);
 		} catch (Exception e) {

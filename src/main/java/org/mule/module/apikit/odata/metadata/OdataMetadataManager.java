@@ -6,20 +6,15 @@
  */
 package org.mule.module.apikit.odata.metadata;
 
-import org.mule.module.apikit.model.RamlImpl10V2Wrapper;
+import org.mule.module.apikit.model.AMFWrapper;
 import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
-import org.mule.module.apikit.odata.metadata.raml.RamlParserUtils;
 
 import static org.mule.module.apikit.model.Entity.pluralizeName;
-
-import java.util.concurrent.ExecutionException;
-
-import org.mule.module.apikit.model.AMFWrapper;
 
 public class OdataMetadataManager {
 
