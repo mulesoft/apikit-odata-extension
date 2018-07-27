@@ -7,13 +7,11 @@
 package org.mule.module.apikit.odata.metadata.raml;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
-import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
@@ -89,23 +87,6 @@ public class RamlParserTestCase {
 		ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-incomplete-schema.raml"));
 	}
 
-	@Ignore // this test no longer makes sense since the trait is in the library
-	@Test
-	public void withSomeTraitsTest() throws OdataMetadataFieldsException, OdataMetadataFormatException {
-		thrown.expect(OdataMetadataFormatException.class);
-		thrown.expectMessage("RAML is invalid. See log list.");
-		ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/with-some-traits.raml"));
-	}
-
-	@Ignore // this test no longer makes sense since the trait is in the library
-	@Test
-	public void withoutTraitsTest() throws OdataMetadataFieldsException, OdataMetadataFormatException {
-		thrown.expect(OdataMetadataFormatException.class);
-		thrown.expectMessage("RAML is invalid. See log list.");
-		ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/without-traits.raml"));
-	}
-
-	@Ignore // this test no longer makes sense since extension focus on the odata.raml and delagates the api.raml validations to apikit
 	@Test
 	public void withoutSchemas() throws OdataMetadataFieldsException, OdataMetadataFormatException {
 		thrown.expect(OdataMetadataFormatException.class);

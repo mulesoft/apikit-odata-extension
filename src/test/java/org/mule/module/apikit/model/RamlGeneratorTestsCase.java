@@ -57,7 +57,7 @@ public class RamlGeneratorTestsCase {
 
 	@Test
 	public void invalidModel1Test() throws FileNotFoundException, JSONException, IOException, TemplateException, ProcessingException, EntityModelParsingException {
-		thrown.expectMessage("Property \"remote name\" is missing in field \"MyField\" in entity \"MyEntity\"");
+		thrown.expectMessage("Property \"remote name\" is missing in entity MyEntity");
 		new RamlGenerator().generate(getAbsolutePath("model/invalidOdata1.raml"));
 	}
 
