@@ -154,6 +154,24 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		return entries;
 	}
 
+	protected static void checkResponseHttpStatus(CoreEvent response) throws ClientErrorException {
+
+		String status = response.getVariables().get("httpStatus").getValue().toString();
+		int httpStatus = 0;
+
+		try {
+			httpStatus = Integer.valueOf(status);
+		} catch (Exception e) {
+			// do nothing...
+		}
+
+		if(httpStatus >= 400){
+			// If there was an error, it makes no sense to return a list of entry
+			// just raise an exception
+			Object payload = CoreEventUtils.getPayloadAsString(response);
+			throw new ClientErrorException(payload != null ? payload.toString() : "", httpStatus);
+		}
+	}
 
 	private List<Entry> verifyFlowResponse(CompletableFuture<Event> response) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
 			OdataMetadataResourceNotFound, OdataMetadataFormatException, ODataInvalidFlowResponseException, ClientErrorException {
@@ -162,7 +180,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		try {
 			CoreEvent event;
 			event = (CoreEvent) response.get();
-			
+			checkResponseHttpStatus(event);
 			OdataMetadataManager metadataManager = getMetadataManager();
 			EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
 			List<Entry> entries;
