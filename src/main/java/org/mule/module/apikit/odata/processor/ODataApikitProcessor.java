@@ -6,8 +6,6 @@
  */
 package org.mule.module.apikit.odata.processor;
 
-import static reactor.core.publisher.Mono.fromFuture;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 import org.apache.commons.lang.StringUtils;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
-import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.module.apikit.odata.context.OdataContextVariables;
 import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ClientErrorException;
@@ -115,7 +113,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 	}
 
 	public List<Entry> processEntityRequest(CoreEvent event, EventProcessor eventProcessor, List<Format> formats) throws Exception {
-		List<Entry> entries = new ArrayList<Entry>();
+		List<Entry> entries = new ArrayList<>();
 		HttpRequestAttributes attributes =CoreEventUtils.getHttpRequestAttributes(event);
 		String uri = attributes.getRelativePath();;
 		String basePath = uri.substring(0, uri.toLowerCase().indexOf("/odata.svc"));
@@ -128,7 +126,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		httpRequestAttributesBuilder.requestUri(httpRequest);
 		httpRequestAttributesBuilder.queryString(this.query);
 		httpRequestAttributesBuilder.relativePath(this.path);
-		
+
 		MultiMap<String, String> httpQueryParams = Helper.queryToMap(query);
 		httpRequestAttributesBuilder.queryParams(httpQueryParams);
 
@@ -149,12 +147,13 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 			message = Message.builder(event.getMessage()).attributesValue(httpRequestAttributesBuilder.build()).build();
 		}
 
-		CompletableFuture<Event> response = eventProcessor.processEvent(CoreEvent.builder(event).message(message).build());
+		CompletableFuture<Event> response = eventProcessor.processEvent(CoreEvent.builder(event).message(message).addVariable("odata", this.getMetadataManager().getOdataContextVariables(entity)).build());
 
 		entries = verifyFlowResponse(response);
 
 		return entries;
 	}
+
 
 	private List<Entry> verifyFlowResponse(CompletableFuture<Event> response) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
 			OdataMetadataResourceNotFound, OdataMetadataFormatException, ODataInvalidFlowResponseException, ClientErrorException {

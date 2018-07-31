@@ -6,8 +6,6 @@
  */
 package org.mule.module.apikit.odata.processor;
 
-import java.util.List;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
@@ -15,6 +13,8 @@ import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.spi.EventProcessor;
 import org.mule.runtime.core.api.event.CoreEvent;
+
+import java.util.List;
 
 public abstract class ODataRequestProcessor {
 
