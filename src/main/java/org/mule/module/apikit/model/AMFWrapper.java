@@ -109,7 +109,7 @@ public class AMFWrapper {
 
         try {
             initNodeShapesList(ramlPath);
-        } catch (Exception e){
+        }catch ( ExecutionException | InterruptedException e){
             throw new OdataMetadataFormatException("RAML is invalid. See log list.");
         }
 
@@ -121,20 +121,20 @@ public class AMFWrapper {
 
 	}
 
-    private void initNodeShapesList(String ramlPath) throws ExecutionException, InterruptedException, OdataMetadataFieldsException {
+    private void initNodeShapesList(String ramlPath) throws ExecutionException, InterruptedException, OdataMetadataFieldsException, OdataMetadataFormatException {
         nodeShapesList = new ArrayList<>();
 
         Raml10Parser parser = AMF.raml10Parser();
         Object object = parser.parseFileAsync(ramlPath).get();
         validateOdataRaml(parser);
 
-        if(object instanceof Module){
-            addNodeShapes((Module) object);
+        if(object instanceof Module){ // If the parsed file is a module it comes from scaffolding odata.raml
+            addNodeShapes((Module) object, true); //in this case we should throw an exception if remote name is missing
         }else if(object instanceof Document){
             Document document = (Document) object;
-            for(BaseUnit baseUnit :document.references()){
+            for(BaseUnit baseUnit :document.references()){ // If the parsed file is a document it is the initialization from the apikit based on the api.raml
                 if(baseUnit instanceof Module)
-                    addNodeShapes((Module)baseUnit);
+                    addNodeShapes((Module)baseUnit, false); // In order to allow the user to add other types at the api.raml we shouldn't throw an exception if remote name is missing
             }
         }
 
@@ -142,10 +142,21 @@ public class AMFWrapper {
             throw new OdataMetadataFieldsException("odata.raml must declare at least one type");
     }
 
-    private void addNodeShapes(Module module){
+
+    private void addNodeShapes(Module module, boolean throwException) throws OdataMetadataFormatException, OdataMetadataFieldsException {
         for(DomainElement domainElement :module.declares()) {
-            if (domainElement instanceof NodeShape)
-                nodeShapesList.add((NodeShape) domainElement);
+            if (domainElement instanceof Shape){
+                String remoteName = getAnnotation((Shape) domainElement, NAMESPACE_REMOTE_NAME);
+                if (domainElement instanceof NodeShape){
+                    NodeShape nodeShape = (NodeShape) domainElement;
+                    if (remoteName != null)
+                        nodeShapesList.add(nodeShape);
+                    else if(throwException)
+                        throw new OdataMetadataFieldsException("Property \"remote name\" is missing in entity " + nodeShape.name());
+                } else if(remoteName != null) {
+                    throw new OdataMetadataFormatException("Type not supported. " + remoteName);
+                }
+            }
         }
     }
 
@@ -169,7 +180,7 @@ public class AMFWrapper {
         	
         	notNull("Property \"name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", entityName);
         	notNull("Property \"remote name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", remoteName);
-        	
+
         	EntityDefinitionProperty entityDefinitionProperty = null;
         	
         	final String key = getAnnotation(shape, NAMESPACE_KEY_PROPERTY);
