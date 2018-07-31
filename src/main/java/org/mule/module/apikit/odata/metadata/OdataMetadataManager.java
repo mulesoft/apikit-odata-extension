@@ -27,6 +27,8 @@ public class OdataMetadataManager {
 	private static AMFWrapper apiWrapper = null;
 	private static EntityDefinitionSet entitySet = null;
 	private static final Object lock = new Object();
+	private static  Logger logger = Logger.getLogger(OdataMetadataManager.class);
+
 
 	public OdataMetadataManager(String ramlPath) throws OdataMetadataFormatException {
 		this(ramlPath, false);
@@ -39,8 +41,9 @@ public class OdataMetadataManager {
 			synchronized (lock) {
 				if (apiWrapper == null) {
 					try {
-						Logger.getLogger(OdataMetadataManager.class).info("Initializing Odata Metadata ");
+						logger.info("Initializing Odata Metadata");
 						apiWrapper = new AMFWrapper(ramlPath);
+						logger.info("Odata Metadata initialized");
 					} catch (Exception e) {
 						throw new OdataMetadataFormatException(e.getMessage());
 					}
