@@ -15,6 +15,15 @@ public class ODataPayload {
 	private String content;
 	List<Entry> entries;
 	private ODataPayloadFormatter formatter;
+	private int status=200;
+
+	public int getStatus() {
+		return status;
+	}
+
+	public List<Entry> getEntries() {
+		return entries;
+	}
 
 	public ODataPayloadFormatter getFormatter() {
 		return formatter;
@@ -24,8 +33,18 @@ public class ODataPayload {
 		this.content = content;
 	}
 
+	public ODataPayload(String content, int status) {
+		this.content = content;
+		this.status = status;
+	}
+
 	public ODataPayload(List<Entry> entries) {
 		this.entries = entries;
+	}
+
+	public ODataPayload(List<Entry> entries, int status) {
+		this.entries = entries;
+		this.status = status;
 	}
 
 	public ODataPayload() {

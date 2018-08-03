@@ -94,25 +94,24 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		// truncate the URL at the entity
 		oDataURL = oDataURL.substring(0, oDataURL.indexOf(entity));
 
-		List<Entry> entries = processEntityRequest(event, eventProcessor, formats);
-		ODataPayload oDataPayload;
+		// invoke flow and validate response
+		ODataPayload oDataPayload = processEntityRequest(event, eventProcessor, formats);
 
 		if (isEntityCount()) {
 			if (formats.contains(Format.Plain) || formats.contains(Format.Default)) {
-				String count = String.valueOf(entries.size());
-				oDataPayload = new ODataPayload(count);
+				String count = String.valueOf(oDataPayload.getEntries().size());
+				oDataPayload = new ODataPayload(count,oDataPayload.getStatus());
 			} else {
 				throw new ODataUnsupportedMediaTypeException("Unsupported media type requested.");
 			}
 		} else {
-			oDataPayload = new ODataPayload(entries);
 			oDataPayload.setFormatter(new ODataApiKitFormatter(getMetadataManager(), entries, entity, oDataURL));
 		}
 
 		return oDataPayload;
 	}
 
-	public List<Entry> processEntityRequest(CoreEvent event, EventProcessor eventProcessor, List<Format> formats) throws Exception {
+	public ODataPayload processEntityRequest(CoreEvent event, EventProcessor eventProcessor, List<Format> formats) throws Exception {
 		List<Entry> entries = new ArrayList<>();
 		HttpRequestAttributes attributes =CoreEventUtils.getHttpRequestAttributes(event);
 		String uri = attributes.getRelativePath();;
@@ -149,12 +148,10 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 
 		CompletableFuture<Event> response = eventProcessor.processEvent(CoreEvent.builder(event).message(message).addVariable("odata", this.getMetadataManager().getOdataContextVariables(entity)).build());
 
-		entries = verifyFlowResponse(response);
-
-		return entries;
+		return verifyFlowResponse(response);
 	}
 
-	protected static void checkResponseHttpStatus(CoreEvent response) throws ClientErrorException {
+	private static int checkResponseHttpStatus(CoreEvent response) throws ClientErrorException {
 
 		String status = response.getVariables().get("httpStatus").getValue().toString();
 		int httpStatus = 0;
@@ -171,25 +168,29 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 			Object payload = CoreEventUtils.getPayloadAsString(response);
 			throw new ClientErrorException(payload != null ? payload.toString() : "", httpStatus);
 		}
+
+		return httpStatus;
 	}
 
-	private List<Entry> verifyFlowResponse(CompletableFuture<Event> response) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
+	private ODataPayload verifyFlowResponse(CompletableFuture<Event> response) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
 			OdataMetadataResourceNotFound, OdataMetadataFormatException, ODataInvalidFlowResponseException, ClientErrorException {
 		
 
 		try {
 			CoreEvent event;
 			event = (CoreEvent) response.get();
-			checkResponseHttpStatus(event);
+			int httpStatus  = checkResponseHttpStatus(event);
 			OdataMetadataManager metadataManager = getMetadataManager();
 			EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
 			List<Entry> entries;
 
 			String payload = CoreEventUtils.getPayloadAsString(event);
-			if(payload == null || payload == "") 
-				throw new ODataInvalidFlowResponseException("The payload of the response should be a valid json.");
-			
-			entries = Helper.transformJsonToEntryList(payload);
+
+
+			if(payload == null || payload == "")
+				entries = new ArrayList<>();
+			else
+				entries = Helper.transformJsonToEntryList(payload);
 
 			int entryNumber = 1;
 			for (Entry entry : entries) {
@@ -205,7 +206,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 				}
 			}
 
-			return entries;
+			return new ODataPayload(entries,httpStatus);
 		} catch (InterruptedException | ExecutionException e) {
 			throw new ODataInvalidFlowResponseException(e.getMessage());
 		}

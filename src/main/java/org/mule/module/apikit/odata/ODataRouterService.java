@@ -99,7 +99,7 @@ public class ODataRouterService implements RouterService {
 				// Response transformer
 				Message message = ODataResponseTransformer.transform( odataPayload, formats);			
 				
-				CoreEvent newEvent  = CoreEvent.builder(event).message(message).build();
+				CoreEvent newEvent  = CoreEvent.builder(event).message(message).addVariable("httpStatus", odataPayload.getStatus()).build();
 				completableFuture.complete(newEvent);
 			} catch (Exception ex) {
 				completableFuture.complete( ODataErrorHandler.handle(event, ex, formats));
