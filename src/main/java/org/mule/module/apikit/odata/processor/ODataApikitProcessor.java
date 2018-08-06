@@ -36,6 +36,7 @@ import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.model.Entry;
 import org.mule.module.apikit.odata.util.Helper;
+import org.mule.module.apikit.odata.util.ODataUriHelper;
 import org.mule.transport.NullPayload;
 
 public class ODataApikitProcessor extends ODataRequestProcessor {
@@ -88,7 +89,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		String oDataURL = getCompleteUrl(event);
 
 		// truncate the URL at the entity
-		oDataURL = oDataURL.substring(0, oDataURL.indexOf(entity));
+		oDataURL = ODataUriHelper.getOdataUrl(oDataURL);
 
 		List<Entry> entries = processEntityRequest(event, router, formats);
 		ODataPayload oDataPayload;
