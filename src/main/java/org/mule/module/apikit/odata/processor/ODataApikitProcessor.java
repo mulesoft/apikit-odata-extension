@@ -35,6 +35,7 @@ import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProp
 import org.mule.module.apikit.odata.model.Entry;
 import org.mule.module.apikit.odata.util.CoreEventUtils;
 import org.mule.module.apikit.odata.util.Helper;
+import org.mule.module.apikit.odata.util.ODataUriHelper;
 import org.mule.module.apikit.spi.EventProcessor;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.message.Message;
@@ -92,7 +93,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		String oDataURL = getCompleteUrl(CoreEventUtils.getHttpRequestAttributes(event));
 
 		// truncate the URL at the entity
-		oDataURL = oDataURL.substring(0, oDataURL.indexOf(entity));
+		oDataURL = ODataUriHelper.getOdataUrl(oDataURL);
 
 		// invoke flow and validate response
 		ODataPayload oDataPayload = processEntityRequest(event, eventProcessor, formats);
@@ -105,7 +106,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 				throw new ODataUnsupportedMediaTypeException("Unsupported media type requested.");
 			}
 		} else {
-			oDataPayload.setFormatter(new ODataApiKitFormatter(getMetadataManager(), entries, entity, oDataURL));
+			oDataPayload.setFormatter(new ODataApiKitFormatter(getMetadataManager(), oDataPayload.getEntries(), entity, oDataURL));
 		}
 
 		return oDataPayload;
