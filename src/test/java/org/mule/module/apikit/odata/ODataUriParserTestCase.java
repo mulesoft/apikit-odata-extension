@@ -4296,4 +4296,21 @@ public class ODataUriParserTestCase {
 			// Expected exception, doing nothing.
 		}
 	}
+
+	//SE-8810 OData APIKit deployment to CloudHub naming restrictions
+	//To get the odata url it was stripping the first occurrence of the entity which causes issues when the begining of
+	//the app name was equal to the entity name, so instead of it now we are taking the substring before 'odata.svc/'
+	@Test
+	public void getOdataUrlTest(){
+		String completeUrl = "http://companies.us-e2.cloudhub.io/api/odata.svc/companies";
+		String odataUrl = "http://companies.us-e2.cloudhub.io/api/odata.svc/";
+		ODataUriHelper.getOdataUrl(completeUrl);
+
+		assertEquals(odataUrl,ODataUriHelper.getOdataUrl(completeUrl));
+
+		completeUrl = "http://assets.us-e2.cloudhub.io/api/odata.svc/assets";
+		odataUrl = "http://assets.us-e2.cloudhub.io/api/odata.svc/";
+
+		assertEquals(odataUrl,ODataUriHelper.getOdataUrl(completeUrl));
+	}
 }
