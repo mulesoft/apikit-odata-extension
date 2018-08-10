@@ -61,8 +61,8 @@ public class RamlParserTestCase {
 		newEntitySet.addEntity(entityDefinition);
 
 		entityDefinition = new EntityDefinition("odataTypes", "odataTypes");
-		entityDefinition.setHasPrimaryKey(false);
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmString", "Edm.String", false, false, null, null, null, null, null, null, null));
+		entityDefinition.setHasPrimaryKey(true);
+		entityDefinition.addProperty(new EntityDefinitionProperty("edmString", "Edm.String", false, true, null, null, null, null, null, null, null));
 		entityDefinition.addProperty(new EntityDefinitionProperty("edmBoolean", "Edm.Boolean", false, false, null, null, null, null, null, null, null));
 		entityDefinition.addProperty(new EntityDefinitionProperty("edmDouble", "Edm.Double", false, false, null, null, null, null, null, null, null));
 		entityDefinition.addProperty(new EntityDefinitionProperty("edmSingle", "Edm.Single", false, false, null, null, null, null, null, null, null));
