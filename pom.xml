@@ -24,34 +24,6 @@
 		<licensePath>LICENSE_HEADER.txt</licensePath>
 	</properties>
 
-	<profiles>
-		<profile>
-			<id>security</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.5.1</version>
-						<executions>
-							<execution>
-								<id>copy-dependencies</id>
-								<phase>package</phase>
-								<goals>
-									<goal>copy-dependencies</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.build.directory}/lib/</outputDirectory>
-									<!--https://maven.apache.org/plugins/maven-dependency-plugin/copy-dependencies-mojo.html#includeScope -->                      <includeScope>runtime</includeScope>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
-
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
