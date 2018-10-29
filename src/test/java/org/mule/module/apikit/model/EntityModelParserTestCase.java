@@ -29,7 +29,7 @@ public class EntityModelParserTestCase {
 	public void testPositive() throws IOException, EntityModelParsingException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("model/validOdata.raml");
 
-		List<Entity> entities = EntityModelParser.getEntities(url.getPath());
+		List<Entity> entities = EntityModelParser.getEntities(url.toString());
 		Assert.assertEquals("Customer", entities.get(0).getName());
 		Assert.assertEquals("Customer", entities.get(0).getElementName());
 		Assert.assertEquals("Customers", entities.get(0).getCollectionName());
@@ -44,7 +44,7 @@ public class EntityModelParserTestCase {
 	public void testPositive3() throws IOException, EntityModelParsingException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("model/validOdata3.raml");
 
-		List<Entity> entities = EntityModelParser.getEntities(url.getPath());
+		List<Entity> entities = EntityModelParser.getEntities(url.toString());
 		Assert.assertEquals("orders", entities.get(1).getName());
 		Assert.assertEquals("orders", entities.get(1).getElementName());
 		Assert.assertEquals("ordersId", entities.get(1).getIdElementName());

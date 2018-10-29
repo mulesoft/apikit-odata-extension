@@ -79,9 +79,10 @@ public class ODataErrorHandler {
 	 * @return
 	 */
 	private static ODataException processMuleException(MuleException ex){
+/*
 		if (ex instanceof MethodNotAllowedException) {
 			return new ODataMethodNotAllowedException();
-		} else if (ex instanceof BadRequestException) {
+		} else if (ex instanceof BadRequestException) {º
 			return new ODataBadRequestException(ex.getMessage(), ex);
 		} else if (ex instanceof NotAcceptableException) {
 			return new ODataNotAcceptableException();
@@ -90,6 +91,13 @@ public class ODataErrorHandler {
 		} else if (ex instanceof UnsupportedMediaTypeException) {
 			return new ODataUnsupportedMediaTypeException(ex.getMessage());
 		} else {
+			return new ODataInternalServerErrorException(ex);
+		}
+*/
+
+		if (ex instanceof BadRequestException) {
+			return new ODataBadRequestException(ex.getMessage(), ex);
+		}else {
 			return new ODataInternalServerErrorException(ex);
 		}
 	}

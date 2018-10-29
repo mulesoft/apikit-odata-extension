@@ -8,6 +8,7 @@ package org.mule.module.apikit.odata;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
@@ -16,13 +17,13 @@ import org.mule.module.apikit.api.exception.ApikitRuntimeException;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.error.ODataErrorHandler;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
+import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 import org.mule.module.apikit.odata.processor.ODataRequestProcessor;
 import org.mule.module.apikit.odata.util.CoreEventUtils;
-import org.mule.module.apikit.odata.util.FileUtils;
 import org.mule.module.apikit.spi.EventProcessor;
 import org.mule.module.apikit.spi.RouterService;
 import org.mule.runtime.api.event.Event;
@@ -34,18 +35,20 @@ public class ODataRouterService implements RouterService {
 
 	private static final String ODATA_SVC_URI_PREFIX = "odata.svc";
 
-	private  Logger logger = Logger.getLogger(ODataRouterService.class);
+	private static  Logger logger = Logger.getLogger(ODataRouterService.class);
 
+	private static final ExecutorService executorService = Executors.newCachedThreadPool();
 	static { 
 		System.setProperty("javax.ws.rs.ext.RuntimeDelegate","org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl"); // Workaround for issue while loading class javax.ws.rs.ext.RuntimeDelegate embedded in odata4j
 	}																									  	  // https://stackoverflow.com/questions/30316829/classnotfoundexception-org-glassfish-jersey-internal-runtimedelegateimpl-cannot
 	
 	@Override
-	public CompletableFuture<Event> process(CoreEvent event, EventProcessor router) throws MuleException {
-		logger.info("Handling odata enabled request.");
-		
+	public CompletableFuture<Event> process(CoreEvent event, EventProcessor router, String raml) throws MuleException {
+		logger.debug("Handling odata enabled request.");
+
+		String ramlPath = router.getRamlHandler().getApi().getUri();
 		HttpRequestAttributes attributes = CoreEventUtils.getHttpRequestAttributes(event);
-        OdataContext oDataContext = getOdataContext(FileUtils.getAbsolutePath("api/api.raml"));
+        OdataContext oDataContext = getOdataContext(ramlPath);
 		oDataContext.setMethod(attributes.getMethod());
 		String path = attributes.getRelativePath();
 			
@@ -57,30 +60,27 @@ public class ODataRouterService implements RouterService {
 	}
 	
 	private OdataContext getOdataContext(String ramlPath) throws ApikitRuntimeException {
-		OdataContext oDataContext = null;
+		OdataContext oDataContext;
 
 		try {
 			oDataContext = initializeModel(ramlPath);
-		} catch (OdataMetadataFieldsException | OdataMetadataResourceNotFound | OdataMetadataFormatException
-				| OdataMetadataEntityNotFoundException e) {
+		} catch (OdataMetadataFormatException e) {
 			logger.error(e.getMessage(),e);
 			throw new ApikitRuntimeException(e);
 		}		
 		return oDataContext;
 	}
 	
-	protected static OdataContext initializeModel(String ramlPath) throws OdataMetadataFieldsException, OdataMetadataResourceNotFound,
-			OdataMetadataFormatException, OdataMetadataEntityNotFoundException {
-		Logger.getLogger(ODataRouterService.class).info("Init model.");
-		OdataContextInitializer contextInitializer = new OdataContextInitializer();
-		return contextInitializer.initializeContext(ramlPath);
+	private static OdataContext initializeModel(String ramlPath) throws OdataMetadataFormatException {
+		final OdataMetadataManager odataMetadataManager = new OdataMetadataManager(ramlPath);
+		return new OdataContext(odataMetadataManager);
 	}
 
 	
-	protected static CompletableFuture<Event> processODataRequest(HttpRequestAttributes attributes,EventProcessor eventProcessor ,OdataContext oDataContext, CoreEvent event) throws MuleException {
+	private static CompletableFuture<Event> processODataRequest(HttpRequestAttributes attributes,EventProcessor eventProcessor ,OdataContext oDataContext, CoreEvent event) throws MuleException {
 		CompletableFuture<Event> completableFuture = new CompletableFuture<Event>();
-		
-		Executors.newCachedThreadPool().submit(()->{ 
+
+		executorService.submit(()->{
 			List<Format> formats = null;
 			try {
 				String listenerPath = attributes.getListenerPath().substring( 0,attributes.getListenerPath().lastIndexOf("/*"));
@@ -99,7 +99,7 @@ public class ODataRouterService implements RouterService {
 				// Response transformer
 				Message message = ODataResponseTransformer.transform( odataPayload, formats);			
 				
-				CoreEvent newEvent  = CoreEvent.builder(event).message(message).build();
+				CoreEvent newEvent  = CoreEvent.builder(event).message(message).addVariable("httpStatus", odataPayload.getStatus()).build();
 				completableFuture.complete(newEvent);
 			} catch (Exception ex) {
 				completableFuture.complete( ODataErrorHandler.handle(event, ex, formats));

@@ -6,8 +6,6 @@
  */
 package org.mule.module.apikit.odata.processor;
 
-import static reactor.core.publisher.Mono.fromFuture;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 import org.apache.commons.lang.StringUtils;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
-import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.module.apikit.odata.context.OdataContextVariables;
 import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ClientErrorException;
@@ -37,6 +35,7 @@ import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProp
 import org.mule.module.apikit.odata.model.Entry;
 import org.mule.module.apikit.odata.util.CoreEventUtils;
 import org.mule.module.apikit.odata.util.Helper;
+import org.mule.module.apikit.odata.util.ODataUriHelper;
 import org.mule.module.apikit.spi.EventProcessor;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.message.Message;
@@ -94,28 +93,27 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		String oDataURL = getCompleteUrl(CoreEventUtils.getHttpRequestAttributes(event));
 
 		// truncate the URL at the entity
-		oDataURL = oDataURL.substring(0, oDataURL.indexOf(entity));
+		oDataURL = ODataUriHelper.getOdataUrl(oDataURL);
 
-		List<Entry> entries = processEntityRequest(event, eventProcessor, formats);
-		ODataPayload oDataPayload;
+		// invoke flow and validate response
+		ODataPayload oDataPayload = processEntityRequest(event, eventProcessor, formats);
 
 		if (isEntityCount()) {
 			if (formats.contains(Format.Plain) || formats.contains(Format.Default)) {
-				String count = String.valueOf(entries.size());
-				oDataPayload = new ODataPayload(count);
+				String count = String.valueOf(oDataPayload.getEntries().size());
+				oDataPayload = new ODataPayload(count,oDataPayload.getStatus());
 			} else {
 				throw new ODataUnsupportedMediaTypeException("Unsupported media type requested.");
 			}
 		} else {
-			oDataPayload = new ODataPayload(entries);
-			oDataPayload.setFormatter(new ODataApiKitFormatter(getMetadataManager(), entries, entity, oDataURL));
+			oDataPayload.setFormatter(new ODataApiKitFormatter(getMetadataManager(), oDataPayload.getEntries(), entity, oDataURL));
 		}
 
 		return oDataPayload;
 	}
 
-	public List<Entry> processEntityRequest(CoreEvent event, EventProcessor eventProcessor, List<Format> formats) throws Exception {
-		List<Entry> entries = new ArrayList<Entry>();
+	public ODataPayload processEntityRequest(CoreEvent event, EventProcessor eventProcessor, List<Format> formats) throws Exception {
+		List<Entry> entries = new ArrayList<>();
 		HttpRequestAttributes attributes =CoreEventUtils.getHttpRequestAttributes(event);
 		String uri = attributes.getRelativePath();;
 		String basePath = uri.substring(0, uri.toLowerCase().indexOf("/odata.svc"));
@@ -128,7 +126,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		httpRequestAttributesBuilder.requestUri(httpRequest);
 		httpRequestAttributesBuilder.queryString(this.query);
 		httpRequestAttributesBuilder.relativePath(this.path);
-		
+
 		MultiMap<String, String> httpQueryParams = Helper.queryToMap(query);
 		httpRequestAttributesBuilder.queryParams(httpQueryParams);
 
@@ -140,35 +138,60 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 			}
 			boolean isXMLFormat = !formats.contains(Format.Json);
 			payloadAsString = BodyToJsonConverter.convertPayload(entity, isXMLFormat, payloadAsString);
+			MultiMap<String,String> headers = new MultiMap<>();
+			headers.put("host", attributes.getRemoteAddress());
+			headers.put("content-type",MediaType.APPLICATION_JSON.toString());
+			httpRequestAttributesBuilder.headers(headers);
 			message = Message.builder().value(payloadAsString).mediaType(MediaType.APPLICATION_JSON).attributesValue(httpRequestAttributesBuilder.build()).build();
 		} else {
 			message = Message.builder(event.getMessage()).attributesValue(httpRequestAttributesBuilder.build()).build();
 		}
 
-		CompletableFuture<Event> response = eventProcessor.processEvent(CoreEvent.builder(event).message(message).build());
+		CompletableFuture<Event> response = eventProcessor.processEvent(CoreEvent.builder(event).message(message).addVariable("odata", this.getMetadataManager().getOdataContextVariables(entity)).build());
 
-		entries = verifyFlowResponse(response);
-
-		return entries;
+		return verifyFlowResponse(response);
 	}
 
-	private List<Entry> verifyFlowResponse(CompletableFuture<Event> response) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
+	private static int checkResponseHttpStatus(CoreEvent response) throws ClientErrorException {
+
+		String status = response.getVariables().get("httpStatus").getValue().toString();
+		int httpStatus = 0;
+
+		try {
+			httpStatus = Integer.valueOf(status);
+		} catch (Exception e) {
+			// do nothing...
+		}
+
+		if(httpStatus >= 400){
+			// If there was an error, it makes no sense to return a list of entry
+			// just raise an exception
+			Object payload = CoreEventUtils.getPayloadAsString(response);
+			throw new ClientErrorException(payload != null ? payload.toString() : "", httpStatus);
+		}
+
+		return httpStatus;
+	}
+
+	private ODataPayload verifyFlowResponse(CompletableFuture<Event> response) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
 			OdataMetadataResourceNotFound, OdataMetadataFormatException, ODataInvalidFlowResponseException, ClientErrorException {
 		
 
 		try {
 			CoreEvent event;
 			event = (CoreEvent) response.get();
-			
+			int httpStatus  = checkResponseHttpStatus(event);
 			OdataMetadataManager metadataManager = getMetadataManager();
 			EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
 			List<Entry> entries;
 
 			String payload = CoreEventUtils.getPayloadAsString(event);
-			if(payload == null || payload == "") 
-				throw new ODataInvalidFlowResponseException("The payload of the response should be a valid json.");
-			
-			entries = Helper.transformJsonToEntryList(payload);
+
+
+			if(payload == null || payload == "")
+				entries = new ArrayList<>();
+			else
+				entries = Helper.transformJsonToEntryList(payload);
 
 			int entryNumber = 1;
 			for (Entry entry : entries) {
@@ -184,7 +207,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 				}
 			}
 
-			return entries;
+			return new ODataPayload(entries,httpStatus);
 		} catch (InterruptedException | ExecutionException e) {
 			throw new ODataInvalidFlowResponseException(e.getMessage());
 		}

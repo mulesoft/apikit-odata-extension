@@ -51,7 +51,7 @@ public class ODataScaffolderService implements ScaffolderService {
 		}
 		Scaffolder scaffolder;
 		try {			
-			scaffolder = Scaffolder.createScaffolder(log, appDir, ramlFilePaths, muleXmlFiles, domain, muleVersion, runtimeEdition, ramlsWithExtensionEnabledPaths);
+			scaffolder = Scaffolder.createScaffolder(log, appDir, ramlFilePaths, muleXmlFiles, domain, muleVersion, runtimeEdition);
 		} catch (Exception e) {
 			throw new RuntimeException("Error executing scaffolder", e);
 		}

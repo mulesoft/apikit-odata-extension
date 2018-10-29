@@ -58,6 +58,9 @@ public class ODataUriHelper {
     public static final Pattern ODATA_PRIMITIVE_STRING_PATTERN = Pattern.compile(ODATA_PRIMITIVE_STRING_REGEXP);
     public static final Pattern ODATA_LONG_PATTERN = Pattern.compile(ODATA_LONG_REGEXP);
 
+    private static final String ODATA_SVC_URI_PREFIX = "/odata.svc";
+
+
     public static boolean isMetadata(String path) {
         return path.contains("$metadata");
     }
@@ -354,5 +357,9 @@ public class ODataUriHelper {
         } catch (Exception e) {
             throw new ODataInvalidUriException(e.getMessage());
         }
+    }
+
+    public static String getOdataUrl(String completeUrl){
+        return  completeUrl.substring(0, completeUrl.indexOf(ODATA_SVC_URI_PREFIX) + ODATA_SVC_URI_PREFIX.length() + 1);
     }
 }

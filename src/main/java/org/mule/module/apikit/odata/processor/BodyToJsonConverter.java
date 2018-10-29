@@ -34,6 +34,7 @@ import static org.odata4j.edm.EdmSimpleType.INT16;
 import static org.odata4j.edm.EdmSimpleType.INT32;
 import static org.odata4j.edm.EdmSimpleType.INT64;
 import static org.odata4j.edm.EdmSimpleType.STRING;
+import static org.odata4j.edm.EdmSimpleType.SINGLE;
 
 /*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
@@ -133,6 +134,7 @@ public class BodyToJsonConverter {
 			if (BOOLEAN.equals(type)) return object.getBoolean(key);
 			if (DECIMAL.equals(type)) return new BigDecimal(object.getString(key));
 			if (DOUBLE.equals(type)) return object.getDouble(key);
+			if (SINGLE.equals(type)) return object.getDouble(key);
 			if (INT64.equals(type)) return object.getLong(key);
 			if (INT16.equals(type) || INT32.equals(type)) return object.getInt(key);
 

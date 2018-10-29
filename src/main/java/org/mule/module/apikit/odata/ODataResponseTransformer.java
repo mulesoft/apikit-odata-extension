@@ -35,7 +35,7 @@ public class ODataResponseTransformer {
 					mediaType = MediaType.APPLICATION_XML;
 				}
 			}
-		}	
+		}
 
 
 	    return Message.builder().value(formatted).mediaType(mediaType).build();
