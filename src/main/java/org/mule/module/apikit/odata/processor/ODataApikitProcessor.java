@@ -27,7 +27,7 @@ import org.mule.module.apikit.odata.model.Entry;
 import org.mule.module.apikit.odata.util.CoreEventUtils;
 import org.mule.module.apikit.odata.util.Helper;
 import org.mule.module.apikit.odata.util.ODataUriHelper;
-import org.mule.module.apikit.spi.EventProcessor;
+import org.mule.module.apikit.spi.AbstractRouter;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.util.MultiMap;
@@ -89,14 +89,14 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 	}
 
 	@Override
-	public ODataPayload process(CoreEvent event, EventProcessor eventProcessor, List<Format> formats) throws Exception {
+	public ODataPayload process(CoreEvent event, AbstractRouter router, List<Format> formats) throws Exception {
 		String oDataURL = getCompleteUrl(CoreEventUtils.getHttpRequestAttributes(event));
 
 		// truncate the URL at the entity
 		oDataURL = ODataUriHelper.getOdataUrl(oDataURL);
 
 		// invoke flow and validate response
-		ODataPayload oDataPayload = processEntityRequest(event, eventProcessor, formats);
+		ODataPayload oDataPayload = processEntityRequest(event, router, formats);
 
 		if (isEntityCount()) {
 			if (formats.contains(Format.Plain) || formats.contains(Format.Default)) {
@@ -112,7 +112,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		return oDataPayload;
 	}
 
-	public ODataPayload processEntityRequest(CoreEvent event, EventProcessor eventProcessor, List<Format> formats) throws Exception {
+	public ODataPayload processEntityRequest(CoreEvent event, AbstractRouter router, List<Format> formats) throws Exception {
 		List<Entry> entries = new ArrayList<>();
 		HttpRequestAttributes attributes =CoreEventUtils.getHttpRequestAttributes(event);
 		String uri = attributes.getRelativePath();;
@@ -152,7 +152,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 				.addVariable("odata", this.getMetadataManager().getOdataContextVariables(entity))
 				.build();
 
-		Publisher<CoreEvent> processResponse = eventProcessor.processEvent(odataEvent);
+		Publisher<CoreEvent> processResponse = router.processEvent(odataEvent);
 		final CoreEvent response = Mono.from(processResponse)
 				.onErrorMap(error -> new ODataInvalidFlowResponseException(error.getMessage())).block();
 

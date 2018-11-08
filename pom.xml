@@ -121,9 +121,8 @@
 
 		<dependency>
 			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-apikit-module</artifactId>
+			<artifactId>mule-apikit-module-spi</artifactId>
 			<version>${apikit.version}</version>
-			<classifier>mule-plugin</classifier>
 			<scope>provided</scope>
 		</dependency>
 

@@ -16,7 +16,7 @@ import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.processor.ODataRequestProcessor;
 import org.mule.module.apikit.odata.util.CoreEventUtils;
-import org.mule.module.apikit.spi.EventProcessor;
+import org.mule.module.apikit.spi.AbstractRouter;
 import org.mule.module.apikit.spi.RouterService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -40,10 +40,10 @@ public class ODataRouterService implements RouterService {
 	}																									  	  // https://stackoverflow.com/questions/30316829/classnotfoundexception-org-glassfish-jersey-internal-runtimedelegateimpl-cannot
 	
 	@Override
-	public Publisher<CoreEvent> process(CoreEvent event, EventProcessor router, String raml) throws MuleException {
+	public Publisher<CoreEvent> process(CoreEvent event, AbstractRouter router, String raml) throws MuleException {
 		logger.debug("Handling odata enabled request.");
 
-		String ramlPath = router.getRamlHandler().getApi().getUri();
+		String ramlPath = router.getRaml().getUri();
 		HttpRequestAttributes attributes = CoreEventUtils.getHttpRequestAttributes(event);
         OdataContext oDataContext = getOdataContext(ramlPath);
 		oDataContext.setMethod(attributes.getMethod());
@@ -74,7 +74,7 @@ public class ODataRouterService implements RouterService {
 	}
 
 	
-	private static Publisher<CoreEvent> processODataRequest(HttpRequestAttributes attributes,EventProcessor eventProcessor ,OdataContext oDataContext, CoreEvent event) throws MuleException {
+	private static Publisher<CoreEvent> processODataRequest(HttpRequestAttributes attributes, AbstractRouter router ,OdataContext oDataContext, CoreEvent event) throws MuleException {
 		List<Format> formats = null;
 		try {
 			String listenerPath = attributes.getListenerPath().substring( 0,attributes.getListenerPath().lastIndexOf("/*"));
@@ -88,7 +88,7 @@ public class ODataRouterService implements RouterService {
 			formats = ODataFormatHandler.getFormats(attributes);
 
 			// Request processor
-			ODataPayload odataPayload = odataRequestProcessor.process(event, eventProcessor, formats);
+			ODataPayload odataPayload = odataRequestProcessor.process(event, router, formats);
 
 			// Response transformer
 			Message message = ODataResponseTransformer.transform( odataPayload, formats);
