@@ -8,6 +8,7 @@
 package org.mule.module.apikit.odata.formatter;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ODataException;
@@ -16,6 +17,7 @@ import org.mule.module.apikit.odata.util.FileUtils;
 
 import static org.junit.Assert.assertTrue;
 
+@Ignore("APIMF-1265")
 public class FormatterTestCase {
 
 	private static OdataContext oDataContext;

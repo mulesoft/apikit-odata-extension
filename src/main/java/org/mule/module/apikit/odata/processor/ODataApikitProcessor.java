@@ -6,18 +6,9 @@
  */
 package org.mule.module.apikit.odata.processor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
 import org.apache.commons.lang.StringUtils;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
-import org.mule.module.apikit.odata.context.OdataContextVariables;
 import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ClientErrorException;
@@ -36,12 +27,21 @@ import org.mule.module.apikit.odata.model.Entry;
 import org.mule.module.apikit.odata.util.CoreEventUtils;
 import org.mule.module.apikit.odata.util.Helper;
 import org.mule.module.apikit.odata.util.ODataUriHelper;
-import org.mule.module.apikit.spi.EventProcessor;
-import org.mule.runtime.api.event.Event;
+import org.mule.module.apikit.spi.AbstractRouter;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class ODataApikitProcessor extends ODataRequestProcessor {
 	private String path;
@@ -89,14 +89,14 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 	}
 
 	@Override
-	public ODataPayload process(CoreEvent event, EventProcessor eventProcessor, List<Format> formats) throws Exception {
+	public ODataPayload process(CoreEvent event, AbstractRouter router, List<Format> formats) throws Exception {
 		String oDataURL = getCompleteUrl(CoreEventUtils.getHttpRequestAttributes(event));
 
 		// truncate the URL at the entity
 		oDataURL = ODataUriHelper.getOdataUrl(oDataURL);
 
 		// invoke flow and validate response
-		ODataPayload oDataPayload = processEntityRequest(event, eventProcessor, formats);
+		ODataPayload oDataPayload = processEntityRequest(event, router, formats);
 
 		if (isEntityCount()) {
 			if (formats.contains(Format.Plain) || formats.contains(Format.Default)) {
@@ -112,7 +112,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		return oDataPayload;
 	}
 
-	public ODataPayload processEntityRequest(CoreEvent event, EventProcessor eventProcessor, List<Format> formats) throws Exception {
+	public ODataPayload processEntityRequest(CoreEvent event, AbstractRouter router, List<Format> formats) throws Exception {
 		List<Entry> entries = new ArrayList<>();
 		HttpRequestAttributes attributes =CoreEventUtils.getHttpRequestAttributes(event);
 		String uri = attributes.getRelativePath();;
@@ -147,7 +147,14 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 			message = Message.builder(event.getMessage()).attributesValue(httpRequestAttributesBuilder.build()).build();
 		}
 
-		CompletableFuture<Event> response = eventProcessor.processEvent(CoreEvent.builder(event).message(message).addVariable("odata", this.getMetadataManager().getOdataContextVariables(entity)).build());
+		final CoreEvent odataEvent = CoreEvent.builder(event)
+				.message(message)
+				.addVariable("odata", this.getMetadataManager().getOdataContextVariables(entity))
+				.build();
+
+		Publisher<CoreEvent> processResponse = router.processEvent(odataEvent);
+		final CoreEvent response = Mono.from(processResponse)
+				.onErrorMap(error -> new ODataInvalidFlowResponseException(error.getMessage())).block();
 
 		return verifyFlowResponse(response);
 	}
@@ -173,44 +180,37 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		return httpStatus;
 	}
 
-	private ODataPayload verifyFlowResponse(CompletableFuture<Event> response) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
+	private ODataPayload verifyFlowResponse(CoreEvent event) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
 			OdataMetadataResourceNotFound, OdataMetadataFormatException, ODataInvalidFlowResponseException, ClientErrorException {
-		
 
-		try {
-			CoreEvent event;
-			event = (CoreEvent) response.get();
-			int httpStatus  = checkResponseHttpStatus(event);
-			OdataMetadataManager metadataManager = getMetadataManager();
-			EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
-			List<Entry> entries;
+		int httpStatus  = checkResponseHttpStatus(event);
+		OdataMetadataManager metadataManager = getMetadataManager();
+		EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
+		List<Entry> entries;
 
-			String payload = CoreEventUtils.getPayloadAsString(event);
+		String payload = CoreEventUtils.getPayloadAsString(event);
 
 
-			if(payload == null || payload == "")
-				entries = new ArrayList<>();
-			else
-				entries = Helper.transformJsonToEntryList(payload);
+		if(isNullOrEmpty(payload))
+			entries = new ArrayList<>();
+		else
+			entries = Helper.transformJsonToEntryList(payload);
 
-			int entryNumber = 1;
-			for (Entry entry : entries) {
-				// verifies the # of properties matches the definition
-				if (entry.getProperties().entrySet().size() > entityDefinition.getProperties().size())
-					throw new ODataInvalidFlowResponseException("There are absent properties in flow response (entry #" + (entryNumber++) + ")");
+		int entryNumber = 1;
+		for (Entry entry : entries) {
+			// verifies the # of properties matches the definition
+			if (entry.getProperties().entrySet().size() > entityDefinition.getProperties().size())
+				throw new ODataInvalidFlowResponseException("There are absent properties in flow response (entry #" + (entryNumber++) + ")");
 
-				// verifies each property against the definition
-				for (String propertyName : entry.getProperties().keySet()) {
-					EntityDefinitionProperty entityDefinitionProperty = entityDefinition.findPropertyDefinition(propertyName);
-					if (entityDefinitionProperty == null)
-						throw new ODataInvalidFlowResponseException("Property '" + propertyName + "' was not expected for entity '" + entityDefinition.getName() + "'");
-				}
+			// verifies each property against the definition
+			for (String propertyName : entry.getProperties().keySet()) {
+				EntityDefinitionProperty entityDefinitionProperty = entityDefinition.findPropertyDefinition(propertyName);
+				if (entityDefinitionProperty == null)
+					throw new ODataInvalidFlowResponseException("Property '" + propertyName + "' was not expected for entity '" + entityDefinition.getName() + "'");
 			}
-
-			return new ODataPayload(entries,httpStatus);
-		} catch (InterruptedException | ExecutionException e) {
-			throw new ODataInvalidFlowResponseException(e.getMessage());
 		}
+
+		return new ODataPayload(entries,httpStatus);
 	}
 
 
