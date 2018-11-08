@@ -6,11 +6,6 @@
  */
 package org.mule.module.apikit.odata;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.apache.log4j.Logger;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.module.apikit.api.exception.ApikitRuntimeException;
@@ -18,18 +13,20 @@ import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.error.ODataErrorHandler;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
-import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
-import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
-import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 import org.mule.module.apikit.odata.processor.ODataRequestProcessor;
 import org.mule.module.apikit.odata.util.CoreEventUtils;
 import org.mule.module.apikit.spi.EventProcessor;
 import org.mule.module.apikit.spi.RouterService;
-import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ODataRouterService implements RouterService {
 
@@ -43,7 +40,7 @@ public class ODataRouterService implements RouterService {
 	}																									  	  // https://stackoverflow.com/questions/30316829/classnotfoundexception-org-glassfish-jersey-internal-runtimedelegateimpl-cannot
 	
 	@Override
-	public CompletableFuture<Event> process(CoreEvent event, EventProcessor router, String raml) throws MuleException {
+	public Publisher<CoreEvent> process(CoreEvent event, EventProcessor router, String raml) throws MuleException {
 		logger.debug("Handling odata enabled request.");
 
 		String ramlPath = router.getRamlHandler().getApi().getUri();
@@ -77,36 +74,30 @@ public class ODataRouterService implements RouterService {
 	}
 
 	
-	private static CompletableFuture<Event> processODataRequest(HttpRequestAttributes attributes,EventProcessor eventProcessor ,OdataContext oDataContext, CoreEvent event) throws MuleException {
-		CompletableFuture<Event> completableFuture = new CompletableFuture<Event>();
+	private static Publisher<CoreEvent> processODataRequest(HttpRequestAttributes attributes,EventProcessor eventProcessor ,OdataContext oDataContext, CoreEvent event) throws MuleException {
+		List<Format> formats = null;
+		try {
+			String listenerPath = attributes.getListenerPath().substring( 0,attributes.getListenerPath().lastIndexOf("/*"));
+			String path = attributes.getRelativePath().replaceAll(listenerPath, "");
+			String query = attributes.getQueryString();
 
-		executorService.submit(()->{
-			List<Format> formats = null;
-			try {
-				String listenerPath = attributes.getListenerPath().substring( 0,attributes.getListenerPath().lastIndexOf("/*"));
-				String path = attributes.getRelativePath().replaceAll(listenerPath, "");
-				String query = attributes.getQueryString();
-				
-				// URIParser
-				ODataRequestProcessor odataRequestProcessor = ODataUriParser.parse(oDataContext, path, query);
-	
-				// Validate format
-				formats = ODataFormatHandler.getFormats(attributes);
-				
-				// Request processor
-				ODataPayload odataPayload = odataRequestProcessor.process(event, eventProcessor, formats);
-	
-				// Response transformer
-				Message message = ODataResponseTransformer.transform( odataPayload, formats);			
-				
-				CoreEvent newEvent  = CoreEvent.builder(event).message(message).addVariable("httpStatus", odataPayload.getStatus()).build();
-				completableFuture.complete(newEvent);
-			} catch (Exception ex) {
-				completableFuture.complete( ODataErrorHandler.handle(event, ex, formats));
-			}
-		});
+			// URIParser
+			ODataRequestProcessor odataRequestProcessor = ODataUriParser.parse(oDataContext, path, query);
 
-		return completableFuture;
+			// Validate format
+			formats = ODataFormatHandler.getFormats(attributes);
+
+			// Request processor
+			ODataPayload odataPayload = odataRequestProcessor.process(event, eventProcessor, formats);
+
+			// Response transformer
+			Message message = ODataResponseTransformer.transform( odataPayload, formats);
+
+			CoreEvent newEvent  = CoreEvent.builder(event).message(message).addVariable("httpStatus", odataPayload.getStatus()).build();
+			return Mono.just(newEvent);
+		} catch (Exception ex) {
+			return Mono.just(ODataErrorHandler.handle(event, ex, formats));
+		}
 	}
 	
 }

@@ -7,6 +7,7 @@
 package org.mule.module.apikit.odata.metadata.raml;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -122,6 +123,7 @@ public class RamlParserTestCase {
 	}
 
 	@Test
+	@Ignore("APIMF-1265")
 	public void allowedTypes() throws OdataMetadataFieldsException, OdataMetadataFormatException {
 		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-allowed-types.raml"));
 		EntityDefinition entityDefinition = entitySet.toList().get(0);

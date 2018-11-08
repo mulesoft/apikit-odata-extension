@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 import java.util.HashMap;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ODataException;
@@ -31,6 +32,7 @@ import org.mule.module.apikit.odata.processor.ODataServiceDocumentProcessor;
 import org.mule.module.apikit.odata.util.FileUtils;
 import org.mule.module.apikit.odata.util.ODataUriHelper;
 
+@Ignore("APIMF-1265")
 public class ODataUriParserTestCase {
 
 	private static OdataContext oDataContext;
