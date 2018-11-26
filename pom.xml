@@ -24,7 +24,7 @@
 		<mule.version>4.1.4</mule.version>
 		<apikit.version>1.2.0-SNAPSHOT</apikit.version>
 		<mule.plugin.maven.plugin.version>1.2.0-SNAPSHOT</mule.plugin.maven.plugin.version>
-		<amfVersion>3.0.2-SNAPSHOT</amfVersion>
+		<amfVersion>3.0.2</amfVersion>
 		<licensePath>LICENSE_HEADER.txt</licensePath>
 	</properties>
 
