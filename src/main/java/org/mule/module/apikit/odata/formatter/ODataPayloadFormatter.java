@@ -11,9 +11,13 @@ public abstract class ODataPayloadFormatter {
 		Json, Atom, Plain, Default
 	}
 
+	public enum InlineCount {
+		ALL_PAGES, NONE
+	}
+
 	boolean supportsAtom = false;
 
-	abstract public String format(Format format) throws Exception;
+	abstract public String format(Format format, InlineCount inlineCount) throws Exception;
 
 	public boolean supportsAtom() {
 		return supportsAtom;

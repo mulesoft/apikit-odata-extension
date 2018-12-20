@@ -6,14 +6,7 @@
  */
 package org.mule.module.apikit.odata.processor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONObject;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -23,7 +16,6 @@ import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ClientErrorException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFlowResponseException;
-import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.exception.ODataUnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.formatter.ODataApiKitFormatter;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
@@ -38,6 +30,12 @@ import org.mule.module.apikit.odata.model.Entry;
 import org.mule.module.apikit.odata.util.Helper;
 import org.mule.module.apikit.odata.util.ODataUriHelper;
 import org.mule.transport.NullPayload;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class ODataApikitProcessor extends ODataRequestProcessor {
 	private String path;
