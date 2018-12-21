@@ -6,10 +6,15 @@
  */
 package org.mule.module.apikit.odata;
 
-import java.util.List;
-
 import org.mule.api.MuleEvent;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
+import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.ALL_PAGES;
+import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.NONE;
 
 public class ODataResponseTransformer {
 	public static MuleEvent transform(MuleEvent event, ODataPayload payload, List<Format> formats) throws Exception {
@@ -19,8 +24,9 @@ public class ODataResponseTransformer {
 		} else {
 
 			boolean isJson = formats.contains(Format.Json) && !formats.contains(Format.Atom);
+			final InlineCount inlineCount = getInlineCount(event);
 
-			String formatted = payload.getFormatter().format(isJson ? Format.Json : Format.Atom);
+			String formatted = payload.getFormatter().format(isJson ? Format.Json : Format.Atom, inlineCount);
 			event.getMessage().setPayload(formatted);
 
 			if (isJson) {
@@ -39,6 +45,15 @@ public class ODataResponseTransformer {
 		}
 
 		return event;
+	}
+
+	private static InlineCount getInlineCount(MuleEvent event) {
+		final Map queryParamsMap = event.getMessage().getInboundProperty("http.query.params");
+		final String inlineCountParameterValue = (String) queryParamsMap.get("inlinecount");
+
+		if ("allpages".equalsIgnoreCase(inlineCountParameterValue)) return ALL_PAGES;
+
+		return NONE;
 	}
 
 }
