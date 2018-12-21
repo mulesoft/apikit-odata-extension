@@ -36,7 +36,7 @@ public class ODataApiKitFormatter extends ODataPayloadFormatter {
 		this.setSupportsAtom(true);
 	}
 
-	public String format(Format format) throws Exception {
+	public String format(Format format, InlineCount inlineCount) throws Exception {
 		if (Format.Default.equals(format)) {
 			format = Format.Atom;
 		}
@@ -44,7 +44,7 @@ public class ODataApiKitFormatter extends ODataPayloadFormatter {
 				format.name(), null);
 
 		EntityDefinitionSet entitySet = odataMetadataManager.getEntitySet();
-		EntitiesResponse entitiesResponse = Helper.convertEntriesToOEntries(entries, entityName, entitySet);
+		EntitiesResponse entitiesResponse = Helper.convertEntriesToOEntries(entries, entityName, entitySet, inlineCount);
 
 		StringWriter sw = new StringWriter();
 		UriInfo uriInfo = new UriInfoImpl(url);

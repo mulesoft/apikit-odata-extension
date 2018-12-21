@@ -30,7 +30,7 @@ public class ServiceDocumentPayloadFormatter extends ODataPayloadFormatter {
 		this.setSupportsAtom(false);
 	}
 
-	public String format(Format format) throws Exception {
+	public String format(Format format, InlineCount inlineCount) throws Exception {
 		if (Format.Default.equals(format)) {
 			format = Format.Atom;
 		}

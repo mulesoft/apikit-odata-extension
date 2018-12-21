@@ -15,6 +15,7 @@ import org.mule.module.apikit.odata.exception.ClientErrorException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFlowResponseException;
 import org.mule.module.apikit.odata.exception.ODataUnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.formatter.ODataApiKitFormatter;
+import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
@@ -42,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.ALL_PAGES;
+import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.NONE;
 
 public class ODataApikitProcessor extends ODataRequestProcessor {
 	private String path;
@@ -109,7 +112,20 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 			oDataPayload.setFormatter(new ODataApiKitFormatter(getMetadataManager(), oDataPayload.getEntries(), entity, oDataURL));
 		}
 
+		oDataPayload.setInlineCount(getInlineCount(event));
+
 		return oDataPayload;
+	}
+
+	private static ODataPayloadFormatter.InlineCount getInlineCount(CoreEvent event) {
+		HttpRequestAttributes attributes = ((HttpRequestAttributes) event.getMessage().getAttributes().getValue());
+		final MultiMap<String, String> queryParams = attributes.getQueryParams();
+
+		final String inlineCountParameterValue = queryParams.get("$inlinecount");
+
+		if ("allpages".equalsIgnoreCase(inlineCountParameterValue)) return ALL_PAGES;
+
+		return NONE;
 	}
 
 	public ODataPayload processEntityRequest(CoreEvent event, AbstractRouter router, List<Format> formats) throws Exception {
@@ -210,7 +226,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 			}
 		}
 
-		return new ODataPayload(entries,httpStatus);
+		return new ODataPayload(entries, httpStatus);
 	}
 
 

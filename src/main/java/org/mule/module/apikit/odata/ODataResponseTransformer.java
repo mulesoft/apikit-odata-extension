@@ -6,14 +6,14 @@
  */
 package org.mule.module.apikit.odata;
 
-import java.util.List;
-
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 
+import java.util.List;
+
 public class ODataResponseTransformer {
-	public static Message transform( ODataPayload payload, List<Format> formats) throws Exception {
+	public static Message transform(ODataPayload payload, List<Format> formats) throws Exception {
 		String formatted = null ;
 		MediaType mediaType = null;
 		
@@ -23,7 +23,7 @@ public class ODataResponseTransformer {
 	} else {
 
 			boolean isJson = formats.contains(Format.Json) && !formats.contains(Format.Atom);
-			 formatted = payload.getFormatter().format(isJson ? Format.Json : Format.Atom);
+            formatted = payload.getFormatter().format(isJson ? Format.Json : Format.Atom, payload.getInlineCount());
 
 			if (isJson) {
 				mediaType = MediaType.APPLICATION_JSON;

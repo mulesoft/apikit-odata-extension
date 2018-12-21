@@ -32,7 +32,7 @@ public class ODataFormatHandler {
 	 * the $format query option is present in a request URI it takes precedence
 	 * over the value(s) specified in the Accept request header.
 	 * 
-	 * @param event
+	 * @param attributes
 	 * @return
 	 * @throws ODataInvalidUriException
 	 * @throws ODataInvalidFormatException

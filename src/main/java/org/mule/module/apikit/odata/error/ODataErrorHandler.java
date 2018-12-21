@@ -6,33 +6,21 @@
  */
 package org.mule.module.apikit.odata.error;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import org.mule.extension.http.internal.temporary.HttpConnector;
 import org.mule.module.apikit.api.exception.BadRequestException;
-import org.mule.module.apikit.exception.MethodNotAllowedException;
-import org.mule.module.apikit.exception.NotAcceptableException;
-import org.mule.module.apikit.exception.NotFoundException;
-import org.mule.module.apikit.exception.UnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.ODataFormatHandler;
 import org.mule.module.apikit.odata.exception.ODataBadRequestException;
 import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.exception.ODataInternalServerErrorException;
-import org.mule.module.apikit.odata.exception.ODataMethodNotAllowedException;
-import org.mule.module.apikit.odata.exception.ODataNotAcceptableException;
-import org.mule.module.apikit.odata.exception.ODataNotFoundException;
-import org.mule.module.apikit.odata.exception.ODataUnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.util.CoreEventUtils;
-import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.ExceptionUtils;
-import org.mule.runtime.http.api.HttpConstants;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
+
+import java.util.List;
 
 public class ODataErrorHandler {
 

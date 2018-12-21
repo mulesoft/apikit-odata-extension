@@ -9,11 +9,15 @@ package org.mule.module.apikit.odata;
 import java.util.List;
 
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter;
+import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount;
 import org.mule.module.apikit.odata.model.Entry;
+
+import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.NONE;
 
 public class ODataPayload {
 	private String content;
-	List<Entry> entries;
+	private List<Entry> entries;
+	private InlineCount inlineCount = NONE;
 	private ODataPayloadFormatter formatter;
 	private int status=200;
 
@@ -68,6 +72,14 @@ public class ODataPayload {
 
 	public void setFormatter(ODataPayloadFormatter oDataPayloadFormatter) {
 		this.formatter = oDataPayloadFormatter;
+	}
+
+	public void setInlineCount(InlineCount inlineCount) {
+		this.inlineCount = inlineCount;
+	}
+
+	public InlineCount getInlineCount() {
+		return inlineCount;
 	}
 
 }
