@@ -23,10 +23,11 @@ public class ODataResponseTransformer {
 			event.getMessage().setPayload(payload.getContent());
 		} else {
 
-			boolean isJson = formats.contains(Format.Json) && !formats.contains(Format.Atom);
-			final InlineCount inlineCount = getInlineCount(event);
+			final boolean isJson = formats.contains(Format.Json) && !formats.contains(Format.Atom);
 
-			String formatted = payload.getFormatter().format(isJson ? Format.Json : Format.Atom, inlineCount);
+			final Integer entitiesCount = getEntitiesCount(event);
+
+			String formatted = payload.getFormatter().format(isJson ? Format.Json : Format.Atom, entitiesCount);
 			event.getMessage().setPayload(formatted);
 
 			if (isJson) {
@@ -45,6 +46,23 @@ public class ODataResponseTransformer {
 		}
 
 		return event;
+	}
+
+	private static Integer getEntitiesCount(MuleEvent event) {
+		Integer entitiesCount;
+		final InlineCount inlineCount = getInlineCount(event);
+		if (inlineCount == ALL_PAGES) {
+			final Object inlineCountPopertyValue = event.getMessage().getOutboundProperty("odata.inlineCount");
+			if (inlineCountPopertyValue instanceof String)
+				entitiesCount = Integer.valueOf((String) inlineCountPopertyValue);
+			else if (inlineCountPopertyValue instanceof Integer)
+				entitiesCount = (Integer) inlineCountPopertyValue;
+			else
+				throw new RuntimeException("Unsupported value for 'odata.inlineCount' property: '" + inlineCountPopertyValue + "'");
+		} else {
+			entitiesCount = null;
+		}
+		return entitiesCount;
 	}
 
 	private static InlineCount getInlineCount(MuleEvent event) {

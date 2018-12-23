@@ -22,7 +22,7 @@ public class ODataPayloadMetadataFormatter extends ODataPayloadFormatter {
 		this.setSupportsAtom(false);
 	}
 
-	public String format(Format format, InlineCount inlineCount) throws Exception {
+	public String format(Format format, Integer inlineCount) throws Exception {
 		Writer w = new StringWriter();
 		EdmDataServices ees = Helper.createMetadata(odataMetadataManager.getEntitySet());
 		EdmxFormatWriter.write(ees, w);

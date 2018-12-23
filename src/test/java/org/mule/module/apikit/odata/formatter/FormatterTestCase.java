@@ -14,7 +14,6 @@ import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.NONE;
 
 public class FormatterTestCase {
 
@@ -32,7 +31,7 @@ public class FormatterTestCase {
 
         ServiceDocumentPayloadFormatter formatter = new ServiceDocumentPayloadFormatter(odataMetadataManager, "http://localhost:8081/api/odata.svc");
 
-        String format = formatter.format(ODataPayloadFormatter.Format.Atom, NONE);
+        String format = formatter.format(ODataPayloadFormatter.Format.Atom, null);
         assertTrue(format.contains("<collection href=\"customers\">"));
         assertTrue(format.contains("<atom:title>customers</atom:title>"));
         // Entity city pluralized to cities
@@ -46,7 +45,7 @@ public class FormatterTestCase {
 
         ODataPayloadMetadataFormatter formatter = new ODataPayloadMetadataFormatter(odataMetadataManager);
 
-        String format = formatter.format(ODataPayloadFormatter.Format.Atom, NONE);
+        String format = formatter.format(ODataPayloadFormatter.Format.Atom, null);
         assertTrue(format.contains("<EntityType Name=\"customers\">"));
         assertTrue(format.contains("<EntityType Name=\"city\">"));
     }

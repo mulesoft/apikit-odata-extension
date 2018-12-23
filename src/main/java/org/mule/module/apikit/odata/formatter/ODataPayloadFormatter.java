@@ -17,7 +17,7 @@ public abstract class ODataPayloadFormatter {
 
 	boolean supportsAtom = false;
 
-	abstract public String format(Format format, InlineCount inlineCount) throws Exception;
+	abstract public String format(Format format, Integer inlineCount) throws Exception;
 
 	public boolean supportsAtom() {
 		return supportsAtom;
