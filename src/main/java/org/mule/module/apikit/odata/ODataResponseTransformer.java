@@ -16,14 +16,13 @@ public class ODataResponseTransformer {
 	public static Message transform(ODataPayload payload, List<Format> formats) throws Exception {
 		String formatted = null ;
 		MediaType mediaType = null;
-		
-	    if (payload.getContent() != null) {
-	    	mediaType = MediaType.TEXT;
-	    	formatted = payload.getContent();
-	} else {
 
+	    if (payload.getValue() instanceof String) {
+	    	mediaType = MediaType.TEXT;
+	    	formatted = (String) payload.getValue();
+	    } else {
 			boolean isJson = formats.contains(Format.Json) && !formats.contains(Format.Atom);
-            formatted = payload.getFormatter().format(isJson ? Format.Json : Format.Atom, payload.getInlineCount());
+            formatted = payload.getFormatter().format(isJson ? Format.Json : Format.Atom);
 
 			if (isJson) {
 				mediaType = MediaType.APPLICATION_JSON;
@@ -36,7 +35,6 @@ public class ODataResponseTransformer {
 				}
 			}
 		}
-
 
 	    return Message.builder().value(formatted).mediaType(mediaType).build();
 	}

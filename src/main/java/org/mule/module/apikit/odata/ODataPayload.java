@@ -6,80 +6,93 @@
  */
 package org.mule.module.apikit.odata;
 
-import java.util.List;
-
+import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount;
-import org.mule.module.apikit.odata.model.Entry;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.core.api.event.CoreEvent;
 
+import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.ALL_PAGES;
 import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.NONE;
 
-public class ODataPayload {
-	private String content;
-	private List<Entry> entries;
-	private InlineCount inlineCount = NONE;
+public class ODataPayload<T> {
+	private T value;
 	private ODataPayloadFormatter formatter;
 	private int status=200;
+	private CoreEvent muleEvent;
+
+	public ODataPayload(CoreEvent event) {
+		this.muleEvent = event;
+	}
+
+	public ODataPayload(CoreEvent event, T value, int status) {
+		this(event);
+		this.value = value;
+		this.status = status;
+	}
 
 	public int getStatus() {
 		return status;
 	}
 
-	public List<Entry> getEntries() {
-		return entries;
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+	public T getValue() {
+		return value;
+	}
+
+	public void setValue(T value) {
+		this.value = value;
+	}
+
+	public CoreEvent getMuleEvent() {
+		return muleEvent;
+	}
+
+	public void setMuleEvent(CoreEvent muleEvent) {
+		this.muleEvent = muleEvent;
 	}
 
 	public ODataPayloadFormatter getFormatter() {
 		return formatter;
 	}
 
-	public ODataPayload(String content) {
-		this.content = content;
-	}
-
-	public ODataPayload(String content, int status) {
-		this.content = content;
-		this.status = status;
-	}
-
-	public ODataPayload(List<Entry> entries) {
-		this.entries = entries;
-	}
-
-	public ODataPayload(List<Entry> entries, int status) {
-		this.entries = entries;
-		this.status = status;
-	}
-
-	public ODataPayload() {
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public List<Entry> getEntities() {
-		return entries;
-	}
-
-	public void setEntities(List<Entry> entities) {
-		this.entries = entities;
-	}
-
 	public void setFormatter(ODataPayloadFormatter oDataPayloadFormatter) {
 		this.formatter = oDataPayloadFormatter;
 	}
 
-	public void setInlineCount(InlineCount inlineCount) {
-		this.inlineCount = inlineCount;
+	public Integer getInlineCount() {
+		final InlineCount inlineCountParam = getInlineCountParam(muleEvent);
+
+		if (inlineCountParam == ALL_PAGES) {
+			final TypedValue inlineCount = muleEvent.getVariables().get("inlineCount");
+			if (inlineCount != null) {
+				final Object inlineCountValue = inlineCount.getValue();
+
+				if (inlineCountValue instanceof Integer)
+					return (Integer) inlineCountValue;
+
+				if (inlineCountValue instanceof String)
+					return Integer.valueOf((String) inlineCountValue);
+
+				throw new RuntimeException("Unsupported value for 'inlineCount' variable: '" + inlineCountValue + "'");
+			}
+		}
+
+		return null;
 	}
 
-	public InlineCount getInlineCount() {
-		return inlineCount;
-	}
+	private static InlineCount getInlineCountParam(CoreEvent event) {
+		HttpRequestAttributes attributes = ((HttpRequestAttributes) event.getMessage().getAttributes().getValue());
+		final MultiMap<String, String> queryParams = attributes.getQueryParams();
 
+		final String inlineCountParameterValue = queryParams.get("inlinecount");
+
+		if ("allpages".equalsIgnoreCase(inlineCountParameterValue)) return ALL_PAGES;
+
+		return NONE;
+	}
 }

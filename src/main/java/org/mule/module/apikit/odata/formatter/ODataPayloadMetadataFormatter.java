@@ -6,13 +6,13 @@
  */
 package org.mule.module.apikit.odata.formatter;
 
-import java.io.StringWriter;
-import java.io.Writer;
-
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.util.Helper;
 import org.odata4j.edm.EdmDataServices;
 import org.odata4j.format.xml.EdmxFormatWriter;
+
+import java.io.StringWriter;
+import java.io.Writer;
 
 public class ODataPayloadMetadataFormatter extends ODataPayloadFormatter {
 	private OdataMetadataManager odataMetadataManager;
@@ -22,7 +22,7 @@ public class ODataPayloadMetadataFormatter extends ODataPayloadFormatter {
 		this.setSupportsAtom(false);
 	}
 
-	public String format(Format format, InlineCount inlineCount) throws Exception {
+	public String format(Format ignored) throws Exception {
 		Writer w = new StringWriter();
 		EdmDataServices ees = Helper.createMetadata(odataMetadataManager.getEntitySet());
 		EdmxFormatWriter.write(ees, w);

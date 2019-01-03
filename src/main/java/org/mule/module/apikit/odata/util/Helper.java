@@ -18,7 +18,6 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mule.module.apikit.odata.exception.ODataInvalidFlowResponseException;
-import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
@@ -40,7 +39,7 @@ import org.odata4j.producer.Responses;
 
 public class Helper {
 
-	public static EntitiesResponse convertEntriesToOEntries(List<Entry> outputEntries, String entitySetName, EntityDefinitionSet metadata1, InlineCount inlineCount) {
+	public static EntitiesResponse convertEntriesToOEntries(List<Entry> outputEntries, String entitySetName, EntityDefinitionSet metadata1, Integer inlineCount) {
 
 		EdmEntitySet ees = Helper.createMetadata(metadata1).getEdmEntitySet(entitySetName);
 		List<OEntity> entities = new ArrayList<>();
@@ -74,9 +73,7 @@ public class Helper {
 
 		}
 
-		final Integer entitiesCount = inlineCount == ALL_PAGES ? entities.size() : null;
-
-		return Responses.entities(entities, ees, entitiesCount, null);
+		return Responses.entities(entities, ees, inlineCount, null);
 	}
 
 	public static EdmDataServices createMetadata(EntityDefinitionSet metadata) {

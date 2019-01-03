@@ -6,13 +6,6 @@
  */
 package org.mule.module.apikit.odata.formatter;
 
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
-
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 import org.mule.module.apikit.odata.model.Entry;
@@ -22,21 +15,28 @@ import org.odata4j.format.FormatWriter;
 import org.odata4j.format.FormatWriterFactory;
 import org.odata4j.producer.EntitiesResponse;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.List;
+
 public class ODataApiKitFormatter extends ODataPayloadFormatter {
 	private List<Entry> entries;
+	private Integer totalEntitiesCount;
 	private String entityName;
 	private String url;
 	private OdataMetadataManager odataMetadataManager;
 
-	public ODataApiKitFormatter(OdataMetadataManager odataMetadataManager, List<Entry> entities, String entityName, String url) {
+	public ODataApiKitFormatter(OdataMetadataManager odataMetadataManager, String entityName, String url, List<Entry> entities, Integer totalEntitiesCount) {
 		this.odataMetadataManager = odataMetadataManager;
-		this.entries = entities;
 		this.entityName = entityName;
 		this.url = url;
-		this.setSupportsAtom(true);
+		this.entries = entities;
+		this.totalEntitiesCount = totalEntitiesCount;
 	}
 
-	public String format(Format format, InlineCount inlineCount) throws Exception {
+	public String format(Format format) throws Exception {
 		if (Format.Default.equals(format)) {
 			format = Format.Atom;
 		}
@@ -44,7 +44,7 @@ public class ODataApiKitFormatter extends ODataPayloadFormatter {
 				format.name(), null);
 
 		EntityDefinitionSet entitySet = odataMetadataManager.getEntitySet();
-		EntitiesResponse entitiesResponse = Helper.convertEntriesToOEntries(entries, entityName, entitySet, inlineCount);
+		EntitiesResponse entitiesResponse = Helper.convertEntriesToOEntries(entries, entityName, entitySet, totalEntitiesCount);
 
 		StringWriter sw = new StringWriter();
 		UriInfo uriInfo = new UriInfoImpl(url);

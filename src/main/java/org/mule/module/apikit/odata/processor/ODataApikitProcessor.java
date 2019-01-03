@@ -15,7 +15,6 @@ import org.mule.module.apikit.odata.exception.ClientErrorException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFlowResponseException;
 import org.mule.module.apikit.odata.exception.ODataUnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.formatter.ODataApiKitFormatter;
-import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
@@ -43,8 +42,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.ALL_PAGES;
-import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.NONE;
 
 public class ODataApikitProcessor extends ODataRequestProcessor {
 	private String path;
@@ -99,36 +96,24 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		oDataURL = ODataUriHelper.getOdataUrl(oDataURL);
 
 		// invoke flow and validate response
-		ODataPayload oDataPayload = processEntityRequest(event, router, formats);
+		ODataPayload<List<Entry>> oDataPayload = processEntityRequest(event, router, formats);
+        final List<Entry> entries = oDataPayload.getValue();
 
-		if (isEntityCount()) {
-			if (formats.contains(Format.Plain) || formats.contains(Format.Default)) {
-				String count = String.valueOf(oDataPayload.getEntries().size());
-				oDataPayload = new ODataPayload(count,oDataPayload.getStatus());
+        if (isEntityCount()) {
+            if (formats.contains(Format.Plain) || formats.contains(Format.Default)) {
+                String count = String.valueOf(entries.size());
+                return new ODataPayload<String>(oDataPayload.getMuleEvent(), count, oDataPayload.getStatus());
 			} else {
 				throw new ODataUnsupportedMediaTypeException("Unsupported media type requested.");
 			}
 		} else {
-			oDataPayload.setFormatter(new ODataApiKitFormatter(getMetadataManager(), oDataPayload.getEntries(), entity, oDataURL));
+			oDataPayload.setFormatter(new ODataApiKitFormatter(getMetadataManager(), entity, oDataURL, entries, oDataPayload.getInlineCount()));
 		}
-
-		oDataPayload.setInlineCount(getInlineCount(event));
 
 		return oDataPayload;
 	}
 
-	private static ODataPayloadFormatter.InlineCount getInlineCount(CoreEvent event) {
-		HttpRequestAttributes attributes = ((HttpRequestAttributes) event.getMessage().getAttributes().getValue());
-		final MultiMap<String, String> queryParams = attributes.getQueryParams();
-
-		final String inlineCountParameterValue = queryParams.get("$inlinecount");
-
-		if ("allpages".equalsIgnoreCase(inlineCountParameterValue)) return ALL_PAGES;
-
-		return NONE;
-	}
-
-	public ODataPayload processEntityRequest(CoreEvent event, AbstractRouter router, List<Format> formats) throws Exception {
+	public ODataPayload<List<Entry>> processEntityRequest(CoreEvent event, AbstractRouter router, List<Format> formats) throws Exception {
 		List<Entry> entries = new ArrayList<>();
 		HttpRequestAttributes attributes =CoreEventUtils.getHttpRequestAttributes(event);
 		String uri = attributes.getRelativePath();;
@@ -196,7 +181,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		return httpStatus;
 	}
 
-	private ODataPayload verifyFlowResponse(CoreEvent event) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
+	private ODataPayload<List<Entry>> verifyFlowResponse(CoreEvent event) throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
 			OdataMetadataResourceNotFound, OdataMetadataFormatException, ODataInvalidFlowResponseException, ClientErrorException {
 
 		int httpStatus  = checkResponseHttpStatus(event);
@@ -226,7 +211,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 			}
 		}
 
-		return new ODataPayload(entries, httpStatus);
+		return new ODataPayload<>(event, entries, httpStatus);
 	}
 
 

@@ -91,9 +91,9 @@ public class ODataRouterService implements RouterService {
 			ODataPayload odataPayload = odataRequestProcessor.process(event, router, formats);
 
 			// Response transformer
-			Message message = ODataResponseTransformer.transform( odataPayload, formats);
+			Message message = ODataResponseTransformer.transform(odataPayload, formats);
 
-			CoreEvent newEvent  = CoreEvent.builder(event).message(message).addVariable("httpStatus", odataPayload.getStatus()).build();
+			CoreEvent newEvent  = CoreEvent.builder(odataPayload.getMuleEvent()).message(message).addVariable("httpStatus", odataPayload.getStatus()).build();
 			return Mono.just(newEvent);
 		} catch (Exception ex) {
 			return Mono.just(ODataErrorHandler.handle(event, ex, formats));

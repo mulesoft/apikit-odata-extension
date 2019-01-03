@@ -28,7 +28,7 @@ public class ODataServiceDocumentProcessor extends ODataRequestProcessor {
 			
 			String url = getCompleteUrl(CoreEventUtils.getHttpRequestAttributes(event));
 
-			ODataPayload result = new ODataPayload();
+			ODataPayload result = new ODataPayload(event);
 			result.setFormatter(new ServiceDocumentPayloadFormatter(getMetadataManager(), url));
 			return result;
 		} else {

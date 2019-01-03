@@ -24,7 +24,7 @@ public class ODataMetadataProcessor extends ODataRequestProcessor {
 	public ODataPayload process(CoreEvent event, AbstractRouter router, List<Format> formats) throws Exception
 	{
 		if("GET".equalsIgnoreCase(super.oDataContext.getMethod())){
-			ODataPayload oDataPayload = new ODataPayload();
+			ODataPayload oDataPayload = new ODataPayload(event);
 			oDataPayload.setFormatter(new ODataPayloadMetadataFormatter(getMetadataManager()));
 			return oDataPayload;
 		} else{

@@ -6,19 +6,18 @@
  */
 package org.mule.module.apikit.odata.formatter;
 
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Arrays;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
-
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.util.Helper;
 import org.mule.module.apikit.odata.util.UriInfoImpl;
 import org.odata4j.edm.EdmDataServices;
 import org.odata4j.format.FormatWriter;
 import org.odata4j.format.FormatWriterFactory;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Arrays;
 
 public class ServiceDocumentPayloadFormatter extends ODataPayloadFormatter {
 	private final String url;
@@ -30,7 +29,7 @@ public class ServiceDocumentPayloadFormatter extends ODataPayloadFormatter {
 		this.setSupportsAtom(false);
 	}
 
-	public String format(Format format, InlineCount inlineCount) throws Exception {
+	public String format(Format format) throws Exception {
 		if (Format.Default.equals(format)) {
 			format = Format.Atom;
 		}
