@@ -136,10 +136,17 @@ public class BodyToJsonConverter {
 			if (INT64.equals(type)) return object.getLong(key);
 			if (INT16.equals(type) || INT32.equals(type)) return object.getInt(key);
 
-			return object.getString(key);
+			return getString(object.get(key));
 		} catch (final JSONException e) {
 			throw new ODataInvalidFormatException("Invalid format.");
 		}
+	}
+
+	private static String getString(Object object){
+		if(object != null)
+			return object.toString();
+
+		return null;
 	}
 
 	private static boolean isNull(JSONObject object) {
