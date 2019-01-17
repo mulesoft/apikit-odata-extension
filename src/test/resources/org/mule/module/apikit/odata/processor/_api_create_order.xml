@@ -15,6 +15,7 @@
             <d:ShipName>Testing</d:ShipName>
             <d:SmallInt m:type="Edm.Int32">1</d:SmallInt>
             <d:NullValue m:type="Edm.Int32" m:null="true"></d:NullValue>
+            <d:String m:type="Edm.String">111</d:String>
         </m:properties>
     </content>
 </entry>
