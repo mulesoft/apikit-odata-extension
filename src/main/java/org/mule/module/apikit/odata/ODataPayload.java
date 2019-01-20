@@ -87,6 +87,9 @@ public class ODataPayload<T> {
 
 	private static InlineCount getInlineCountParam(CoreEvent event) {
 		HttpRequestAttributes attributes = ((HttpRequestAttributes) event.getMessage().getAttributes().getValue());
+		if(attributes == null)
+			return NONE;
+
 		final MultiMap<String, String> queryParams = attributes.getQueryParams();
 
 		final String inlineCountParameterValue = queryParams.get("inlinecount");
