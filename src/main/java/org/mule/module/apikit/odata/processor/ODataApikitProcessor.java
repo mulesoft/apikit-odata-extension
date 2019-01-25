@@ -15,6 +15,7 @@ import org.mule.module.apikit.odata.exception.ClientErrorException;
 import org.mule.module.apikit.odata.exception.ODataInvalidFlowResponseException;
 import org.mule.module.apikit.odata.exception.ODataUnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.formatter.ODataApiKitFormatter;
+import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
@@ -42,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.ALL_PAGES;
+import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.NONE;
 
 public class ODataApikitProcessor extends ODataRequestProcessor {
 	private String path;
@@ -107,7 +110,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 				throw new ODataUnsupportedMediaTypeException("Unsupported media type requested.");
 			}
 		} else {
-			oDataPayload.setFormatter(new ODataApiKitFormatter(getMetadataManager(), entity, oDataURL, entries, oDataPayload.getInlineCount()));
+			oDataPayload.setFormatter(new ODataApiKitFormatter(getMetadataManager(), entity, oDataURL, entries, oDataPayload.getInlineCount(getInlineCountParam(event))));
 		}
 
 		return oDataPayload;
@@ -241,5 +244,19 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 
 	public void setKeys(Map<String, Object> keys) {
 		this.keys = keys;
+	}
+
+	private static ODataPayloadFormatter.InlineCount getInlineCountParam(CoreEvent event) {
+		HttpRequestAttributes attributes = ((HttpRequestAttributes) event.getMessage().getAttributes().getValue());
+		if(attributes == null)
+			return NONE;
+
+		final MultiMap<String, String> queryParams = attributes.getQueryParams();
+
+		final String inlineCountParameterValue = queryParams.get("$inlinecount");
+
+		if ("allpages".equalsIgnoreCase(inlineCountParameterValue)) return ALL_PAGES;
+
+		return NONE;
 	}
 }
