@@ -100,12 +100,12 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 
 		// invoke flow and validate response
 		ODataPayload<List<Entry>> oDataPayload = processEntityRequest(event, router, formats);
-        final List<Entry> entries = oDataPayload.getValue();
+		final List<Entry> entries = oDataPayload.getValue();
 
-        if (isEntityCount()) {
-            if (formats.contains(Format.Plain) || formats.contains(Format.Default)) {
-                String count = String.valueOf(entries.size());
-                return new ODataPayload<String>(oDataPayload.getMuleEvent(), count, oDataPayload.getStatus());
+		if (isEntityCount()) {
+			if (formats.contains(Format.Plain) || formats.contains(Format.Default)) {
+					String count = String.valueOf(entries.size());
+					return new ODataPayload<String>(oDataPayload.getMuleEvent(), count, oDataPayload.getStatus());
 			} else {
 				throw new ODataUnsupportedMediaTypeException("Unsupported media type requested.");
 			}
