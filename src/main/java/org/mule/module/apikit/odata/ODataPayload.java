@@ -6,15 +6,12 @@
  */
 package org.mule.module.apikit.odata;
 
-import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.ALL_PAGES;
-import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.NONE;
 
 public class ODataPayload<T> {
 	private T value;
@@ -64,8 +61,7 @@ public class ODataPayload<T> {
 		this.formatter = oDataPayloadFormatter;
 	}
 
-	public Integer getInlineCount() {
-		final InlineCount inlineCountParam = getInlineCountParam(muleEvent);
+	public Integer getInlineCount(InlineCount inlineCountParam) {
 
 		if (inlineCountParam == ALL_PAGES) {
 			final TypedValue inlineCount = muleEvent.getVariables().get("inlineCount");
@@ -85,17 +81,4 @@ public class ODataPayload<T> {
 		return null;
 	}
 
-	private static InlineCount getInlineCountParam(CoreEvent event) {
-		HttpRequestAttributes attributes = ((HttpRequestAttributes) event.getMessage().getAttributes().getValue());
-		if(attributes == null)
-			return NONE;
-
-		final MultiMap<String, String> queryParams = attributes.getQueryParams();
-
-		final String inlineCountParameterValue = queryParams.get("inlinecount");
-
-		if ("allpages".equalsIgnoreCase(inlineCountParameterValue)) return ALL_PAGES;
-
-		return NONE;
-	}
 }
