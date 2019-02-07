@@ -134,7 +134,11 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		MultiMap<String, String> httpQueryParams = Helper.queryToMap(query);
 		httpRequestAttributesBuilder.queryParams(httpQueryParams);
 
-		Message message = null;
+		Message message;
+		MultiMap<String,String> headers = new MultiMap<>();
+		headers.put("host", attributes.getRemoteAddress());
+		headers.put("content-type",MediaType.APPLICATION_JSON.toString());
+		httpRequestAttributesBuilder.headers(headers);
 		if (Arrays.asList(methodsWithBody).contains(attributes.getMethod().toUpperCase())) {
 			String payloadAsString = CoreEventUtils.getPayloadAsString(event);
 			if(payloadAsString == null){
@@ -142,10 +146,6 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 			}
 			boolean isXMLFormat = !formats.contains(Format.Json);
 			payloadAsString = BodyToJsonConverter.convertPayload(entity, isXMLFormat, payloadAsString);
-			MultiMap<String,String> headers = new MultiMap<>();
-			headers.put("host", attributes.getRemoteAddress());
-			headers.put("content-type",MediaType.APPLICATION_JSON.toString());
-			httpRequestAttributesBuilder.headers(headers);
 			message = Message.builder().value(payloadAsString).mediaType(MediaType.APPLICATION_JSON).attributesValue(httpRequestAttributesBuilder.build()).build();
 		} else {
 			message = Message.builder(event.getMessage()).attributesValue(httpRequestAttributesBuilder.build()).build();
