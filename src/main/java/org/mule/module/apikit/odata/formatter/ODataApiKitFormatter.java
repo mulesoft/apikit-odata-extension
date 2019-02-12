@@ -34,6 +34,7 @@ public class ODataApiKitFormatter extends ODataPayloadFormatter {
 		this.url = url;
 		this.entries = entities;
 		this.totalEntitiesCount = totalEntitiesCount;
+		this.setSupportsAtom(true);
 	}
 
 	public String format(Format format) throws Exception {
