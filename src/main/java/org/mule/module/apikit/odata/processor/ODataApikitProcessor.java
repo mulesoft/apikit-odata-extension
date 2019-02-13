@@ -117,38 +117,21 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 	}
 
 	public ODataPayload<List<Entry>> processEntityRequest(CoreEvent event, AbstractRouter router, List<Format> formats) throws Exception {
-		List<Entry> entries = new ArrayList<>();
-		HttpRequestAttributes attributes =CoreEventUtils.getHttpRequestAttributes(event);
-		String uri = attributes.getRelativePath();;
-		String basePath = uri.substring(0, uri.toLowerCase().indexOf("/odata.svc"));
-		String httpRequest = basePath + this.path + "?" + this.query;
-		String httpRequestPath = basePath + this.path;
+		HttpRequestAttributes attributes = CoreEventUtils.getHttpRequestAttributes(event);
+    HttpRequestAttributes httpRequestAttributes = getHttpRequestAttributes(attributes);
 
-		
-		HttpRequestAttributesBuilder httpRequestAttributesBuilder =  new HttpRequestAttributesBuilder(attributes);
-		httpRequestAttributesBuilder.requestPath(httpRequestPath);
-		httpRequestAttributesBuilder.requestUri(httpRequest);
-		httpRequestAttributesBuilder.queryString(this.query);
-		httpRequestAttributesBuilder.relativePath(this.path);
+    Message message;
 
-		MultiMap<String, String> httpQueryParams = Helper.queryToMap(query);
-		httpRequestAttributesBuilder.queryParams(httpQueryParams);
-
-		Message message;
-		MultiMap<String,String> headers = new MultiMap<>();
-		headers.put("host", attributes.getRemoteAddress());
-		headers.put("content-type",MediaType.APPLICATION_JSON.toString());
-		httpRequestAttributesBuilder.headers(headers);
-		if (Arrays.asList(methodsWithBody).contains(attributes.getMethod().toUpperCase())) {
+    if (Arrays.asList(methodsWithBody).contains(attributes.getMethod().toUpperCase())) {
 			String payloadAsString = CoreEventUtils.getPayloadAsString(event);
 			if(payloadAsString == null){
 				payloadAsString = "";
 			}
 			boolean isXMLFormat = !formats.contains(Format.Json);
 			payloadAsString = BodyToJsonConverter.convertPayload(entity, isXMLFormat, payloadAsString);
-			message = Message.builder().value(payloadAsString).mediaType(MediaType.APPLICATION_JSON).attributesValue(httpRequestAttributesBuilder.build()).build();
+			message = Message.builder().value(payloadAsString).mediaType(MediaType.APPLICATION_JSON).attributesValue(httpRequestAttributes).build();
 		} else {
-			message = Message.builder(event.getMessage()).attributesValue(httpRequestAttributesBuilder.build()).build();
+			message = Message.builder(event.getMessage()).attributesValue(httpRequestAttributes).build();
 		}
 
 		final CoreEvent odataEvent = CoreEvent.builder(event)
@@ -163,7 +146,35 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 		return verifyFlowResponse(response);
 	}
 
-	private static int checkResponseHttpStatus(CoreEvent response) throws ClientErrorException {
+  private HttpRequestAttributes getHttpRequestAttributes(HttpRequestAttributes attributes) {
+    String uri = attributes.getRelativePath();
+    String basePath = uri.substring(0, uri.toLowerCase().indexOf("/odata.svc"));
+    String httpRequest = basePath + this.path + "?" + this.query;
+    String httpRequestPath = basePath + this.path;
+
+    HttpRequestAttributesBuilder httpRequestAttributesBuilder =  new HttpRequestAttributesBuilder();
+    httpRequestAttributesBuilder.listenerPath(attributes.getListenerPath());
+    httpRequestAttributesBuilder.relativePath(this.path);
+    httpRequestAttributesBuilder.version(attributes.getVersion());
+    httpRequestAttributesBuilder.scheme(attributes.getScheme());
+    httpRequestAttributesBuilder.method(attributes.getMethod());
+    httpRequestAttributesBuilder.requestPath(httpRequestPath);
+    httpRequestAttributesBuilder.requestUri(httpRequest);
+    httpRequestAttributesBuilder.queryString(this.query);
+    httpRequestAttributesBuilder.localAddress(attributes.getLocalAddress());
+    httpRequestAttributesBuilder.remoteAddress(attributes.getRemoteAddress());
+
+    MultiMap<String, String> httpQueryParams = Helper.queryToMap(query);
+    httpRequestAttributesBuilder.queryParams(httpQueryParams);
+
+    MultiMap<String,String> headers = new MultiMap<>();
+    headers.put("host", attributes.getRemoteAddress());
+    headers.put("content-type", MediaType.APPLICATION_JSON.toString());
+    httpRequestAttributesBuilder.headers(headers);
+    return httpRequestAttributesBuilder.build();
+  }
+
+  private static int checkResponseHttpStatus(CoreEvent response) throws ClientErrorException {
 
 		String status = response.getVariables().get("httpStatus").getValue().toString();
 		int httpStatus = 0;

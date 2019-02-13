@@ -37,7 +37,7 @@ public abstract class ODataRequestProcessor {
 	}
 
 	protected String getHost(HttpRequestAttributes attributes) {
-		String host = attributes.getRemoteAddress();
+		String host = attributes.getLocalAddress();
 		return host;
 	}
 

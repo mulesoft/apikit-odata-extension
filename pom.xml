@@ -178,7 +178,7 @@
 		<dependency>
 			<groupId>org.jboss.oreva</groupId>
 			<artifactId>odata-core</artifactId>
-			<version>1.0.0</version>
+			<version>0.8.1</version>
 		</dependency>
 
 		<!-- Commons Lang -->
