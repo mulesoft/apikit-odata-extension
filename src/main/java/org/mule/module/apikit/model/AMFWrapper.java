@@ -248,8 +248,10 @@ public class AMFWrapper {
     private Shape getScalarShape(Shape shape) throws OdataMetadataFieldsException {
         if(shape instanceof UnionShape){
         	UnionShape unionShape = (UnionShape) shape;
+        	List<DomainExtension> annotations = shape.customDomainProperties();
             for(Shape unionSubShape : unionShape.anyOf()){
                 if(unionSubShape instanceof ScalarShape){
+                    unionSubShape.withCustomDomainProperties(annotations);
                     return unionSubShape;
                 }
             }
