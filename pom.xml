@@ -22,7 +22,7 @@
 	<!-- Properties -->
 	<properties>
 		<mule.version>4.1.5-SNAPSHOT</mule.version>
-		<apikit.version>1.2.2-SNAPSHOT</apikit.version>
+		<apikit.version>1.2.5-SNAPSHOT</apikit.version>
 		<mule.plugin.maven.plugin.version>1.2.0-SNAPSHOT</mule.plugin.maven.plugin.version>
 		<amfVersion>3.2.0-SNAPSHOT</amfVersion>
 		<licensePath>LICENSE_HEADER.txt</licensePath>

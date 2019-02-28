@@ -35,17 +35,17 @@ public class ODataRouterService implements RouterService {
 	private static  Logger logger = Logger.getLogger(ODataRouterService.class);
 
 	private static final ExecutorService executorService = Executors.newCachedThreadPool();
+	OdataContext oDataContext;
+
 	static { 
 		System.setProperty("javax.ws.rs.ext.RuntimeDelegate","org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl"); // Workaround for issue while loading class javax.ws.rs.ext.RuntimeDelegate embedded in odata4j
 	}																									  	  // https://stackoverflow.com/questions/30316829/classnotfoundexception-org-glassfish-jersey-internal-runtimedelegateimpl-cannot
 	
 	@Override
-	public Publisher<CoreEvent> process(CoreEvent event, AbstractRouter router, String raml) throws MuleException {
+	public Publisher<CoreEvent> process(CoreEvent event, AbstractRouter router) throws MuleException {
 		logger.debug("Handling odata enabled request.");
 
-		String ramlPath = router.getRaml().getUri();
 		HttpRequestAttributes attributes = CoreEventUtils.getHttpRequestAttributes(event);
-        OdataContext oDataContext = getOdataContext(ramlPath);
 		oDataContext.setMethod(attributes.getMethod());
 		String path = attributes.getRelativePath();
 			
@@ -55,19 +55,18 @@ public class ODataRouterService implements RouterService {
 			return router.processEvent(event);
 		}
 	}
-	
-	private OdataContext getOdataContext(String ramlPath) throws ApikitRuntimeException {
-		OdataContext oDataContext;
 
+	@Override
+	public RouterService initialise(String ramlPath) throws MuleException {
 		try {
-			oDataContext = initializeModel(ramlPath);
+			this.oDataContext=  initializeModel(ramlPath);
+			return this;
 		} catch (OdataMetadataFormatException e) {
 			logger.error(e.getMessage(),e);
 			throw new ApikitRuntimeException(e);
-		}		
-		return oDataContext;
+		}
 	}
-	
+
 	private static OdataContext initializeModel(String ramlPath) throws OdataMetadataFormatException {
 		final OdataMetadataManager odataMetadataManager = new OdataMetadataManager(ramlPath);
 		return new OdataContext(odataMetadataManager);

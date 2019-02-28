@@ -24,46 +24,25 @@ import static org.mule.module.apikit.model.Entity.pluralizeName;
 
 public class OdataMetadataManager {
 
-	private static AMFWrapper apiWrapper = null;
-	private static EntityDefinitionSet entitySet = null;
-	private static final Object lock = new Object();
+	private final AMFWrapper apiWrapper;
+	private final EntityDefinitionSet entitySet;
 	private static  Logger logger = Logger.getLogger(OdataMetadataManager.class);
 
-
 	public OdataMetadataManager(String ramlPath) throws OdataMetadataFormatException {
-		this(ramlPath, false);
-	}
 
-	public OdataMetadataManager(String ramlPath, boolean cleanCache) throws OdataMetadataFormatException {
-		if (cleanCache) cleanCaches();
-
-		if (apiWrapper == null) {
-			synchronized (lock) {
-				if (apiWrapper == null) {
-					try {
-						logger.info("Initializing Odata Metadata");
-						apiWrapper = new AMFWrapper(ramlPath);
-						logger.info("Odata Metadata initialized");
-					} catch (Exception e) {
-						throw new OdataMetadataFormatException(e.getMessage());
-					}
-				}
-			}
+		logger.info("Initializing Odata Metadata");
+		try {
+			apiWrapper = new AMFWrapper(ramlPath);
+			entitySet = apiWrapper.getSchemas();
+		} catch (OdataMetadataFieldsException e) {
+			throw new OdataMetadataFormatException(e.getMessage());
 		}
+		logger.info("Odata Metadata initialized");
 	}
 
-	private void cleanCaches() {
-		apiWrapper = null;
-		entitySet = null;
-	}
 
-	public EntityDefinitionSet getEntitySet() throws OdataMetadataFormatException, OdataMetadataFieldsException {
-		if (entitySet == null) {
-			synchronized (lock) {
-				if (entitySet == null)
-					entitySet = apiWrapper.getSchemas();
-			}
-		}
+
+	public EntityDefinitionSet getEntitySet() {
 		return entitySet;
 	}
 
