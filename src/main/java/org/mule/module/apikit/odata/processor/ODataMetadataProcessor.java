@@ -6,12 +6,12 @@
  */
 package org.mule.module.apikit.odata.processor;
 
+import org.mule.module.apikit.api.spi.AbstractRouter;
 import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ODataMethodNotAllowedException;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.formatter.ODataPayloadMetadataFormatter;
-import org.mule.module.apikit.spi.AbstractRouter;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.List;

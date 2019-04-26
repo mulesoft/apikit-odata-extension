@@ -1,0 +1,19 @@
+#%RAML 1.0 ResourceType
+
+description: A collection resource
+usage: Use this to describe a resource that lists items
+is: [odata.orderby, odata.top, odata.skip, odata.filter, odata.expand, odata.format, odata.select, odata.inlinecount]
+get:
+  description: List of <<model | !pluralize>>
+  responses:
+    200:
+      body:
+        application/json:
+          type: <<model>>[]
+post:
+  description: Create a new <<model>>
+  responses:
+    200:
+      body:
+        application/json:
+          type: <<model>>
