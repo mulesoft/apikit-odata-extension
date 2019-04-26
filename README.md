@@ -1,3 +1,3 @@
-# apikit-odata-service
+# APIKit OData extension
 
-OData extension Service for APIKit v2.0+. 
+Extension module that enable the creation of OData servers using APIKit rest.
