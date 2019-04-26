@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd ">
+    <http:listener-config name="api-for-multiple-model-test-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${serverPort2}" />
+    </http:listener-config>
+    <apikit:config name="api-for-multiple-model-test-config" api="org/mule/module/apikit/odata/api-for-multiple-model-test.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="api-for-multiple-model-test-main">
+        <http:listener config-ref="api-for-multiple-model-test-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="api-for-multiple-model-test-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+                <set-payload value="{ &quot;message&quot;: &quot;Bad request&quot; }" />
+                <set-variable variableName="httpStatus" value="400" />
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+                <set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" />
+                <set-variable variableName="httpStatus" value="404" />
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+                <set-payload value="{ &quot;message&quot;: &quot;Method not allowed&quot; }" />
+                <set-variable variableName="httpStatus" value="405" />
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+                <set-payload value="{ &quot;message&quot;: &quot;Not acceptable&quot; }" />
+                <set-variable variableName="httpStatus" value="406" />
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+                <set-payload value="{ &quot;message&quot;: &quot;Unsupported media type&quot; }" />
+                <set-variable variableName="httpStatus" value="415" />
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+                <set-payload value="{ &quot;message&quot;: &quot;Not Implemented&quot; }" />
+                <set-variable variableName="httpStatus" value="501" />
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="api-for-multiple-model-test-console">
+        <http:listener config-ref="api-for-multiple-model-test-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="api-for-multiple-model-test-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+                <set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" />
+                <set-variable variableName="httpStatus" value="404" />
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\customers\(customerId):application\json:api-for-multiple-model-test-config">
+        <set-variable value="#[attributes.uriParams.customerId]" variableName="customerId" />
+        <logger level="INFO" message="put:\customers\(customerId):application\json:api-for-multiple-model-test-config" />
+    </flow>
+    <flow name="put:\orders\(orderId):application\json:api-for-multiple-model-test-config">
+        <set-variable value="#[attributes.uriParams.orderId]" variableName="orderId" />
+        <logger level="INFO" message="put:\orders\(orderId):application\json:api-for-multiple-model-test-config" />
+    </flow>
+    <flow name="delete:\customers\(customerId):api-for-multiple-model-test-config">
+        <set-variable value="#[attributes.uriParams.customerId]" variableName="customerId" />
+        <logger level="INFO" message="delete:\customers\(customerId):api-for-multiple-model-test-config" />
+    </flow>
+    <flow name="delete:\orders\(orderId):api-for-multiple-model-test-config">
+        <set-variable value="#[attributes.uriParams.orderId]" variableName="orderId" />
+        <logger level="INFO" message="delete:\orders\(orderId):api-for-multiple-model-test-config" />
+    </flow>
+    <flow name="get:\customers\(customerId):api-for-multiple-model-test-config">
+        <set-variable value="#[attributes.uriParams.customerId]" variableName="customerId" />
+        <logger level="INFO" message="get:\customers\(customerId):api-for-multiple-model-test-config" />
+    </flow>
+    <flow name="get:\customers:api-for-multiple-model-test-config">
+        <logger level="INFO" message="get:\customers:api-for-multiple-model-test-config" />
+    </flow>
+    <flow name="get:\orders\(orderId):api-for-multiple-model-test-config">
+        <set-variable value="#[attributes.uriParams.orderId]" variableName="orderId" />
+        <set-payload
+                value="{ &quot;entries&quot; : [{&quot;OrderID&quot;:10248,&quot;ShipName&quot;:&quot;Vins et alcools Chevalier&quot;,&quot;ShipAddress&quot;:&quot;59 rue de l-Abbaye&quot;}] }"
+        />	</flow>
+    <flow name="get:\orders:api-for-multiple-model-test-config">
+        <set-payload
+                value="{ &quot;entries&quot; : [{&quot;OrderID&quot;:10248,&quot;ShipName&quot;:&quot;Vins et alcools Chevalier&quot;,&quot;ShipAddress&quot;:&quot;59 rue de l-Abbaye&quot;}, {&quot;OrderID&quot;:10249,&quot;ShipName&quot;:&quot;Toms Spezialitten&quot;,&quot;ShipAddress&quot;:&quot;Luisenstr. 48&quot;}] }"
+        />	</flow>
+    <flow name="post:\customers:application\json:api-for-multiple-model-test-config">
+        <logger level="INFO" message="post:\customers:application\json:api-for-multiple-model-test-config" />
+    </flow>
+    <flow name="post:\orders:application\json:api-for-multiple-model-test-config">
+        <logger level="INFO" message="post:\orders:application\json:api-for-multiple-model-test-config" />
+    </flow>
+</mule>
