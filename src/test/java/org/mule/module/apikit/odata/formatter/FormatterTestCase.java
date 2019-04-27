@@ -24,7 +24,7 @@ public class FormatterTestCase {
 
     @BeforeClass
     public static void setUp() throws ODataException {
-        final OdataMetadataManager odataMetadataManager = new OdataMetadataManager(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/model-mk.raml"), true);
+        final OdataMetadataManager odataMetadataManager = new OdataMetadataManager(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/model-mk.raml"));
         oDataContext = new OdataContext(odataMetadataManager, "GET");
     }
 

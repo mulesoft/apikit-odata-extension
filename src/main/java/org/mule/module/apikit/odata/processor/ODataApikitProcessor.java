@@ -7,8 +7,10 @@
 package org.mule.module.apikit.odata.processor;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
+import org.mule.module.apikit.api.spi.AbstractRouter;
 import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ClientErrorException;
@@ -28,7 +30,6 @@ import org.mule.module.apikit.odata.model.Entry;
 import org.mule.module.apikit.odata.util.CoreEventUtils;
 import org.mule.module.apikit.odata.util.Helper;
 import org.mule.module.apikit.odata.util.ODataUriHelper;
-import org.mule.module.apikit.spi.AbstractRouter;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.util.MultiMap;

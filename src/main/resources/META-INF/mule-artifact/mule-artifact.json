@@ -5,7 +5,8 @@
   "classLoaderModelLoaderDescriptor": {
     "id": "mule",
     "attributes": {
-      "exportedResources": ["META-INF/services/org.mule.module.apikit.spi.RouterService"
+      "exportedResources": [
+        "META-INF/services/org.mule.module.apikit.api.spi.RouterService"
       ],
       "exportedPackages": ["org.mule.module.apikit.odata"]
     }

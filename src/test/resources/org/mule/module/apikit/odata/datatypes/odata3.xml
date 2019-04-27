@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd ">
+	<http:listener-config name="api-httpListenerConfig">
+		<http:listener-connection host="0.0.0.0" port="${serverPort}" />
+	</http:listener-config>
+	<apikit:config name="api-config" api="org/mule/module/apikit/odata/datatypes/api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<flow name="api-main">
+		<http:listener config-ref="api-httpListenerConfig" path="/api/*">
+			<http:response statusCode="#[vars.httpStatus default 200]">
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:response>
+			<http:error-response statusCode="#[vars.httpStatus default 500]">
+				<http:body>#[payload]</http:body>
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:router config-ref="api-config" />
+		<error-handler>
+			<on-error-propagate type="APIKIT:BAD_REQUEST">
+				<set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+				<set-payload value="{ &quot;message&quot;: &quot;Bad request&quot; }" />
+				<set-variable variableName="httpStatus" value="400" />
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_FOUND">
+				<set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+				<set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" />
+				<set-variable variableName="httpStatus" value="404" />
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+				<set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+				<set-payload value="{ &quot;message&quot;: &quot;Method not allowed&quot; }" />
+				<set-variable variableName="httpStatus" value="405" />
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+				<set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+				<set-payload value="{ &quot;message&quot;: &quot;Not acceptable&quot; }" />
+				<set-variable variableName="httpStatus" value="406" />
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+				<set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+				<set-payload value="{ &quot;message&quot;: &quot;Unsupported media type&quot; }" />
+				<set-variable variableName="httpStatus" value="415" />
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+				<set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+				<set-payload value="{ &quot;message&quot;: &quot;Not Implemented&quot; }" />
+				<set-variable variableName="httpStatus" value="501" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="api-console">
+		<http:listener config-ref="api-httpListenerConfig" path="/console/*">
+			<http:response statusCode="#[vars.httpStatus default 200]">
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:response>
+			<http:error-response statusCode="#[vars.httpStatus default 500]">
+				<http:body>#[payload]</http:body>
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:console config-ref="api-config" />
+		<error-handler>
+			<on-error-propagate type="APIKIT:NOT_FOUND">
+				<set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]" />
+				<set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" />
+				<set-variable variableName="httpStatus" value="404" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="put:\customers\(customerId):application\json:api-config">
+		<set-variable value="#[attributes.uriParams.customerId]" variableName="customerId" />
+		<logger level="INFO" message="put:\customers\(customerId):application\json:api-config" />
+	</flow>
+	<flow name="put:\orders\(orderId):application\json:api-config">
+		<set-variable value="#[attributes.uriParams.orderId]" variableName="orderId" />
+		<logger level="INFO" message="put:\orders\(orderId):application\json:api-config" />
+	</flow>
+	<flow name="delete:\customers\(customerId):api-config">
+		<set-variable value="#[attributes.uriParams.customerId]" variableName="customerId" />
+		<logger level="INFO" message="delete:\customers\(customerId):api-config" />
+	</flow>
+	<flow name="delete:\orders\(orderId):api-config">
+		<set-variable value="#[attributes.uriParams.orderId]" variableName="orderId" />
+		<logger level="INFO" message="delete:\orders\(orderId):api-config" />
+	</flow>
+	<flow name="get:\customers\(customerId):api-config">
+		<set-variable value="#[attributes.uriParams.customerId]" variableName="customerId" />
+		<logger level="INFO" message="get:\customers\(customerId):api-config" />
+	</flow>
+	<flow name="get:\customers:api-config">
+		<logger level="INFO" message="get:\customers:api-config" />
+	</flow>
+	<flow name="get:\orders\(orderId):api-config">
+		<set-variable value="#[attributes.uriParams.orderId]" variableName="orderId" />
+		<set-payload
+				value="{ &quot;entries&quot; : [{&quot;OrderID&quot;:10248,&quot;ShipName&quot;:&quot;Vins et alcools Chevalier&quot;,&quot;ShipAddress&quot;:&quot;59 rue de l-Abbaye&quot;}] }"
+		/>	</flow>
+	<flow name="get:\orders:api-config">
+		<set-payload value="{&quot;entries&quot;:[{&quot;ShipName&quot;:&quot;New Ship Name From Rest&quot;, &quot;OrderID&quot;:11089, &quot;OrderDate&quot;:null}, {&quot;ShipName&quot;:&quot;Maria Anders&quot;, &quot;OrderID&quot;:11103, &quot;OrderDate&quot;:null}, {&quot;ShipName&quot;:&quot;Maria Anders&quot;, &quot;OrderID&quot;:11104, &quot;OrderDate&quot;:null}, {&quot;ShipName&quot;:&quot;Maria Anders&quot;, &quot;OrderID&quot;:11105, &quot;OrderDate&quot;:null}, {&quot;ShipName&quot;:&quot;Maria Anders&quot;, &quot;OrderID&quot;:111111, &quot;OrderDate&quot;:null}, {&quot;ShipName&quot;:&quot;Testing&quot;, &quot;OrderID&quot;:111112, &quot;OrderDate&quot;:null}, {&quot;ShipName&quot;:&quot;updated 2 name From Rest&quot;, &quot;OrderID&quot;:10248, &quot;OrderDate&quot;:&quot;1996-07-04 00:00:00.0&quot;}, {&quot;ShipName&quot;:&quot;Toms Spezialitten&quot;, &quot;OrderID&quot;:10249, &quot;OrderDate&quot;:&quot;1996-07-05 00:00:00.0&quot;}, {&quot;ShipName&quot;:&quot;Hanari Carnes&quot;, &quot;OrderID&quot;:10250, &quot;OrderDate&quot;:&quot;1996-07-08 00:00:00.0&quot;}, {&quot;ShipName&quot;:&quot;Victuailles en stock&quot;, &quot;OrderID&quot;:10251, &quot;OrderDate&quot;:&quot;1996-07-08 00:00:00.0&quot;}, {&quot;ShipName&quot;:&quot;Suprmes dlices&quot;, &quot;OrderID&quot;:10252, &quot;OrderDate&quot;:&quot;1996-07-09 00:00:00.0&quot;}, {&quot;ShipName&quot;:&quot;Hanari Carnes&quot;, &quot;OrderID&quot;:10253, &quot;OrderDate&quot;:&quot;1996-07-10 00:00:00.0&quot;}, {&quot;ShipName&quot;:&quot;Chop-suey Chinese&quot;, &quot;OrderID&quot;:10254, &quot;OrderDate&quot;:&quot;1996-07-11 00:00:00.0&quot;}, {&quot;ShipName&quot;:&quot;Richter Supermarkt&quot;, &quot;OrderID&quot;:10255, &quot;OrderDate&quot;:&quot;1996-07-12 00:00:00.0&quot;}, {&quot;ShipName&quot;:&quot;Wellington Importadora&quot;, &quot;OrderID&quot;:10256, &quot;OrderDate&quot;:&quot;1996-07-15 00:00:00.0&quot;}, {&quot;ShipName&quot;:&quot;HILARION-Abastos&quot;, &quot;OrderID&quot;:10257, &quot;OrderDate&quot;:&quot;1996-07-16 00:00:00.0&quot;}, {&quot;ShipName&quot;:&quot;Ernst Handel&quot;, &quot;OrderID&quot;:10258, &quot;OrderDate&quot;:&quot;1996-07-17 00:00:00.0&quot;}, {&quot;ShipName&quot;:&quot;Centro comercial Moctezuma&quot;, &quot;OrderID&quot;:10259, &quot;OrderDate&quot;:&quot;1996-07-18 00:00:00.0&quot;}, {&quot;ShipName&quot;:&quot;Ottilies Kseladen&quot;, &quot;OrderID&quot;:10260, &quot;OrderDate&quot;:&quot;1996-07-19 00:00:00.0&quot;}, {&quot;ShipName&quot;:&quot;Que Delcia&quot;, &quot;OrderID&quot;:10261, &quot;OrderDate&quot;:&quot;1996-07-19 00:00:00.0&quot;}]}" />
+	</flow>
+	<flow name="post:\customers:application\json:api-config">
+		<logger level="INFO" message="post:\customers:application\json:api-config" />
+	</flow>
+	<flow name="post:\orders:application\json:api-config">
+		<logger level="INFO" message="post:\orders:application\json:api-config" />
+	</flow>
+</mule>

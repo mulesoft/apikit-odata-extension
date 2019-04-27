@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:java="http://www.mulesoft.org/schema/mule/java"
-      xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
       xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+      http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd">
     <http:listener-config name="api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="${serverPort}"/>
     </http:listener-config>
-    <apikit:config name="api-config" api="org/mule/module/apikit/odata/api.raml"
-                   outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus"/>
+    <apikit:config name="api-config" api="org/mule/module/apikit/odata/api.raml" outboundHeadersMapName="outboundHeaders"
+                   httpStatusVarName="httpStatus"/>
     <flow name="api-main">
         <http:listener config-ref="api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -96,43 +97,19 @@
     </flow>
     <flow name="get:\orders\(orderId):api-config">
         <set-variable value="#[attributes.uriParams.orderId]" variableName="orderId"/>
-        <java:invoke-static class="org.mule.module.apikit.processor.SamplesToPayloadTransformer"
-                            method="getJson(String)">
-            <java:args><![CDATA[#[%dw 2.0
-                        output application/java
-                        ---
-                        {
-                            arg0: attributes.requestPath
-                        }]]]>
-            </java:args>
-        </java:invoke-static>
+        <set-payload
+                value="{ &quot;entries&quot; : [{&quot;OrderID&quot;:10248,&quot;ShipName&quot;:&quot;Vins et alcools Chevalier&quot;,&quot;ShipAddress&quot;:&quot;59 rue de l-Abbaye&quot;}] }"
+        />
     </flow>
     <flow name="get:\orders:api-config">
-        <set-variable value="2" variableName="inlineCount"/>
-        <java:invoke-static class="org.mule.module.apikit.processor.SamplesToPayloadTransformer"
-                            method="getJson(String)">
-            <java:args><![CDATA[#[%dw 2.0
-                        output application/java
-                        ---
-                        {
-                            arg0: attributes.requestPath
-                        }]]]>
-            </java:args>
-        </java:invoke-static>
+        <set-payload
+                value="{ &quot;entries&quot; : [{&quot;OrderID&quot;:10248,&quot;ShipName&quot;:&quot;Vins et alcools Chevalier&quot;,&quot;ShipAddress&quot;:&quot;59 rue de l-Abbaye&quot;}, {&quot;OrderID&quot;:10249,&quot;ShipName&quot;:&quot;Toms Spezialitten&quot;,&quot;ShipAddress&quot;:&quot;Luisenstr. 48&quot;}] }"
+        />
     </flow>
     <flow name="post:\customers:application\json:api-config">
         <logger level="INFO" message="post:\customers:application\json:api-config"/>
     </flow>
     <flow name="post:\orders:application\json:api-config">
-        <java:invoke-static class="org.mule.module.apikit.processor.SamplesToPayloadTransformer"
-                            method="getJson(String)">
-            <java:args><![CDATA[#[%dw 2.0
-                        output application/java
-                        ---
-                        {
-                            arg0: attributes.requestPath
-                        }]]]>
-            </java:args>
-        </java:invoke-static>
+        <logger level="INFO" message="post:\orders:application\json:api-config"/>
     </flow>
 </mule>
