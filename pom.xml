@@ -202,7 +202,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.tools</groupId>
+            <groupId>org.mule.apikit</groupId>
             <artifactId>mule-apikit-scaffolder</artifactId>
             <version>${apikit.version}</version>
             <scope>provided</scope>
@@ -314,21 +314,6 @@
             <version>${mule.version}</version>
             <scope>test</scope>
         </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>org.mule.services</groupId>-->
-            <!--<artifactId>mule-service-weave</artifactId>-->
-            <!--<classifier>mule-service</classifier>-->
-            <!--<version>${mule.service.weave.version}</version>-->
-            <!--<scope>test</scope>-->
-            <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.mule.syaml</groupId>-->
-                    <!--<artifactId>syaml_2.12</artifactId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
-            <!--used to get the muleContext in the tests-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-runner</artifactId>
