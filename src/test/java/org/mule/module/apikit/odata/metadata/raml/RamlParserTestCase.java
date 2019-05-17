@@ -7,7 +7,6 @@
 package org.mule.module.apikit.odata.metadata.raml;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -23,119 +22,117 @@ import static org.junit.Assert.assertThat;
 
 public class RamlParserTestCase {
 
-	private RamlParser ramlParser;
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+  private RamlParser ramlParser;
+  private EntityDefinitionSet mockEntitySet;
 
-	private EntityDefinitionSet mockEntitySet;
+  @Before
+  public void setUp() throws Exception {
+    ramlParser = new RamlParser();
+    mockEntitySet = mockEntitySet();
+  }
 
-	@Before
-	public void setUp() throws Exception {
-		ramlParser = new RamlParser();
-		mockEntitySet = mockEntitySet();
-	}
+  private EntityDefinitionSet mockEntitySet() {
+    EntityDefinitionSet newEntitySet = new EntityDefinitionSet();
+    EntityDefinition entityDefinition;
+    entityDefinition = new EntityDefinition("gateways", "gateways");
+    entityDefinition.setHasPrimaryKey(true);
 
-	private EntityDefinitionSet mockEntitySet() {
-		EntityDefinitionSet newEntitySet = new EntityDefinitionSet();
-		EntityDefinition entityDefinition;
-		entityDefinition = new EntityDefinition("gateways", "gateways");
-		entityDefinition.setHasPrimaryKey(true);
-		
-		entityDefinition.addProperty(new EntityDefinitionProperty("id", "Edm.Int32", false, true, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("name", "Edm.String", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("description", "Edm.String", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("status", "Edm.String", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("published", "Edm.Boolean", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("draft", "Edm.Boolean", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("ch_domain", "Edm.String", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("ch_full_domain", "Edm.String", false, false, null, null, null, null, null, null, null));
-		
-		newEntitySet.addEntity(entityDefinition);
+    entityDefinition.addProperty(new EntityDefinitionProperty("id", "Edm.Int32", false, true, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("name", "Edm.String", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("description", "Edm.String", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("status", "Edm.String", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("published", "Edm.Boolean", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("draft", "Edm.Boolean", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("ch_domain", "Edm.String", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("ch_full_domain", "Edm.String", false, false, null, null, null, null, null, null, null));
 
-		entityDefinition = new EntityDefinition("users", "users");
-		entityDefinition.setHasPrimaryKey(true);
-		entityDefinition.addProperty(new EntityDefinitionProperty("id", "Edm.Int32", false, true, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("first_name", "Edm.String", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("last_name", "Edm.String", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("email", "Edm.String", false, false, null, null, null, null, null, null, null));
-		newEntitySet.addEntity(entityDefinition);
+    newEntitySet.addEntity(entityDefinition);
 
-		entityDefinition = new EntityDefinition("odataTypes", "odataTypes");
-		entityDefinition.setHasPrimaryKey(true);
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmString", "Edm.String", false, true, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmBoolean", "Edm.Boolean", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmDouble", "Edm.Double", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmSingle", "Edm.Single", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmBinary", "Edm.Binary", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmDateTime", "Edm.DateTime", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmInt32", "Edm.Int32", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmInt64", "Edm.Int64", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmInt16", "Edm.Int16", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmByte", "Edm.Byte", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmDecimal", "Edm.Decimal", false, false, null, null, null, null, null, "3", "3"));
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmGuid", "Edm.Guid", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmTime", "Edm.Time", false, false, null, null, null, null, null, null, null));
-		entityDefinition.addProperty(new EntityDefinitionProperty("edmDateTimeOffset", "Edm.DateTimeOffset", false, false, null, null, null, null, null, null, null));
-		newEntitySet.addEntity(entityDefinition);
+    entityDefinition = new EntityDefinition("users", "users");
+    entityDefinition.setHasPrimaryKey(true);
+    entityDefinition.addProperty(new EntityDefinitionProperty("id", "Edm.Int32", false, true, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("first_name", "Edm.String", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("last_name", "Edm.String", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("email", "Edm.String", false, false, null, null, null, null, null, null, null));
+    newEntitySet.addEntity(entityDefinition);
 
-		return newEntitySet;
-	}
+    entityDefinition = new EntityDefinition("odataTypes", "odataTypes");
+    entityDefinition.setHasPrimaryKey(true);
+    entityDefinition.addProperty(new EntityDefinitionProperty("edmString", "Edm.String", false, true, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("edmBoolean", "Edm.Boolean", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("edmDouble", "Edm.Double", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("edmSingle", "Edm.Single", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("edmBinary", "Edm.Binary", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("edmDateTime", "Edm.DateTime", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("edmInt32", "Edm.Int32", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("edmInt64", "Edm.Int64", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("edmInt16", "Edm.Int16", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("edmByte", "Edm.Byte", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("edmDecimal", "Edm.Decimal", false, false, null, null, null, null, null, "3", "3"));
+    entityDefinition.addProperty(new EntityDefinitionProperty("edmGuid", "Edm.Guid", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("edmTime", "Edm.Time", false, false, null, null, null, null, null, null, null));
+    entityDefinition.addProperty(new EntityDefinitionProperty("edmDateTimeOffset", "Edm.DateTimeOffset", false, false, null, null, null, null, null, null, null));
+    newEntitySet.addEntity(entityDefinition);
 
-	@Test
-	public void incompleteSchemaTest() throws OdataMetadataFieldsException, OdataMetadataFormatException {
-		thrown.expect(OdataMetadataFieldsException.class);
-		thrown.expectMessage("Property \"nullable\" is missing in field \"draft\" in entity \"gateways\"");
-		ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-incomplete-schema.raml"));
-	}
+    return newEntitySet;
+  }
 
-	@Test
-	public void withoutSchemas() throws OdataMetadataFieldsException, OdataMetadataFormatException {
-		thrown.expect(OdataMetadataFormatException.class);
-		thrown.expectMessage("Type not supported. gateways");
-		ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/without-schemas.raml"));
-	}
+  @Test
+  public void incompleteSchemaTest() throws OdataMetadataFieldsException, OdataMetadataFormatException {
+    thrown.expect(OdataMetadataFieldsException.class);
+    thrown.expectMessage("Property \"nullable\" is missing in field \"draft\" in entity \"gateways\"");
+    ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-incomplete-schema.raml"));
+  }
 
-	@Test
-	public void withSchemasKey() throws OdataMetadataFieldsException, OdataMetadataFormatException {
-		thrown.expect(OdataMetadataFieldsException.class);
-		ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-with-schemas-key.raml"));
-	}
+  @Test
+  public void withoutSchemas() throws OdataMetadataFieldsException, OdataMetadataFormatException {
+    thrown.expect(OdataMetadataFormatException.class);
+    thrown.expectMessage("Type not supported. gateways");
+    ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/without-schemas.raml"));
+  }
 
-	@Test
-	public void schemasMultipleKey() throws OdataMetadataFieldsException, OdataMetadataFormatException {
-		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-multiple-keys.raml"));
-		EntityDefinition entityDefinition = entitySet.toList().get(0);
-		assertThat(entityDefinition, is(getEntityByName("gateways")));
-	}
+  @Test
+  public void withSchemasKey() throws OdataMetadataFieldsException, OdataMetadataFormatException {
+    thrown.expect(OdataMetadataFieldsException.class);
+    ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-with-schemas-key.raml"));
+  }
 
-	@Test
-	public void schemasWithoutProperties() throws OdataMetadataFieldsException, OdataMetadataFormatException {
-		thrown.expect(OdataMetadataFormatException.class);
-		thrown.expectMessage("No schemas found.");
-		ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-without-properties.raml"));
-	}
+  @Test
+  public void schemasMultipleKey() throws OdataMetadataFieldsException, OdataMetadataFormatException {
+    EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-multiple-keys.raml"));
+    EntityDefinition entityDefinition = entitySet.toList().get(0);
+    assertThat(entityDefinition, is(getEntityByName("gateways")));
+  }
 
-	@Test
-	public void testPositive() throws OdataMetadataFieldsException, OdataMetadataFormatException {
-		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/odata.raml"));
-		EntityDefinition entityDefinition = entitySet.toList().get(0);
-		assertThat(entityDefinition, is(getEntityByName("gateways")));
-	}
+  @Test
+  public void schemasWithoutProperties() throws OdataMetadataFieldsException, OdataMetadataFormatException {
+    thrown.expect(OdataMetadataFormatException.class);
+    thrown.expectMessage("No schemas found.");
+    ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-without-properties.raml"));
+  }
 
-	@Test
-	@Ignore("APIMF-1265")
-	public void allowedTypes() throws OdataMetadataFieldsException, OdataMetadataFormatException {
-		EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-allowed-types.raml"));
-		EntityDefinition entityDefinition = entitySet.toList().get(0);
-		assertThat(entityDefinition, is(getEntityByName("odataTypes")));
-	}
+  @Test
+  public void testPositive() throws OdataMetadataFieldsException, OdataMetadataFormatException {
+    EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/odata.raml"));
+    EntityDefinition entityDefinition = entitySet.toList().get(0);
+    assertThat(entityDefinition, is(getEntityByName("gateways")));
+  }
 
-	private EntityDefinition getEntityByName(String name) {
-		for (EntityDefinition entityDefinition : mockEntitySet.toList()) {
-			if (entityDefinition.getName().equals(name)) return entityDefinition;
-		}
+  @Test
+  public void allowedTypes() throws OdataMetadataFieldsException, OdataMetadataFormatException {
+    EntityDefinitionSet entitySet = ramlParser.getEntitiesFromRaml(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/model-allowed-types.raml"));
+    EntityDefinition entityDefinition = entitySet.toList().get(0);
+    assertThat(entityDefinition, is(getEntityByName("odataTypes")));
+  }
 
-		throw new RuntimeException("Entity not found in mock");
-	}
+  private EntityDefinition getEntityByName(String name) {
+    for (EntityDefinition entityDefinition : mockEntitySet.toList()) {
+      if (entityDefinition.getName().equals(name)) return entityDefinition;
+    }
+
+    throw new RuntimeException("Entity not found in mock");
+  }
 
 }
