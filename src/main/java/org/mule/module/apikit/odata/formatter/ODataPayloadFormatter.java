@@ -1,29 +1,29 @@
 /*
- * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright
- * law. All use of this software is subject to MuleSoft's Master Subscription Agreement
- * (or other master license agreement) separately entered into in writing between you and
- * MuleSoft. If such an agreement is not in place, you may not use the software.
+ * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright law. All
+ * use of this software is subject to MuleSoft's Master Subscription Agreement (or other master
+ * license agreement) separately entered into in writing between you and MuleSoft. If such an
+ * agreement is not in place, you may not use the software.
  */
 package org.mule.module.apikit.odata.formatter;
 
 public abstract class ODataPayloadFormatter {
-	public enum Format {
-		Json, Atom, Plain, Default
-	}
+  public enum Format {
+    Json, Atom, Plain, Default
+  }
 
-	public enum InlineCount {
-		ALL_PAGES, NONE
-	}
+  public enum InlineCount {
+    ALL_PAGES, NONE
+  }
 
-	boolean supportsAtom = false;
+  boolean supportsAtom = false;
 
-	abstract public String format(Format format) throws Exception;
+  abstract public String format(Format format) throws Exception;
 
-	public boolean supportsAtom() {
-		return supportsAtom;
-	}
+  public boolean supportsAtom() {
+    return supportsAtom;
+  }
 
-	public void setSupportsAtom(boolean supportsAtom) {
-		this.supportsAtom = supportsAtom;
-	}
+  public void setSupportsAtom(boolean supportsAtom) {
+    this.supportsAtom = supportsAtom;
+  }
 }

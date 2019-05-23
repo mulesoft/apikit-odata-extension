@@ -1,8 +1,8 @@
 /*
- * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright
- * law. All use of this software is subject to MuleSoft's Master Subscription Agreement
- * (or other master license agreement) separately entered into in writing between you and
- * MuleSoft. If such an agreement is not in place, you may not use the software.
+ * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright law. All
+ * use of this software is subject to MuleSoft's Master Subscription Agreement (or other master
+ * license agreement) separately entered into in writing between you and MuleSoft. If such an
+ * agreement is not in place, you may not use the software.
  */
 package org.mule.module.apikit.model;
 
@@ -14,9 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
 import org.mule.module.apikit.model.exception.EntityModelParsingException;
-
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -29,80 +27,81 @@ import freemarker.template.Version;
  */
 public class RamlGenerator {
 
-	private static Configuration fmkCfg;
+  private static Configuration fmkCfg;
 
-	private static Configuration getConfiguration() {
-		if (fmkCfg == null) {
-			fmkCfg = new Configuration();
+  private static Configuration getConfiguration() {
+    if (fmkCfg == null) {
+      fmkCfg = new Configuration();
 
-			// Where do we load the templates from:
-			fmkCfg.setClassForTemplateLoading(RamlGenerator.class, "/");
+      // Where do we load the templates from:
+      fmkCfg.setClassForTemplateLoading(RamlGenerator.class, "/");
 
-			// Some other recommended settings:
-			fmkCfg.setIncompatibleImprovements(new Version(2, 3, 20));
-			fmkCfg.setDefaultEncoding("UTF-8");
-			fmkCfg.setLocale(Locale.US);
-			fmkCfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+      // Some other recommended settings:
+      fmkCfg.setIncompatibleImprovements(new Version(2, 3, 20));
+      fmkCfg.setDefaultEncoding("UTF-8");
+      fmkCfg.setLocale(Locale.US);
+      fmkCfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
-		}
-		return fmkCfg;
-	}
+    }
+    return fmkCfg;
+  }
 
-	public String generate(String filePath) throws IOException, TemplateException, EntityModelParsingException {
-		return generate(EntityModelParser.getEntities(filePath));
-	}
+  public String generate(String filePath)
+      throws IOException, TemplateException, EntityModelParsingException {
+    return generate(EntityModelParser.getEntities(filePath));
+  }
 
-	private String generate(List<Entity> entities) throws IOException, TemplateException {
+  private String generate(List<Entity> entities) throws IOException, TemplateException {
 
-		Map<String, Object> raml = new HashMap<String, Object>();
+    Map<String, Object> raml = new HashMap<String, Object>();
 
-		Configuration cfg = getConfiguration();
+    Configuration cfg = getConfiguration();
 
-		// modify the raml object
-		raml.put("title", "Auto-generated RAML");
-		raml.put("version", "0.1");
-		raml.put("ramlVersion", "1.0");
+    // modify the raml object
+    raml.put("title", "Auto-generated RAML");
+    raml.put("version", "0.1");
+    raml.put("ramlVersion", "1.0");
 
-		List<Map<String, Object>> resources = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> resources = new ArrayList<Map<String, Object>>();
 
-		for (Entity entity : entities) {
-			Map<String, Object> resource = new HashMap<String, Object>();
-			resource.put("name", entity.getName());
-			resource.put("elementName", entity.getElementName());
-			resource.put("collectionName", entity.getCollectionName());
-			resource.put("id", buildKeyForResource(entity));
-			resources.add(resource);
-		}
-		raml.put("resources", resources);
-		Template template = cfg.getTemplate("api-raml-template.ftl");
+    for (Entity entity : entities) {
+      Map<String, Object> resource = new HashMap<String, Object>();
+      resource.put("name", entity.getName());
+      resource.put("elementName", entity.getElementName());
+      resource.put("collectionName", entity.getCollectionName());
+      resource.put("id", buildKeyForResource(entity));
+      resources.add(resource);
+    }
+    raml.put("resources", resources);
+    Template template = cfg.getTemplate("api-raml-template.ftl");
 
-		Writer out = new StringWriter();
-		template.process(raml, out);
+    Writer out = new StringWriter();
+    template.process(raml, out);
 
-		return out.toString();
+    return out.toString();
 
-	}
+  }
 
-	/**
-	 *
-	 * @param entity
-	 * @return {entityId} or key1_{key1}-key2_{key2}-...-keyN_{keyN}
-	 */
-	private String buildKeyForResource(Entity entity) {
-		List<String> keys = entity.getKeys();
-		String ret = "";
-		String delim = "";
-		if (keys.size() > 1) {
-			for (int i = 0; i < keys.size(); i++) {
-				String key = keys.get(i);
-				ret += delim;
-				ret += key + "_{" + key + "}";
-				delim = "-";
-			}
-		} else {
-			ret = "{" + keys.get(0) + "}";
-		}
-		return ret;
-	}
+  /**
+   *
+   * @param entity
+   * @return {entityId} or key1_{key1}-key2_{key2}-...-keyN_{keyN}
+   */
+  private String buildKeyForResource(Entity entity) {
+    List<String> keys = entity.getKeys();
+    String ret = "";
+    String delim = "";
+    if (keys.size() > 1) {
+      for (int i = 0; i < keys.size(); i++) {
+        String key = keys.get(i);
+        ret += delim;
+        ret += key + "_{" + key + "}";
+        delim = "-";
+      }
+    } else {
+      ret = "{" + keys.get(0) + "}";
+    }
+    return ret;
+  }
 
 }
