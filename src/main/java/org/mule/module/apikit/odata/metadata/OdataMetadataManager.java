@@ -12,14 +12,50 @@ import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFou
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
+import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 
-public interface OdataMetadataManager {
-  EntityDefinitionSet getEntitySet();
+import java.util.ArrayList;
+import java.util.List;
 
-  EntityDefinition getEntityByName(String entityName) throws OdataMetadataEntityNotFoundException, OdataMetadataFormatException, OdataMetadataFieldsException;
+import static org.mule.module.apikit.model.Entity.pluralizeName;
 
-  String[] getEntityKeys(String entityName) throws ODataException;
+public abstract class OdataMetadataManager {
 
-  OdataContextVariables getOdataContextVariables(String entity) throws OdataMetadataEntityNotFoundException, OdataMetadataFormatException, OdataMetadataFieldsException;
+  public abstract EntityDefinitionSet getEntitySet();
+
+  public EntityDefinition getEntityByName(String entityName) throws OdataMetadataEntityNotFoundException, OdataMetadataFormatException, OdataMetadataFieldsException {
+    for (EntityDefinition entityDefinition : getEntitySet().toList()) {
+      final String entityDefinitionName = entityDefinition.getName();
+      if (entityDefinitionName.equalsIgnoreCase(entityName) || pluralizeName(entityDefinitionName).equalsIgnoreCase(entityName)) {
+        return entityDefinition;
+      }
+    }
+    throw new OdataMetadataEntityNotFoundException("Entity " + entityName + " not found.");
+  }
+
+
+  public String[] getEntityKeys(String entityName) throws ODataException {
+    return getEntityByName(entityName).getKeys().split(",");
+  }
+
+  public OdataContextVariables getOdataContextVariables(String entity) throws OdataMetadataEntityNotFoundException, OdataMetadataFormatException, OdataMetadataFieldsException {
+    if(entity == null)
+      return null;
+
+    EntityDefinition entityDefinition = this.getEntityByName(entity);
+    OdataContextVariables odata = new OdataContextVariables(entityDefinition.getRemoteEntity(),entityDefinition.getKeys(), getFieldsAsList(entityDefinition.getProperties()));
+
+    return odata;
+  }
+
+  private List<String> getFieldsAsList(List<EntityDefinitionProperty> properties) {
+    List<String> ret = new ArrayList<String>();
+
+    for (EntityDefinitionProperty property : properties) {
+      ret.add(property.getName());
+    }
+
+    return ret;
+  }
 }
