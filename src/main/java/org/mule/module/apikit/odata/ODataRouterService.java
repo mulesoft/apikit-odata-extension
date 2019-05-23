@@ -1,8 +1,8 @@
 /*
- * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright
- * law. All use of this software is subject to MuleSoft's Master Subscription Agreement
- * (or other master license agreement) separately entered into in writing between you and
- * MuleSoft. If such an agreement is not in place, you may not use the software.
+ * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright law. All
+ * use of this software is subject to MuleSoft's Master Subscription Agreement (or other master
+ * license agreement) separately entered into in writing between you and MuleSoft. If such an
+ * agreement is not in place, you may not use the software.
  */
 package org.mule.module.apikit.odata;
 
@@ -38,7 +38,7 @@ public class ODataRouterService extends AbstractODataRouterService implements Ro
   @Override
   public Publisher<CoreEvent> process(CoreEvent event, AbstractRouter router) throws MuleException {
     logger.debug("Handling odata enabled request.");
-    return process(event,router::processEvent);
+    return process(event, router::processEvent);
   }
 
   private static OdataContext initializeModel(String ramlPath) throws OdataMetadataFormatException {

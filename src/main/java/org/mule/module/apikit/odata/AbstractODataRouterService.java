@@ -1,8 +1,8 @@
 /*
- * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright
- * law. All use of this software is subject to MuleSoft's Master Subscription Agreement
- * (or other master license agreement) separately entered into in writing between you and
- * MuleSoft. If such an agreement is not in place, you may not use the software.
+ * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright law. All
+ * use of this software is subject to MuleSoft's Master Subscription Agreement (or other master
+ * license agreement) separately entered into in writing between you and MuleSoft. If such an
+ * agreement is not in place, you may not use the software.
  */
 package org.mule.module.apikit.odata;
 
@@ -17,7 +17,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
-
 import java.util.List;
 
 public abstract class AbstractODataRouterService {
@@ -25,14 +24,16 @@ public abstract class AbstractODataRouterService {
   protected static final String ODATA_SVC_URI_PREFIX = "odata.svc";
 
   static {
-    System.setProperty("javax.ws.rs.ext.RuntimeDelegate", "org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl");
+    System.setProperty("javax.ws.rs.ext.RuntimeDelegate",
+        "org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl");
     // Workaround for issue while loading class javax.ws.rs.ext.RuntimeDelegate embedded in odata4j
     // https://stackoverflow.com/questions/30316829/classnotfoundexception-org-glassfish-jersey-internal-runtimedelegateimpl-cannot
   }
 
   protected abstract OdataContext geODataContext();
 
-  public Publisher<CoreEvent> process(CoreEvent event, AbstractRouterInterface router) throws MuleException {
+  public Publisher<CoreEvent> process(CoreEvent event, AbstractRouterInterface router)
+      throws MuleException {
     OdataContext oDataContext = geODataContext();
     HttpRequestAttributes attributes = CoreEventUtils.getHttpRequestAttributes(event);
     oDataContext.setMethod(attributes.getMethod());
@@ -45,11 +46,13 @@ public abstract class AbstractODataRouterService {
     }
   }
 
-  protected static Publisher<CoreEvent> processODataRequest(HttpRequestAttributes attributes, AbstractRouterInterface router,
-                                                            OdataContext oDataContext, CoreEvent event) throws MuleException {
+  protected static Publisher<CoreEvent> processODataRequest(HttpRequestAttributes attributes,
+      AbstractRouterInterface router, OdataContext oDataContext, CoreEvent event)
+      throws MuleException {
     List<ODataPayloadFormatter.Format> formats = null;
     try {
-      String listenerPath = attributes.getListenerPath().substring(0, attributes.getListenerPath().lastIndexOf("/*"));
+      String listenerPath =
+          attributes.getListenerPath().substring(0, attributes.getListenerPath().lastIndexOf("/*"));
       String path = attributes.getRelativePath().replaceAll(listenerPath, "");
       String query = attributes.getQueryString();
 
@@ -65,9 +68,8 @@ public abstract class AbstractODataRouterService {
       // Response transformer
       Message message = ODataResponseTransformer.transform(odataPayload, formats);
 
-      CoreEvent newEvent =
-        CoreEvent.builder(odataPayload.getMuleEvent()).message(message).addVariable("httpStatus", odataPayload.getStatus())
-          .build();
+      CoreEvent newEvent = CoreEvent.builder(odataPayload.getMuleEvent()).message(message)
+          .addVariable("httpStatus", odataPayload.getStatus()).build();
       return Mono.just(newEvent);
     } catch (Exception ex) {
       return Mono.just(ODataErrorHandler.handle(event, ex, formats));
