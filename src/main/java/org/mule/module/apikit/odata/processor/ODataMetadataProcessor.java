@@ -6,7 +6,7 @@
  */
 package org.mule.module.apikit.odata.processor;
 
-import org.mule.module.apikit.api.spi.AbstractRouter;
+import org.mule.module.apikit.odata.AbstractRouterInterface;
 import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ODataMethodNotAllowedException;
@@ -21,7 +21,7 @@ public class ODataMetadataProcessor extends ODataRequestProcessor {
 		super(odataContext);
 	}
 
-	public ODataPayload process(CoreEvent event, AbstractRouter router, List<Format> formats) throws Exception
+	public ODataPayload process(CoreEvent event, AbstractRouterInterface router, List<Format> formats) throws Exception
 	{
 		if("GET".equalsIgnoreCase(super.oDataContext.getMethod())){
 			ODataPayload oDataPayload = new ODataPayload(event);

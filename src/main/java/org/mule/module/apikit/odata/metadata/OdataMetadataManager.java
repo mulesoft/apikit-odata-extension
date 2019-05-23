@@ -6,8 +6,6 @@
  */
 package org.mule.module.apikit.odata.metadata;
 
-import org.apache.log4j.Logger;
-import org.mule.module.apikit.model.AMFWrapper;
 import org.mule.module.apikit.odata.context.OdataContextVariables;
 import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
@@ -22,61 +20,42 @@ import java.util.List;
 
 import static org.mule.module.apikit.model.Entity.pluralizeName;
 
-public class OdataMetadataManager {
+public abstract class OdataMetadataManager {
 
-	private final AMFWrapper apiWrapper;
-	private final EntityDefinitionSet entitySet;
+  public abstract EntityDefinitionSet getEntitySet();
 
-	private static  Logger logger = Logger.getLogger(OdataMetadataManager.class);
+  public EntityDefinition getEntityByName(String entityName) throws OdataMetadataEntityNotFoundException, OdataMetadataFormatException, OdataMetadataFieldsException {
+    for (EntityDefinition entityDefinition : getEntitySet().toList()) {
+      final String entityDefinitionName = entityDefinition.getName();
+      if (entityDefinitionName.equalsIgnoreCase(entityName) || pluralizeName(entityDefinitionName).equalsIgnoreCase(entityName)) {
+        return entityDefinition;
+      }
+    }
+    throw new OdataMetadataEntityNotFoundException("Entity " + entityName + " not found.");
+  }
 
 
-	public OdataMetadataManager(String ramlPath) throws OdataMetadataFormatException {
-		logger.info("Initializing Odata Metadata");
-		try {
-			apiWrapper = new AMFWrapper(ramlPath);
-			entitySet = apiWrapper.getSchemas();
-		} catch (OdataMetadataFieldsException e) {
-			throw new OdataMetadataFormatException(e.getMessage());
-		}
-		logger.info("Odata Metadata initialized");
-	}
+  public String[] getEntityKeys(String entityName) throws ODataException {
+    return getEntityByName(entityName).getKeys().split(",");
+  }
 
-	public EntityDefinitionSet getEntitySet() {
-		return entitySet;
-	}
+  public OdataContextVariables getOdataContextVariables(String entity) throws OdataMetadataEntityNotFoundException, OdataMetadataFormatException, OdataMetadataFieldsException {
+    if(entity == null)
+      return null;
 
-	public EntityDefinition getEntityByName(String entityName) throws OdataMetadataEntityNotFoundException, OdataMetadataFormatException, OdataMetadataFieldsException {
-		for (EntityDefinition entityDefinition : getEntitySet().toList()) {
-			final String entityDefinitionName = entityDefinition.getName();
-			if (entityDefinitionName.equalsIgnoreCase(entityName) || pluralizeName(entityDefinitionName).equalsIgnoreCase(entityName)) {
-				return entityDefinition;
-			}
-		}
-		throw new OdataMetadataEntityNotFoundException("Entity " + entityName + " not found.");
-	}
+    EntityDefinition entityDefinition = this.getEntityByName(entity);
+    OdataContextVariables odata = new OdataContextVariables(entityDefinition.getRemoteEntity(),entityDefinition.getKeys(), getFieldsAsList(entityDefinition.getProperties()));
 
-	public String[] getEntityKeys(String entityName) throws ODataException {
-		return getEntityByName(entityName).getKeys().split(",");
-	}
+    return odata;
+  }
 
-	public OdataContextVariables getOdataContextVariables(String entity) throws OdataMetadataEntityNotFoundException, OdataMetadataFormatException, OdataMetadataFieldsException {
-		if(entity == null)
-			return null;
+  private List<String> getFieldsAsList(List<EntityDefinitionProperty> properties) {
+    List<String> ret = new ArrayList<String>();
 
-		EntityDefinition entityDefinition = this.getEntityByName(entity);
-		OdataContextVariables odata = new OdataContextVariables(entityDefinition.getRemoteEntity(),entityDefinition.getKeys(), getFieldsAsList(entityDefinition.getProperties()));
+    for (EntityDefinitionProperty property : properties) {
+      ret.add(property.getName());
+    }
 
-		return odata;
-	}
-
-	private List<String> getFieldsAsList(List<EntityDefinitionProperty> properties) {
-		List<String> ret = new ArrayList<String>();
-
-		for (EntityDefinitionProperty property : properties) {
-			ret.add(property.getName());
-		}
-
-		return ret;
-	}
-
+    return ret;
+  }
 }

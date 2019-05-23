@@ -7,10 +7,9 @@
 package org.mule.module.apikit.odata.processor;
 
 import org.apache.commons.lang.StringUtils;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
-import org.mule.module.apikit.api.spi.AbstractRouter;
+import org.mule.module.apikit.odata.AbstractRouterInterface;
 import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ClientErrorException;
@@ -141,7 +140,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
   }
 
   @Override
-  public ODataPayload process(CoreEvent event, AbstractRouter router, List<Format> formats) throws Exception {
+  public ODataPayload process(CoreEvent event, AbstractRouterInterface router, List<Format> formats) throws Exception {
     String oDataURL = getCompleteUrl(CoreEventUtils.getHttpRequestAttributes(event));
 
     // truncate the URL at the entity
@@ -165,7 +164,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
     return oDataPayload;
   }
 
-  public ODataPayload<List<Entry>> processEntityRequest(CoreEvent event, AbstractRouter router, List<Format> formats) throws Exception {
+  public ODataPayload<List<Entry>> processEntityRequest(CoreEvent event, AbstractRouterInterface router, List<Format> formats) throws Exception {
     HttpRequestAttributes attributes = CoreEventUtils.getHttpRequestAttributes(event);
     HttpRequestAttributes httpRequestAttributes = getHttpRequestAttributes(attributes);
 

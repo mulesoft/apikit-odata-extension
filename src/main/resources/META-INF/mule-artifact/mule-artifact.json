@@ -6,9 +6,12 @@
     "id": "mule",
     "attributes": {
       "exportedResources": [
-        "META-INF/services/org.mule.module.apikit.api.spi.RouterService"
+        "META-INF/services/org.mule.module.apikit.api.spi.RouterService",
+        "META-INF/services/org.mule.module.apikit.spi.RouterService"
       ],
-      "exportedPackages": ["org.mule.module.apikit.odata"]
+      "exportedPackages": [
+        "org.mule.module.apikit.odata",
+        "org.mule.module.apikit.odata.backward.compatibility"]
     }
   },
   "bundleDescriptorLoader": {
