@@ -35,7 +35,7 @@ public class OdataMetadataTestCase {
 
 	@Test
 	public void retrieveEntityPositive() throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException, OdataMetadataFormatException {
-		final OdataMetadataManager metadataManager = new OdataMetadataManager(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/datagateway-definition.raml"));
+		final OdataMetadataManager metadataManager = new OdataMetadataManagerImpl(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/datagateway-definition.raml"));
 		Assert.assertEquals(metadataManager.getEntityByName("gateways"), mockEntitySet.toList().get(0));
 	}
 
@@ -44,13 +44,13 @@ public class OdataMetadataTestCase {
 			OdataMetadataEntityNotFoundException {
 		thrown.expect(OdataMetadataEntityNotFoundException.class);
 		thrown.expectMessage("Entity bla not found.");
-		final OdataMetadataManager metadataManager = new OdataMetadataManager(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/datagateway-definition.raml"));
+		final OdataMetadataManager metadataManager = new OdataMetadataManagerImpl(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/metadata/datagateway-definition.raml"));
 		metadataManager.getEntityByName("bla");
 	}
 
 	@Test
 	public void decimalPrecisionAndScaleTestCase() throws Exception {
-		final OdataMetadataManager metadataManager = new OdataMetadataManager(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/decimal-precision.raml"));
+		final OdataMetadataManager metadataManager = new OdataMetadataManagerImpl(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/decimal-precision.raml"));
 		final EntityDefinition myType = metadataManager.getEntityByName("myType");
 		for (EntityDefinitionProperty entityDefinitionProperty : myType.getProperties()) {
 			assertEquals("Edm.Decimal", entityDefinitionProperty.getType());
