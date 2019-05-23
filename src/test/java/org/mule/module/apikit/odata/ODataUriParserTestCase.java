@@ -18,6 +18,7 @@ import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.exception.ODataUnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
+import org.mule.module.apikit.odata.metadata.OdataMetadataManagerImpl;
 import org.mule.module.apikit.odata.processor.ODataApikitProcessor;
 import org.mule.module.apikit.odata.processor.ODataMetadataProcessor;
 import org.mule.module.apikit.odata.processor.ODataRequestProcessor;
@@ -37,7 +38,7 @@ public class ODataUriParserTestCase {
 
   @BeforeClass
   public static void setUp() throws ODataException {
-    final OdataMetadataManager odataMetadataManager = new OdataMetadataManager(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/api-mk.raml"));
+    final OdataMetadataManager odataMetadataManager = new OdataMetadataManagerImpl(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/api-mk.raml"));
     oDataContext = new OdataContext(odataMetadataManager, "GET");
   }
 

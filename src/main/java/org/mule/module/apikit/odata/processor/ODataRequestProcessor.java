@@ -7,7 +7,7 @@
 package org.mule.module.apikit.odata.processor;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.module.apikit.api.spi.AbstractRouter;
+import org.mule.module.apikit.odata.AbstractRouterInterface;
 import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
@@ -24,7 +24,7 @@ public abstract class ODataRequestProcessor {
 		this.oDataContext = oDataContext;
 	}
 
-	public abstract ODataPayload process(CoreEvent event, AbstractRouter router, List<Format> formats) throws Exception;
+	public abstract ODataPayload process(CoreEvent event, AbstractRouterInterface router, List<Format> formats) throws Exception;
 
 	protected OdataMetadataManager getMetadataManager() {
 		return oDataContext.getOdataMetadataManager();

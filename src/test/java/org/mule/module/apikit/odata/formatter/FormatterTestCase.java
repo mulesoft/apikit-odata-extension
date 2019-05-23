@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
+import org.mule.module.apikit.odata.metadata.OdataMetadataManagerImpl;
 import org.mule.module.apikit.odata.util.FileUtils;
 
 import static org.junit.Assert.assertTrue;
@@ -22,7 +23,7 @@ public class FormatterTestCase {
 
   @BeforeClass
   public static void setUp() throws ODataException {
-    final OdataMetadataManager odataMetadataManager = new OdataMetadataManager(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/model-mk.raml"));
+    final OdataMetadataManager odataMetadataManager = new OdataMetadataManagerImpl(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/model-mk.raml"));
     oDataContext = new OdataContext(odataMetadataManager, "GET");
   }
 
