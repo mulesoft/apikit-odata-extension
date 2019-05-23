@@ -19,8 +19,10 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.reactivestreams.Publisher;
 
 /**
- * @AbstractODataRouterService implementation only
- * for backward compatibility purpose.
+ * Router implementation only for backward compatibility purpose.
+ *
+ * @deprecated
+ * @see AbstractODataRouterService
  */
 @Deprecated
 public class ODataRouterService extends AbstractODataRouterService implements RouterService {

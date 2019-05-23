@@ -13,8 +13,10 @@ import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatExcept
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 
 /**
- * @OdataMetadataManager implementation only
- * for backward compatibility purpose.
+ * Singleton implementation only for backward compatibility purpose.
+ *
+ * @deprecated
+ * @see OdataMetadataManager
  */
 @Deprecated
 public class OdataMetadataManagerImpl extends OdataMetadataManager {
