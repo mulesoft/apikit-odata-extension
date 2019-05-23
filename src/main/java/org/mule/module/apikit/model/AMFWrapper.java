@@ -1,8 +1,8 @@
 /*
- * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright
- * law. All use of this software is subject to MuleSoft's Master Subscription Agreement
- * (or other master license agreement) separately entered into in writing between you and
- * MuleSoft. If such an agreement is not in place, you may not use the software.
+ * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright law. All
+ * use of this software is subject to MuleSoft's Master Subscription Agreement (or other master
+ * license agreement) separately entered into in writing between you and MuleSoft. If such an
+ * agreement is not in place, you may not use the software.
  */
 package org.mule.module.apikit.model;
 
@@ -32,15 +32,12 @@ import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_INT64;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_SINGLE;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_STRING;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_TIME;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
 import javax.annotation.Nullable;
-
 import amf.ProfileNames;
 import amf.client.model.document.BaseUnit;
 import amf.client.model.document.Document;
@@ -51,9 +48,7 @@ import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatExcept
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
-
 import com.google.common.base.Strings;
-
 import amf.client.AMF;
 import amf.client.model.document.Module;
 import amf.client.model.domain.DomainElement;
@@ -92,7 +87,8 @@ public class AMFWrapper {
   private Map<String, NodeShape> shapes = new HashMap<String, NodeShape>();
   private EntityDefinitionSet entityDefinitionSet = new EntityDefinitionSet();
 
-  public AMFWrapper(String ramlPath) throws OdataMetadataFormatException, OdataMetadataFieldsException {
+  public AMFWrapper(String ramlPath)
+      throws OdataMetadataFormatException, OdataMetadataFieldsException {
     try {
       initNodeShapesList(ramlPath);
     } catch (ExecutionException | InterruptedException e) {
@@ -105,8 +101,10 @@ public class AMFWrapper {
     }
   }
 
-  private void validateOdataRaml(Raml10Parser parser) throws InterruptedException, ExecutionException, OdataMetadataFieldsException {
-    List<ValidationResult> validationResults = parser.reportValidation(ProfileNames.RAML()).get().results();
+  private void validateOdataRaml(Raml10Parser parser)
+      throws InterruptedException, ExecutionException, OdataMetadataFieldsException {
+    List<ValidationResult> validationResults =
+        parser.reportValidation(ProfileNames.RAML()).get().results();
     if (validationResults.isEmpty()) {
       return;
     }
@@ -117,7 +115,8 @@ public class AMFWrapper {
     throw new OdataMetadataFieldsException(errorMessage);
   }
 
-  private void initNodeShapesList(String ramlPath) throws ExecutionException, InterruptedException, OdataMetadataFieldsException, OdataMetadataFormatException {
+  private void initNodeShapesList(String ramlPath) throws ExecutionException, InterruptedException,
+      OdataMetadataFieldsException, OdataMetadataFormatException {
     nodeShapesList = new ArrayList<>();
 
     Raml10Parser parser = AMF.raml10Parser();
@@ -140,7 +139,8 @@ public class AMFWrapper {
   }
 
 
-  private void addNodeShapes(Module module, boolean throwException) throws OdataMetadataFormatException, OdataMetadataFieldsException {
+  private void addNodeShapes(Module module, boolean throwException)
+      throws OdataMetadataFormatException, OdataMetadataFieldsException {
     for (DomainElement domainElement : module.declares()) {
       if (domainElement instanceof Shape) {
         String remoteName = getAnnotation((Shape) domainElement, NAMESPACE_REMOTE_NAME);
@@ -149,7 +149,8 @@ public class AMFWrapper {
           if (remoteName != null)
             nodeShapesList.add(nodeShape);
           else if (throwException)
-            throw new OdataMetadataFieldsException("Property \"remote name\" is missing in entity " + nodeShape.name());
+            throw new OdataMetadataFieldsException(
+                "Property \"remote name\" is missing in entity " + nodeShape.name());
         } else if (remoteName != null) {
           throw new OdataMetadataFormatException("Type not supported. " + remoteName);
         }
@@ -161,7 +162,8 @@ public class AMFWrapper {
     return entityDefinitionSet;
   }
 
-  private EntityDefinition buildEntityDefinition(NodeShape nodeShape) throws OdataMetadataFormatException, OdataMetadataFieldsException {
+  private EntityDefinition buildEntityDefinition(NodeShape nodeShape)
+      throws OdataMetadataFormatException, OdataMetadataFieldsException {
 
     if (nodeShape.properties().isEmpty()) {
       throw new OdataMetadataFormatException("No schemas found.");
@@ -177,25 +179,31 @@ public class AMFWrapper {
       final Shape shape = getScalarShape(propertyShape.range());
       final String propertyName = propertyShape.name().value();
 
-      notNull("Property \"name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", entityName);
-      notNull("Property \"remote name\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", remoteName);
+      notNull("Property \"name\" is missing in field \"" + propertyName + "\" in entity \""
+          + entityName + "\"", entityName);
+      notNull("Property \"remote name\" is missing in field \"" + propertyName + "\" in entity \""
+          + entityName + "\"", remoteName);
 
       EntityDefinitionProperty entityDefinitionProperty = null;
 
       final String key = getAnnotation(shape, NAMESPACE_KEY_PROPERTY);
-      notNull("Property \"key\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", key);
+      notNull("Property \"key\" is missing in field \"" + propertyName + "\" in entity \""
+          + entityName + "\"", key);
       final boolean isKey = Boolean.valueOf(key);
 
       final String nullable = getAnnotation(shape, NAMESPACE_NULLABLE_PROPERTY);
-      notNull("Property \"nullable\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", nullable);
+      notNull("Property \"nullable\" is missing in field \"" + propertyName + "\" in entity \""
+          + entityName + "\"", nullable);
       final boolean isNullable = Boolean.valueOf(nullable);
 
-      final String defaultValue = (propertyShape.defaultValue() != null ? propertyShape.defaultValue().name().value() : null);
+      final String defaultValue = (propertyShape.defaultValue() != null
+          ? propertyShape.defaultValue().name().value() : null);
       if (shape instanceof ScalarShape) {
         final ScalarShape scalarShape = (ScalarShape) shape;
 
         final String type = getOdataType(scalarShape);
-        notNull("Property \"type\" is missing in field \"" + propertyName + "\" in entity \"" + entityName + "\"", type);
+        notNull("Property \"type\" is missing in field \"" + propertyName + "\" in entity \""
+            + entityName + "\"", type);
 
         String maxLength = null;
         if (EDM_STRING.equals(type)) {
@@ -208,9 +216,11 @@ public class AMFWrapper {
         final String precision = getAnnotation(scalarShape, NAMESPACE_PRECISION_PROPERTY);
         final String scale = getAnnotation(scalarShape, NAMESPACE_SCALE_PROPERTY);
 
-        entityDefinitionProperty = new EntityDefinitionProperty(propertyName, type, isNullable, isKey, defaultValue, maxLength, false, null, false, precision, scale);
+        entityDefinitionProperty = new EntityDefinitionProperty(propertyName, type, isNullable,
+            isKey, defaultValue, maxLength, false, null, false, precision, scale);
       } else if (shape instanceof FileShape) {
-        entityDefinitionProperty = new EntityDefinitionProperty(propertyName, EDM_BINARY, isNullable, isKey, defaultValue, null, false, null, false, null, null);
+        entityDefinitionProperty = new EntityDefinitionProperty(propertyName, EDM_BINARY,
+            isNullable, isKey, defaultValue, null, false, null, false, null, null);
       } else {
         throw new OdataMetadataFieldsException("Type not supported of property " + propertyName);
       }
@@ -256,7 +266,8 @@ public class AMFWrapper {
       return EDM_DATETIMEOFFSET;
     }
 
-    throw new UnsupportedOperationException("Type not supported " + dataType + " of property " + scalarShape.name());
+    throw new UnsupportedOperationException(
+        "Type not supported " + dataType + " of property " + scalarShape.name());
   }
 
   private Shape getScalarShape(Shape shape) throws OdataMetadataFieldsException {
@@ -270,7 +281,8 @@ public class AMFWrapper {
         }
       }
 
-      throw new OdataMetadataFieldsException(format("Property %s cannot be just null.", shape.name()));
+      throw new OdataMetadataFieldsException(
+          format("Property %s cannot be just null.", shape.name()));
     }
     return shape;
   }
@@ -289,7 +301,8 @@ public class AMFWrapper {
         case INT8:
           return EDM_BYTE;
         default:
-          throw new OdataMetadataFieldsException(format("Unexpected format %s for number type.", format));
+          throw new OdataMetadataFieldsException(
+              format("Unexpected format %s for number type.", format));
       }
     }
 

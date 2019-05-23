@@ -1,8 +1,8 @@
 /*
- * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright
- * law. All use of this software is subject to MuleSoft's Master Subscription Agreement
- * (or other master license agreement) separately entered into in writing between you and
- * MuleSoft. If such an agreement is not in place, you may not use the software.
+ * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright law. All
+ * use of this software is subject to MuleSoft's Master Subscription Agreement (or other master
+ * license agreement) separately entered into in writing between you and MuleSoft. If such an
+ * agreement is not in place, you may not use the software.
  */
 
 package org.mule.module.apikit.odata.formatter;
@@ -14,7 +14,6 @@ import org.mule.module.apikit.odata.exception.ODataException;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManagerImpl;
 import org.mule.module.apikit.odata.util.FileUtils;
-
 import static org.junit.Assert.assertTrue;
 
 public class FormatterTestCase {
@@ -23,7 +22,8 @@ public class FormatterTestCase {
 
   @BeforeClass
   public static void setUp() throws ODataException {
-    final OdataMetadataManager odataMetadataManager = new OdataMetadataManagerImpl(FileUtils.getAbsolutePath("org/mule/module/apikit/odata/model-mk.raml"));
+    final OdataMetadataManager odataMetadataManager = new OdataMetadataManagerImpl(
+        FileUtils.getAbsolutePath("org/mule/module/apikit/odata/model-mk.raml"));
     oDataContext = new OdataContext(odataMetadataManager, "GET");
   }
 
@@ -31,7 +31,8 @@ public class FormatterTestCase {
   public void serviceDocumentPayloadFormatter() throws Exception {
     OdataMetadataManager odataMetadataManager = oDataContext.getOdataMetadataManager();
 
-    ServiceDocumentPayloadFormatter formatter = new ServiceDocumentPayloadFormatter(odataMetadataManager, "http://localhost:8081/api/odata.svc");
+    ServiceDocumentPayloadFormatter formatter = new ServiceDocumentPayloadFormatter(
+        odataMetadataManager, "http://localhost:8081/api/odata.svc");
 
     String format = formatter.format(ODataPayloadFormatter.Format.Atom);
     assertTrue(format.contains("<collection href=\"customers\">"));
@@ -45,7 +46,8 @@ public class FormatterTestCase {
   public void payloadMetadataFormatter() throws Exception {
     OdataMetadataManager odataMetadataManager = oDataContext.getOdataMetadataManager();
 
-    ODataPayloadMetadataFormatter formatter = new ODataPayloadMetadataFormatter(odataMetadataManager);
+    ODataPayloadMetadataFormatter formatter =
+        new ODataPayloadMetadataFormatter(odataMetadataManager);
 
     String format = formatter.format(ODataPayloadFormatter.Format.Atom);
     assertTrue(format.contains("<EntityType Name=\"customers\">"));

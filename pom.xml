@@ -42,7 +42,6 @@
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>format</formatterGoal>
         <skipVerifications>false</skipVerifications>
-
     </properties>
 
     <build>

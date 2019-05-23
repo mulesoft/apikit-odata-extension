@@ -1,8 +1,8 @@
 /*
- * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright
- * law. All use of this software is subject to MuleSoft's Master Subscription Agreement
- * (or other master license agreement) separately entered into in writing between you and
- * MuleSoft. If such an agreement is not in place, you may not use the software.
+ * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright law. All
+ * use of this software is subject to MuleSoft's Master Subscription Agreement (or other master
+ * license agreement) separately entered into in writing between you and MuleSoft. If such an
+ * agreement is not in place, you may not use the software.
  */
 package org.mule.module.apikit.odata.exception;
 
@@ -10,7 +10,7 @@ package org.mule.module.apikit.odata.exception;
  * Created by arielsegura on 10/16/15.
  */
 public class ClientErrorException extends ODataException {
-    public ClientErrorException(String message, int httpStatus) {
-        super(message, httpStatus);
-    }
+  public ClientErrorException(String message, int httpStatus) {
+    super(message, httpStatus);
+  }
 }

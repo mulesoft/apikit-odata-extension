@@ -1,8 +1,8 @@
 /*
- * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright
- * law. All use of this software is subject to MuleSoft's Master Subscription Agreement
- * (or other master license agreement) separately entered into in writing between you and
- * MuleSoft. If such an agreement is not in place, you may not use the software.
+ * (c) 2003-2015 MuleSoft, Inc. This software is protected under international copyright law. All
+ * use of this software is subject to MuleSoft's Master Subscription Agreement (or other master
+ * license agreement) separately entered into in writing between you and MuleSoft. If such an
+ * agreement is not in place, you may not use the software.
  */
 package org.mule.module.apikit.odata.backward.compatibility;
 
@@ -37,7 +37,8 @@ public class ODataRouterService extends AbstractODataRouterService implements Ro
   }
 
   @Override
-  public Publisher<CoreEvent> process(CoreEvent event, AbstractRouter router, String ramlPath) throws MuleException {
+  public Publisher<CoreEvent> process(CoreEvent event, AbstractRouter router, String ramlPath)
+      throws MuleException {
     initializeModel(router.getRaml().getUri());
     return process(event, router::processEvent);
   }
@@ -45,7 +46,7 @@ public class ODataRouterService extends AbstractODataRouterService implements Ro
   private void initializeModel(String ramlPath) {
     OdataMetadataManager odataMetadataManager;
     try {
-       odataMetadataManager = new OdataMetadataManagerImpl(ramlPath);
+      odataMetadataManager = new OdataMetadataManagerImpl(ramlPath);
     } catch (OdataMetadataFormatException e) {
       logger.error(e.getMessage(), e);
       throw new ApikitRuntimeException(e);
