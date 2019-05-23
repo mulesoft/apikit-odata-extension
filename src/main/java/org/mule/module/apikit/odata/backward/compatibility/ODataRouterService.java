@@ -18,6 +18,11 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.reactivestreams.Publisher;
 
+/**
+ * @AbstractODataRouterService implementation only
+ * for backward compatibility purpose.
+ */
+@Deprecated
 public class ODataRouterService extends AbstractODataRouterService implements RouterService {
 
   private static Logger logger = Logger.getLogger(ODataRouterService.class);

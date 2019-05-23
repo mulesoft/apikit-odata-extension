@@ -12,6 +12,11 @@ import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 
+/**
+ * @OdataMetadataManager implementation only
+ * for backward compatibility purpose.
+ */
+@Deprecated
 public class OdataMetadataManagerImpl extends OdataMetadataManager {
 	private static EntityDefinitionSet entitySet = null;
 	private static final Object lock = new Object();
