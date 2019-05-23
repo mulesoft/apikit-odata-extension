@@ -36,6 +36,13 @@
         <mule.service.weave.version>2.1.8</mule.service.weave.version>
         <mule.http.service.version>1.1.5</mule.http.service.version>
         <mule.java.module.version>1.2.0</mule.java.module.version>
+
+        <javaFormatter.plugin.version>1.9.0</javaFormatter.plugin.version>
+        <javaVersion>1.8</javaVersion>
+        <formatterConfigPath>formatter.xml</formatterConfigPath>
+        <formatterGoal>format</formatterGoal>
+        <skipVerifications>false</skipVerifications>
+
     </properties>
 
     <build>
@@ -105,6 +112,33 @@
                         <goals>
                             <goal>check</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.marvinformatics.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <version>${javaFormatter.plugin.version}</version>
+                <configuration>
+                    <compilerCompliance>${javaVersion}</compilerCompliance>
+                    <compilerSource>${javaVersion}</compilerSource>
+                    <compilerTargetPlatform>${javaVersion}</compilerTargetPlatform>
+                    <configFile>${basedir}/${formatterConfigPath}</configFile>
+                    <configJsFile>${basedir}/${formatterConfigPath}</configJsFile>
+                    <aggregator>false</aggregator>
+                    <executionRoot>true</executionRoot>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>apply-format</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>${formatterGoal}</goal>
+                        </goals>
+                        <configuration>
+                            <skipFormatting>${skipVerifications}</skipFormatting>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
