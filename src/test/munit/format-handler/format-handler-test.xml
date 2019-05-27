@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+  xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+  <munit:config name="odata-format-handler-test-suite"/>
+
+  <munit:test name="send-accept-application-xml-return-content-type-atom+xml">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="format-handler-server-main"/>
+      <munit:enable-flow-source value="get:\orders:format-handler-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="/api/odata.svc/orders">
+        <http:headers>#[output application/java --- {"Accept" : "application/xml"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/atom+xml')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="send-accept-application-atom+xml-return-content-type-atom+xml">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="format-handler-server-main"/>
+      <munit:enable-flow-source value="get:\orders:format-handler-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="/api/odata.svc/orders">
+        <http:headers>#[output application/java --- {"Accept" : "application/atom+xml"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/atom+xml')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="send-multiple-accept-return--content-type-atom+xml">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="format-handler-server-main"/>
+      <munit:enable-flow-source value="get:\orders:format-handler-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="/api/odata.svc/orders">
+        <http:headers>#[output application/java --- {"Accept" : "application/atom+xml, application/atomsvc+xml, application/xml"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/atom+xml')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="send-accept-json-return-content-type-json">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="format-handler-server-main"/>
+      <munit:enable-flow-source value="get:\orders:format-handler-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="/api/odata.svc/orders">
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/json')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="send-format=json-return-content-type-json">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="format-handler-server-main"/>
+      <munit:enable-flow-source value="get:\orders:format-handler-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="/api/odata.svc/orders?$format=json">
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/json')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="send-format=atom-return-content-type-atom+xml">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="format-handler-server-main"/>
+      <munit:enable-flow-source value="get:\orders:format-handler-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="/api/odata.svc/orders?$format=atom">
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/atom+xml')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="without-format-and-accept-return-content-type-atom+xml">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="format-handler-server-main"/>
+      <munit:enable-flow-source value="get:\orders:format-handler-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="/api/odata.svc/orders">
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/atom+xml')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="get-with-accept-xml-and-format-json-return-json">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="format-handler-server-main"/>
+      <munit:enable-flow-source value="get:\orders:format-handler-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$format=json">
+        <http:headers>#[output application/java --- {"Accept" : "application/xml"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/json')]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="get-with-accept-json-and-format-atom-return-atom+xml">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="format-handler-server-main"/>
+      <munit:enable-flow-source value="get:\orders:format-handler-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$format=atom">
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/atom+xml')]"/>
+    </munit:validation>
+  </munit:test>
+
+</mule>

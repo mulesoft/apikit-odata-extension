@@ -6,12 +6,12 @@
  */
 package org.mule.module.apikit.odata;
 
+import static org.mule.module.apikit.odata.util.CoreEventUtils.getHttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.error.ODataErrorHandler;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter;
 import org.mule.module.apikit.odata.processor.ODataRequestProcessor;
-import org.mule.module.apikit.odata.util.CoreEventUtils;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -35,7 +35,7 @@ public abstract class AbstractODataRouterService {
   public Publisher<CoreEvent> process(CoreEvent event, AbstractRouterInterface router)
       throws MuleException {
     OdataContext oDataContext = geODataContext();
-    HttpRequestAttributes attributes = CoreEventUtils.getHttpRequestAttributes(event);
+    HttpRequestAttributes attributes = getHttpRequestAttributes(event);
     oDataContext.setMethod(attributes.getMethod());
     String path = attributes.getRelativePath();
 

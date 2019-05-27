@@ -45,8 +45,7 @@ public class BodyToJsonConverter {
       Pattern.compile(NAMESPACE_DECLARATION_REGEX);
 
   public static String convertPayload(String entity, boolean isXMLFormat, String payloadAsString)
-      throws ODataBadRequestException, OdataMetadataEntityNotFoundException,
-      OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
+      throws ODataBadRequestException {
     if (isXMLFormat) {
       return adaptBodyToJson(payloadAsString).toString();
     } else {
@@ -101,9 +100,7 @@ public class BodyToJsonConverter {
     return jsonObject;
   }
 
-  private static JSONObject adaptBodyToJson(String body)
-      throws ODataInvalidFormatException, OdataMetadataEntityNotFoundException,
-      OdataMetadataFieldsException, OdataMetadataFormatException, OdataMetadataResourceNotFound {
+  private static JSONObject adaptBodyToJson(String body) throws ODataInvalidFormatException {
     try {
       final JSONObject jsonObject = removeNamespaces(XML.toJSONObject(body), getNamespaces(body));
       final JSONObject entry = jsonObject.getJSONObject("entry");

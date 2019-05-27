@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+      http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+      http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd">
+
+  <apikit:config name="errors-config" api="munit/odata-orders-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus"/>
+
+  <flow name="errors-main">
+    <http:listener config-ref="http-listener-simple" path="/api/*">
+      <http:response statusCode="#[vars.httpStatus default 200]">
+        <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+      </http:response>
+      <http:error-response statusCode="#[vars.httpStatus default 500]">
+        <http:body>#[payload]</http:body>
+        <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+      </http:error-response>
+    </http:listener>
+    <apikit:router config-ref="errors-config"/>
+    <error-handler>
+      <on-error-continue enableNotifications="true" type="ANY">
+        <!-- Storing the error to be checked later in the test -->
+        <munit-tools:store key="errorType">
+          <munit-tools:value>#[error.errorType.namespace ++ ':' ++ error.errorType.identifier]</munit-tools:value>
+        </munit-tools:store>
+        <munit-tools:store key="errorPayload">
+          <munit-tools:value>#[error.errorMessage.payload]</munit-tools:value>
+        </munit-tools:store>
+      </on-error-continue>
+    </error-handler>
+  </flow>
+
+  <flow name="get:\orders:errors-config">
+    <raise-error type="CONNECTIVITY" description="this error should be captured by the main flow's global error handler"/>
+  </flow>
+
+  <!-- propagates an error with a new payload -->
+  <flow name="get:\orders\(orderId):errors-config">
+    <raise-error type="CONNECTIVITY" description="falopaaa"/>
+    <error-handler>
+      <on-error-propagate enableNotifications="true" type="ANY">
+        <set-payload value='#[%dw 2.0 output application/json --- { "message": "Internal Server Error" }]'/>
+      </on-error-propagate>
+    </error-handler>
+  </flow>
+</mule>
