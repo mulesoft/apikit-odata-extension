@@ -11,6 +11,7 @@ import org.mule.module.apikit.model.AMFWrapper;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
+import java.net.URLDecoder;
 
 /**
  * Singleton implementation only for backward compatibility purpose.
@@ -39,7 +40,7 @@ public class OdataMetadataManagerImpl extends OdataMetadataManager {
         if (entitySet == null) {
           try {
             logger.info("Initializing Odata Metadata");
-            AMFWrapper apiWrapper = new AMFWrapper(ramlPath);
+            AMFWrapper apiWrapper = new AMFWrapper(URLDecoder.decode(ramlPath));
             entitySet = apiWrapper.getSchemas();
             logger.info("Odata Metadata initialized");
           } catch (Exception e) {
