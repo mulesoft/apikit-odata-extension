@@ -41,6 +41,19 @@ public class OdataMetadataTestCase {
   }
 
   @Test
+  public void folderWithSpaces() throws OdataMetadataEntityNotFoundException,
+      OdataMetadataFieldsException, OdataMetadataFormatException {
+    OdataMetadataManager metadataManager = new OdataMetadataManagerImpl(FileUtils.getAbsolutePath(
+        "org/mule/module/apikit/odata/metadata/folder with spaces/datagateway-definition.raml"));
+    Assert.assertEquals(metadataManager.getEntityByName("gateways"), mockEntitySet.toList().get(0));
+    metadataManager =
+        new org.mule.module.apikit.odata.backward.compatibility.OdataMetadataManagerImpl(
+            FileUtils.getAbsolutePath(
+                "org/mule/module/apikit/odata/metadata/folder with spaces/datagateway-definition.raml"));
+    Assert.assertEquals(metadataManager.getEntityByName("gateways"), mockEntitySet.toList().get(0));
+  }
+
+  @Test
   public void retrieveEntityNegative() throws OdataMetadataFieldsException,
       OdataMetadataFormatException, OdataMetadataEntityNotFoundException {
     thrown.expect(OdataMetadataEntityNotFoundException.class);
