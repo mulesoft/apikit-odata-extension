@@ -1,0 +1,46 @@
+#%RAML 1.0
+title: testing odata format handler!
+version: 0.1
+mediaType:  application/json
+
+uses:
+  odata: libraries/odataLibrary.raml
+  model: orders-model.raml
+
+resourceTypes:
+  collection:
+    is: [odata.orderby, odata.top, odata.skip, odata.filter, odata.expand, odata.format, odata.select, odata.inlinecount]
+    get:
+      description: List of <<model | !pluralize>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>[]
+    post:
+      description: Create a new <<model>>
+      body:
+        application/json:
+          type: <<model>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>
+
+  member:
+    is: [odata.filter, odata.expand, odata.format, odata.select]
+    get:
+      description: Read <<model>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>
+
+/orders:
+  displayName: orders
+  type: { collection: { model: model.orders } }
+  /{orderId}:
+    displayName: order
+    type: { member: { model: model.orders } }
