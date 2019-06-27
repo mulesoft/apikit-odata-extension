@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+      http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd">
+
+  <apikit:config name="unsuccessful-server-config" api="munit/odata-orders-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus"/>
+
+  <flow name="unsuccessful-server-main">
+    <http:listener config-ref="http-listener-simple" path="/api/*">
+      <http:response statusCode="#[vars.httpStatus default 200]">
+        <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+      </http:response>
+      <http:error-response statusCode="#[vars.httpStatus default 500]">
+        <http:body>#[payload]</http:body>
+        <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+      </http:error-response>
+    </http:listener>
+    <apikit:router config-ref="unsuccessful-server-config"/>
+    <error-handler ref="global-server-error-handler"/>
+
+  </flow>
+
+  <flow name="get:\orders\(orderId):unsuccessful-server-config">
+    <set-variable value="#[attributes.uriParams.orderId]" variableName="orderId"/>
+    <set-payload value='#[
+      %dw 2.0
+      output application/json
+      var pathToOrder = "classpath://munit/example_orders/order_" ++ vars.orderId as String ++ ".json"
+      ---
+      readUrl(pathToOrder, "application/json")
+    ]'/>
+  </flow>
+  <flow name="get:\orders:unsuccessful-server-config">
+    <set-variable value="2" variableName="inlineCount"/>
+    <set-payload value='{ "entries" : [{"OrderID":10248,"ShipName":"Vins et alcools Chevalier","ShipAddress":"59 rue de l-Abbaye"}, {"OrderID":10249,"ShipName":"Toms Spezialitten","ShipAddress":"Luisenstr. 48"}]}'/>
+  </flow>
+  <flow name="post:\orders:application\json:unsuccessful-server-config">
+    <set-payload value='#[
+    %dw 2.0
+    output application/java
+    ---
+    { "entries": [
+      {
+        "OrderID": 10248,
+        "ShipName": "Vins et alcools Chevalier",
+        "ShipAddress": "59 rue de l-Abbaye"
+      },
+      {
+        "OrderID": 10249,
+        "ShipName": "Toms Spezialitten",
+        "ShipAddress": "Luisenstr. 48"
+      }]
+    }]'/>
+  </flow>
+</mule>

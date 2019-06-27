@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+  xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+  <munit:config name="success-requests-test-suite"/>
+
+  <munit:test name="get-entity-collection">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$format=json">
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/json')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[0]]" is="#[MunitTools::equalTo(10248)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[1]]" is="#[MunitTools::equalTo(10249)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="count-entity-collection-result">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders/$count">
+        <http:headers>#[output application/java --- {"Accept" : "text/plain"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- payload]" is="#[MunitTools::equalTo('2')]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="count-entities-without-accept-header-return-content-type-text-plain">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders/$count">
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('text/plain')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload]" is="#[MunitTools::equalTo('2')]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="get-entity-by-id-and-format-json">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders\(orderId):success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders(10248)?$format=json">
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[0]]" is="#[MunitTools::equalTo(10248)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="get-entity-by-id-with-json-format-without-a-field">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders\(orderId):success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders(10249)?$format=json">
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[0]]" is="#[MunitTools::equalTo(10249)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[0].ShipName]" is="#[MunitTools::nullValue()]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="get-entity-by-id-with-atom-format">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders\(orderId):success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders(10248)?$format=atom">
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- payload.feed.entry.content.properties.OrderID]" is="#[MunitTools::equalTo('10248')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/atom+xml')]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="post-xml-entity">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="post:\orders:application\json:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="POST" config-ref="http-requester-simple" path="api/odata.svc/orders">
+        <http:body><![CDATA[#[
+          '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+            <entry xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns="http://www.w3.org/2005/Atom">
+              <title/><updated>2013-09-18T23:46:19.3857256Z</updated><author><name/></author><id/>
+                <content type="application/xml">
+                  <m:properties>
+                    <d:OrderID type="Edm.Int32">20000</d:OrderID>
+                    <d:ShipName>ship-name</d:ShipName>
+                    <d:ShipAddress>ship-address-1</d:ShipAddress>
+                  </m:properties>
+                </content>
+            </entry>']]]>
+        </http:body>
+        <http:headers>#[output application/java --- {"Accept" : "application/xml"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="post-json-entity">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="post:\orders:application\json:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="POST" config-ref="http-requester-simple" path="api/odata.svc/orders">
+        <http:body>#['{"OrderID":20000,"ShipAddress":"ship-address-1","ShipName":"ship-name"}']
+        </http:body>
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="post-json-entity-with-null-values">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="post:\orders:application\json:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="POST" config-ref="http-requester-simple" path="api/odata.svc/orders">
+        <http:body>#['{"OrderID":20000,"ShipAddress":null,"ShipName":"ship-name"}']
+        </http:body>
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="filter-by-entity-field-ShipName">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$filter=ShipName eq 'Toms Spezialitten'">
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="get-with-logical-operators">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$filter=ShipName eq 'pepe' and (ShipName eq 'pepe' or ShipName eq 'pepe')">
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="inlinecount=allpages-return-count-field-in-response">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$format=json&amp;$inlinecount=allpages">
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.'__count']" is="#[MunitTools::equalTo('2')]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="inlinecount=none-return-null-count">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$format=json&amp;$inlinecount=none">
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.'__count']" is="#[MunitTools::nullValue()]"/>
+    </munit:validation>
+  </munit:test>
+
+</mule>

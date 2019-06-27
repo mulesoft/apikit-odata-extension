@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+  xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+  <munit:config name="unsuccessful-requests-test-suite"/>
+
+  <munit:test name="get-with-invalid-format">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="unsuccessful-server-main"/>
+      <munit:enable-flow-source value="get:\orders:unsuccessful-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="/api/odata.svc/orders?$format=atoc">
+        <http:response-validator>
+          <http:success-status-code-validator values="1..500"/>
+        </http:response-validator>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(400)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.error.message]" is="#[MunitTools::equalTo('Incorrect format for \$format argument \'atoc\'.')]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="send-invalid-accept-return-UNSUPPORTED_MEDIA_TYPE">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="unsuccessful-server-main"/>
+      <munit:enable-flow-source value="get:\orders:unsuccessful-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="/api/odata.svc/orders">
+        <http:headers>#[output application/java --- {"Accept" : "application/xol"}]</http:headers>
+        <http:response-validator>
+          <http:success-status-code-validator values="1..500"/>
+        </http:response-validator>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(415)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="get-unknown-resource-return-NOT_FOUND">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="unsuccessful-server-main"/>
+      <munit:enable-flow-source value="get:\orders:unsuccessful-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="/api/odata.svc/ordersssss">
+        <http:response-validator>
+          <http:success-status-code-validator values="1..500"/>
+        </http:response-validator>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(404)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="post-xml-body-with-long-ShipName-return-BAD_REQUEST">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="unsuccessful-server-main"/>
+      <munit:enable-flow-source value="post:\orders:application\json:unsuccessful-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="POST" config-ref="http-requester-simple" path="api/odata.svc/orders">
+        <http:body><![CDATA[#[
+          '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+            <entry xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns="http://www.w3.org/2005/Atom">
+              <title/><updated>2013-09-18T23:46:19.3857256Z</updated><author><name/></author><id/>
+                <content type="application/xml">
+                  <m:properties>
+                    <d:OrderID type="Edm.Int32">20000</d:OrderID>
+                    <d:ShipName>ship-name-1-too-loong</d:ShipName>
+                    <d:ShipAddress>ship-address-1</d:ShipAddress>
+                  </m:properties>
+                </content>
+            </entry>']]]>
+        </http:body>
+        <http:headers>#[output application/java --- {"Accept" : "application/xml"}]</http:headers>
+        <http:response-validator>
+          <http:success-status-code-validator values="1..500"/>
+        </http:response-validator>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(400)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.error.message]" is="#[MunitTools::startsWith('/ShipName expected maxLength: 10, actual: 21')]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="post-json-entity-with-long-ShipName-return-BAD_REQUEST">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="unsuccessful-server-main"/>
+      <munit:enable-flow-source value="post:\orders:application\json:unsuccessful-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="POST" config-ref="http-requester-simple" path="api/odata.svc/orders">
+        <http:body><![CDATA[#['{"OrderID":20000,"ShipAddress":"ship-address-1","ShipName":"ship-name-1"}']]]>
+        </http:body>
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+        <http:response-validator>
+          <http:success-status-code-validator values="1..500"/>
+        </http:response-validator>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(400)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="post-entity-with-invalid-field-OrderID-return-BAD_REQUEST">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="unsuccessful-server-main"/>
+      <munit:enable-flow-source value="post:\orders:application\json:unsuccessful-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="POST" config-ref="http-requester-simple" path="api/odata.svc/orders">
+        <http:body><![CDATA[#[
+          '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+            <entry xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns="http://www.w3.org/2005/Atom">
+              <title/><updated>2013-09-18T23:46:19.3857256Z</updated><author><name/></author><id/>
+                <content type="application/xml">
+                  <m:properties>
+                    <d:OrderID>18.3</d:OrderID>
+                    <d:ShipName>ship-name</d:ShipName>
+                    <d:ShipAddress>ship-address-1</d:ShipAddress>
+                  </m:properties>
+                </content>
+            </entry>']]]>
+        </http:body>
+        <http:headers>#[output application/java --- {"Accept" : "application/xml"}]</http:headers>
+        <http:response-validator>
+          <http:success-status-code-validator values="1..500"/>
+        </http:response-validator>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(400)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.error.message]" is="#[MunitTools::startsWith('/OrderID expected type: Number, found: String')]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="post-entity-with-duplicated-fields-return-BAD_REQUEST">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="unsuccessful-server-main"/>
+      <munit:enable-flow-source value="post:\orders:application\json:unsuccessful-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="POST" config-ref="http-requester-simple" path="api/odata.svc/orders">
+        <http:body><![CDATA[#[
+          '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+            <entry xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns="http://www.w3.org/2005/Atom">
+              <title/><updated>2013-09-18T23:46:19.3857256Z</updated><author><name/></author><id/>
+                <content type="application/xml">
+                  <m:properties>
+                    <d:OrderID type="Edm.Int32">20000</d:OrderID>
+                    <d:ShipName>ship-name</d:ShipName>
+                    <d:ShipName>ship-name</d:ShipName>
+                    <d:ShipAddress>ship-address-1</d:ShipAddress>
+                  </m:properties>
+                </content>
+            </entry>']]]>
+        </http:body>
+        <http:headers>#[output application/java --- {"Accept" : "application/xml"}]</http:headers>
+        <http:response-validator>
+          <http:success-status-code-validator values="1..500"/>
+        </http:response-validator>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(400)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="post-empty-body-return-BAD_REQUEST">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="unsuccessful-server-main"/>
+      <munit:enable-flow-source value="post:\orders:application\json:unsuccessful-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="POST" config-ref="http-requester-simple" path="api/odata.svc/orders">
+        <http:headers>#[output application/java --- {"Accept" : "application/xml"}]</http:headers>
+        <http:response-validator>
+          <http:success-status-code-validator values="1..500"/>
+        </http:response-validator>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(400)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="get-entity-with-unknown-property-return-INTERNAL_SERVER_ERROR">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="unsuccessful-server-main"/>
+      <munit:enable-flow-source value="get:\orders\(orderId):unsuccessful-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders(10250)?$format=json">
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+        <http:response-validator>
+          <http:success-status-code-validator values="1..500"/>
+        </http:response-validator>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(500)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="get-entity-with-invalid-json-return-INTERNAL_SERVER_ERROR">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="unsuccessful-server-main"/>
+      <munit:enable-flow-source value="get:\orders\(orderId):unsuccessful-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders(20248)?$format=json">
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+        <http:response-validator>
+          <http:success-status-code-validator values="1..500"/>
+        </http:response-validator>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(500)]"/>
+    </munit:validation>
+  </munit:test>
+
+</mule>
