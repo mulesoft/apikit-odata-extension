@@ -2,20 +2,15 @@
 uses:
   odata: libraries/odataLibrary.raml
 types:
-  orders:
-    (odata.remote): Orders
+  tickets:
+    (odata.remote): Tickets
     properties:
-      OrderID:
+      TicketID:
         type: integer
         (odata.key): true
         (odata.nullable): false
-      ShipName:
+      TicketName:
         type: string
         (odata.nullable): false
         (odata.key): false
         maxLength: 10
-      ShipAddress:
-        type: nil | string
-        (odata.nullable): true
-        (odata.key): false
-        required: false
