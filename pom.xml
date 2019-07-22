@@ -28,26 +28,27 @@
         <mule.plugin.maven.plugin.version>1.1.6</mule.plugin.maven.plugin.version>
         <amfVersion>3.2.0</amfVersion>
         <licensePath>LICENSE_HEADER.txt</licensePath>
-
-        <rest.assured.version>2.9.0</rest.assured.version>
-        <hamcrest.version>1.3</hamcrest.version>
-        <mule.version>4.1.5</mule.version>
-        <mule.service.scheduler.version>1.1.7</mule.service.scheduler.version>
-        <mule.service.weave.version>2.1.8</mule.service.weave.version>
-        <mule.http.service.version>1.1.5</mule.http.service.version>
-        <mule.java.module.version>1.2.0</mule.java.module.version>
-
         <javaFormatter.plugin.version>1.9.0</javaFormatter.plugin.version>
         <javaVersion>1.8</javaVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>format</formatterGoal>
         <skipVerifications>false</skipVerifications>
-
         <munit.input.directory>src/test/munit</munit.input.directory>
         <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
         <munit.extensions.maven.plugin.version>1.0.0-SNAPSHOT</munit.extensions.maven.plugin.version>
         <munit.version>2.2.0-SNAPSHOT</munit.version>
         <mavenResourcesVersion>3.0.2</mavenResourcesVersion>
+        <jibx-tools.version>1.2.6</jibx-tools.version>
+        <json.version>20160810</json.version>
+        <gson.version>2.3.1</gson.version>
+        <commons-lang.version>2.6</commons-lang.version>
+        <odata-core.version>0.8.1</odata-core.version>
+        <jsonassert.version>1.3.0</jsonassert.version>
+        <junit.version>4.12</junit.version>
+        <cxf-rt-frontend-jaxrs.version>3.2.5</cxf-rt-frontend-jaxrs.version>
+        <reactor-core.version>3.2.0.M1</reactor-core.version>
+        <freemarker.version>2.3.23</freemarker.version>
+        <guava.version>25.1-jre</guava.version>
     </properties>
 
     <build>
@@ -246,12 +247,12 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>25.1-jre</version>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
-            <version>2.3.23</version>
+            <version>${freemarker.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -280,19 +281,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-http</artifactId>
-            <version>${mule.http.service.version}</version>
-            <classifier>mule-service</classifier>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.apikit</groupId>
             <artifactId>mule-apikit-scaffolder</artifactId>
             <version>${apikit.version}</version>
@@ -307,7 +295,7 @@
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
-            <version>3.2.0.M1</version>
+            <version>${reactor-core.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.amlorg</groupId>
@@ -318,32 +306,32 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>3.2.5</version>
+            <version>${cxf-rt-frontend-jaxrs.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.oreva</groupId>
             <artifactId>odata-core</artifactId>
-            <version>0.8.1</version>
+            <version>${odata-core.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
+            <version>${commons-lang.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.3.1</version>
+            <version>${gson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20160810</version>
+            <version>${json.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jibx</groupId>
             <artifactId>jibx-tools</artifactId>
-            <version>1.2.6</version>
+            <version>${jibx-tools.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -356,13 +344,13 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
-            <version>1.3.0</version>
+            <version>${jsonassert.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
