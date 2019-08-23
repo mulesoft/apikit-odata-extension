@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd ">
 
-    <apikit:config name="api-for-multiple-model-test-config" api="org/mule/module/apikit/odata/api-for-multiple-model-test.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="api-for-model-a-test-config" api="munit/odata-orders-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="api-for-model-b-test-config" api="munit/api-for-multiple-model-test.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
 
-    <flow name="multiple-models-server-main">
-        <http:listener config-ref="second-http-listener-simple" path="/api/*">
+    <flow name="multiple-models-b">
+        <http:listener config-ref="http-listener-simple" path="/model-a/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:response>
@@ -13,7 +14,21 @@
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:router config-ref="api-for-multiple-model-test-config"/>
+        <apikit:router config-ref="api-for-model-a-test-config"/>
+        <error-handler ref="global-server-error-handler"/>
+    </flow>
+
+    <flow name="multiple-models-a">
+        <http:listener config-ref="http-listener-simple" path="/model-b/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="api-for-model-b-test-config"/>
         <error-handler ref="global-server-error-handler"/>
     </flow>
 
