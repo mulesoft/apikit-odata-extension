@@ -15,17 +15,17 @@
 
   <munit:test name="multiple-model-test">
     <munit:enable-flow-sources>
-      <munit:enable-flow-source value="metadata-server-main"/>
-      <munit:enable-flow-source value="multiple-models-server-main"/>
+      <munit:enable-flow-source value="multiple-models-a"/>
+      <munit:enable-flow-source value="multiple-models-b"/>
     </munit:enable-flow-sources>
     <munit:execution>
-      <http:request method="GET" config-ref="http-requester-simple" path="/api/odata.svc/$metadata">
+      <http:request method="GET" config-ref="http-requester-simple" path="/model-a/odata.svc/$metadata">
         <http:headers>#[output application/java --- {"Accept" : "application/xml"}]</http:headers>
       </http:request>
       <set-variable value="#[output application/java --- attributes.headers.'Content-type']" variableName="firstModelContentType"/>
       <set-variable value="#[output application/java --- attributes.statusCode]" variableName="firstModelStatusCode"/>
       <set-variable value="#[output application/java --- payload.Edmx.DataServices.Schema.EntityType.@Name]" variableName="firstModelEntityName"/>
-      <http:request method="GET" config-ref="second-http-requester-simple" path="/api/odata.svc/$metadata">
+      <http:request method="GET" config-ref="http-requester-simple" path="/model-b/odata.svc/$metadata">
         <http:headers>#[output application/java --- {"Accept" : "application/xml"}]</http:headers>
       </http:request>
       <set-variable value="#[output application/java --- attributes.headers.'Content-type']" variableName="secondModelContentType"/>

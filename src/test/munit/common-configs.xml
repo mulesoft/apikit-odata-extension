@@ -20,16 +20,6 @@
     <http:listener-connection host="localhost" port="${free.port.simple.http}"/>
   </http:listener-config>
 
-  <munit:dynamic-port propertyName="second.free.port.simple.http" min="1024" max="64000"/>
-
-  <http:request-config name="second-http-requester-simple">
-    <http:request-connection host="localhost" port="${second.free.port.simple.http}" />
-  </http:request-config>
-
-  <http:listener-config name="second-http-listener-simple">
-    <http:listener-connection host="localhost" port="${second.free.port.simple.http}"/>
-  </http:listener-config>
-
   <error-handler name = "global-server-error-handler">
     <on-error-propagate type="APIKIT:BAD_REQUEST">
       <set-variable variableName="outboundHeaders" value="#[{'Content-Type':'application/json'}]"/>
