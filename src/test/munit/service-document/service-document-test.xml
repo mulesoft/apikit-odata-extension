@@ -11,7 +11,16 @@
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
     http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-  <munit:config name="odata-service-document-test-suite"/>
+
+  <munit:config name="odata-service-document-test-suite">
+    <munit:parameterizations>
+      <munit:parameterization name="CLOUDHUB">
+        <munit:parameters>
+          <munit:parameter propertyName="fullDomain" value="ch-https-41-demo.au-s1.cloudhub.io"/>
+        </munit:parameters>
+      </munit:parameterization>
+    </munit:parameterizations>
+  </munit:config>
 
   <munit:test name="service-document-json">
     <munit:enable-flow-sources>
@@ -42,6 +51,7 @@
       <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/xml')]"/>
       <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
       <munit-tools:assert-that expression="#[output application/java --- payload.service.workspace.collection.title]" is="#[MunitTools::equalTo('orders')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.service.@base]" is="#[MunitTools::equalTo('http://ch-https-41-demo.au-s1.cloudhub.io/api/odata.svc')]"/>
     </munit:validation>
   </munit:test>
 
