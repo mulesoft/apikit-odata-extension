@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+  xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+  <munit:config name="mysql-example-test-suite"/>
+
+  <munit:test name="get-entity-collection-as-json">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="mysql-example-api-main"/>
+      <munit:enable-flow-source value="get:\orders:mysql-example-api-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$format=json">
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/json')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="get-entity-collection">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="mysql-example-api-main"/>
+      <munit:enable-flow-source value="get:\orders:mysql-example-api-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$format=atom">
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/atom+xml')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="get-entity">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="mysql-example-api-main"/>
+      <munit:enable-flow-source value="get:\orders:mysql-example-api-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders(OrderID=10248,ShipName='updated 2 name From Rest')">
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/atom+xml')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.feed.entry.content.properties.Priority]" is="#[MunitTools::equalTo('1')]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="post-entity">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="mysql-example-api-main"/>
+      <munit:enable-flow-source value="post:\orders:application\json:mysql-example-api-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="POST" config-ref="http-requester-simple" path="api/odata.svc/orders">
+        <http:body><![CDATA[
+          <?xml version="1.0" encoding="utf-8" standalone="yes"?>
+          <entry xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns="http://www.w3.org/2005/Atom">
+            <title />
+            <updated>2013-09-18T23:46:19.3857256Z</updated>
+            <author>
+              <name />
+            </author>
+            <id />
+            <content type="application/xml">
+              <m:properties>
+                <d:OrderID type="Edm.Int32">20000</d:OrderID>
+                <d:ShipName>ship-name</d:ShipName>
+                <d:ShipAddress>ship-address-1</d:ShipAddress>
+              </m:properties>
+            </content>
+          </entry>]]>
+        </http:body>
+        <http:headers>
+          #[output application/java --- { "content-type" : "application/xml" } ]
+        </http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/atom+xml')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.feed.entry.content.properties.ShipName]" is="#[MunitTools::equalTo('ship-name')]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="post-entity-as-json">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="mysql-example-api-main"/>
+      <munit:enable-flow-source value="post:\customers:application\json:mysql-example-api-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="POST" config-ref="http-requester-simple" path="api/odata.svc/customers">
+        <http:body><![CDATA[
+        {
+            "ContactName": "Juan Brasca",
+            "ContactTitle": "Ing.",
+            "CustomerID": "JAB",
+            "CompanyName":"Juanchi Inc."
+        }]]>
+        </http:body>
+        <http:headers>
+          #[output application/java --- { "content-type" : "application/json", "Accept" : "application/json" } ]
+        </http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/json')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results[0].CustomerID]" is="#[MunitTools::equalTo('JAB')]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="put-entity-as-json">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="mysql-example-api-main"/>
+      <munit:enable-flow-source value="put:\customers\(CustomerID):application\json:mysql-example-api-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="PUT" config-ref="http-requester-simple" path="api/odata.svc/customers('ANATR')">
+        <http:body><![CDATA[
+        {
+          "ContactName": "Helados",
+          "ContactTitle": "Owner",
+          "CustomerID": "ANATR",
+          "CompanyName":"Ana Trujillo"
+        }]]>
+        </http:body>
+        <http:headers>
+          #[output application/java --- { "content-type" : "application/json" } ]
+        </http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(204)]"/>
+    </munit:validation>
+  </munit:test>
+</mule>
