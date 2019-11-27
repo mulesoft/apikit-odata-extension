@@ -28,7 +28,7 @@
         <mule.plugin.maven.plugin.version>1.1.6</mule.plugin.maven.plugin.version>
         <amfVersion>3.2.0</amfVersion>
         <licensePath>LICENSE_HEADER.txt</licensePath>
-        <javaFormatter.plugin.version>1.9.0</javaFormatter.plugin.version>
+        <javaFormatter.plugin.version>1.9.2</javaFormatter.plugin.version>
         <javaVersion>1.8</javaVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>format</formatterGoal>
