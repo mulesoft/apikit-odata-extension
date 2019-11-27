@@ -48,7 +48,7 @@
         <jsonassert.version>1.5.0</jsonassert.version>
         <junit.version>4.12</junit.version>
         <cxf-rt-frontend-jaxrs.version>3.3.4</cxf-rt-frontend-jaxrs.version>
-        <reactor-core.version>3.2.0.M1</reactor-core.version>
+        <reactor-core.version>3.3.1.RELEASE</reactor-core.version>
         <freemarker.version>2.3.29</freemarker.version>
         <guava.version>25.1-jre</guava.version>
     </properties>
