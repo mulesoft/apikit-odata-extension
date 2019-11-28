@@ -47,7 +47,7 @@
         <odata-core.version>0.8.1</odata-core.version>
         <jsonassert.version>1.3.0</jsonassert.version>
         <junit.version>4.12</junit.version>
-        <cxf-rt-frontend-jaxrs.version>3.2.5</cxf-rt-frontend-jaxrs.version>
+        <cxf-rt-frontend-jaxrs.version>3.3.4</cxf-rt-frontend-jaxrs.version>
         <reactor-core.version>3.2.0.M1</reactor-core.version>
         <freemarker.version>2.3.23</freemarker.version>
         <guava.version>25.1-jre</guava.version>
