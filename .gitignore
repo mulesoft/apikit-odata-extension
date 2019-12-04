@@ -10,5 +10,3 @@ target
 build.log
 .mule
 /target/
-src/test/resources/valid/app/api.xml
-src/test/resources/mysql-example/data/
