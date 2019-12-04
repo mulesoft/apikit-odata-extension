@@ -13,7 +13,8 @@
 
   <munit:config name="errors-test-suite"/>
 
-  <munit:test name="on-error-continue-on-main-flow-error-handler">
+  <!--TODO : Ignore until APIKIT-2517 gets resolved-->
+  <munit:test name="on-error-continue-on-main-flow-error-handler" ignore="#[true]">
     <munit:enable-flow-sources>
       <munit:enable-flow-source value="errors-main"/>
       <munit:enable-flow-source value="get:\orders:errors-config"/>

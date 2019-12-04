@@ -12,15 +12,14 @@
  */
 package org.mule.module.apikit.model;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mule.tools.apikit.model.RuntimeEdition;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author arielsegura
@@ -36,8 +35,6 @@ public class ODataScaffolderServiceTestCase {
   @Before
   public void setUp() throws Exception {
     scaffolder = new ODataScaffolderService();
-    File api = getResource("valid/app/api.xml");
-    api.delete();
   }
 
   private File getResource(String path) {
@@ -47,47 +44,28 @@ public class ODataScaffolderServiceTestCase {
 
   @Test
   public void scaffoldPositive() {
-    File api = getResource("valid/app/api.xml");
-    Assert.assertFalse(api.exists());
-    List<File> ramlFiles = new ArrayList<File>();
     File model = getResource("valid/api/odata.raml");
-    File appDir = getResource("valid/app");
-    File domainDir = getResource("valid/domain");
-    ramlFiles.add(model);
-    scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "4.0.0", RuntimeEdition.EE);
-    api = getResource("valid/app/api.xml");
-    Assert.assertTrue(api.exists());
+    File api = scaffolder.generateApi(model);
+    assertTrue(api.exists());
   }
 
   @Test
   public void scaffoldNegative() {
-    File api = getResource("valid/app/api.xml");
-    Assert.assertFalse(api.exists());
-    List<File> ramlFiles = new ArrayList<File>();
-    File modelJson = getResource("invalid/api/odata.raml");
-    File appDir = getResource("invalid/app");
-    File domainDir = getResource("invalid/domain");
-    ramlFiles.add(modelJson);
-    thrown.expect(RuntimeException.class);
-    scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "4.0.0", RuntimeEdition.EE);
-    api = getResource("valid/app/api.xml");
-    Assert.assertFalse(api.exists());
+    File model = getResource("invalid/api/odata.raml");
+    try {
+      scaffolder.generateApi(model);
+    } catch (Exception e) {
+      assertEquals("Error: Property \"remote name\" is missing in entity Employee", e.getMessage());
+    }
   }
-
 
   @Test
   public void noKeyError() {
-    File api = getResource("valid/app/api.xml");
-    Assert.assertFalse(api.exists());
-    List<File> ramlFiles = new ArrayList<File>();
-    File modelJson = getResource("nokeyerror/api/odata.raml");
-    File appDir = getResource("invalid/app");
-    File domainDir = getResource("invalid/domain");
-    ramlFiles.add(modelJson);
+    File model = getResource("nokeyerror/api/odata.raml");
     try {
-      scaffolder.executeScaffolder(ramlFiles, appDir, domainDir, "4.0.0", RuntimeEdition.EE);
+      scaffolder.generateApi(model);
     } catch (Exception e) {
-      Assert.assertEquals("Error: Entity defition must have a primary key.", e.getMessage());
+      assertEquals("Error: Entity defition must have a primary key.", e.getMessage());
     }
   }
 
