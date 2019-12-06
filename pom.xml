@@ -21,7 +21,7 @@
 
     <!-- Properties -->
     <properties>
-        <mule.version>4.2.2</mule.version>
+        <mule.version>4.1.5</mule.version>
         <apikit.version>2.0.0-SNAPSHOT</apikit.version>
         <apikit.spi.version>1.3.0</apikit.spi.version>
         <muleHttpConnector>1.5.11</muleHttpConnector>
