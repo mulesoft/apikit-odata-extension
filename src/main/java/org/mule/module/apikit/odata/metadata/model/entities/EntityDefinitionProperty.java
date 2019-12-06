@@ -47,31 +47,22 @@ public class EntityDefinitionProperty implements Comparable<EntityDefinitionProp
   public String toJsonString() {
     StringBuilder ret = new StringBuilder("{");
 
-    ret.append("\"name:\"" + this.name + "\",");
-    ret.append("\"type:\"" + this.type + "\",");
-    ret.append("\"nullable:\"" + this.nullable + "\",");
-    ret.append("\"key:\"" + this.key + "\",");
+    ret.append("\"name\":\"" + this.name + "\",");
+    ret.append("\"type\":\"" + this.type + "\",");
+    ret.append("\"nullable\":\"" + this.nullable + "\",");
+    ret.append("\"key\":\"" + this.key + "\",");
 
     if (this.defaultValue != null) {
-      ret.append("\"defaultValue:\"" + this.defaultValue + "\",");
+      ret.append("\"defaultValue\":\"" + this.defaultValue + "\",");
     }
     if (this.maxLength != null) {
-      ret.append("\"maxLength:\"" + this.maxLength + "\",");
+      ret.append("\"maxLength\":\"" + this.maxLength + "\",");
     }
-    //		if (this.fixedLength != null) {
-    //			ret.append("\"fixedLength:\"" + this.fixedLength + "\",");
-    //		}
-    //		if (this.collation != null) {
-    //			ret.append("\"collation:\"" + this.collation + "\",");
-    //		}
-    //		if (this.unicode != null) {
-    //			ret.append("\"unicode:\"" + this.unicode + "\",");
-    //		}
     if (this.precision != null) {
-      ret.append("\"precision:\"" + this.precision + "\",");
+      ret.append("\"precision\"\":" + this.precision + "\",");
     }
     if (this.scale != null) {
-      ret.append("\"scale:\"" + this.scale + "\",");
+      ret.append("\"scale\":\"" + this.scale + "\",");
     }
 
     ret.append("}");

@@ -7,6 +7,7 @@
 package org.mule.module.apikit.odata.metadata;
 
 import junit.framework.Assert;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,7 +19,12 @@ import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 import org.mule.module.apikit.odata.util.FileUtils;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class OdataMetadataTestCase {
 
@@ -74,6 +80,21 @@ public class OdataMetadataTestCase {
 
   }
 
+  @Test
+  public void entityDefinitionSetToJsonTest() {
+    JSONObject jsonObject = new JSONObject(mockEntitySet.toJsonString());
+    assertTrue(!jsonObject.isEmpty());
+  }
+
+  @Test
+  public void entityDefinitionSetUniquenessTest() {
+    HashSet<EntityDefinitionSet> set = new HashSet<>();
+    EntityDefinitionSet definitionSet1 = mockEntitySet();
+    EntityDefinitionSet definitionSet2 = mockEntitySet();
+    set.add(definitionSet1);
+    assertFalse(set.add(definitionSet2));
+  }
+
   private EntityDefinitionSet mockEntitySet() {
     EntityDefinitionSet newEntitySet = new EntityDefinitionSet();
     EntityDefinition entityDefinition;
@@ -98,16 +119,18 @@ public class OdataMetadataTestCase {
         false, null, null, null, null, null, null, null));
     newEntitySet.addEntity(entityDefinition);
 
-    entityDefinition = new EntityDefinition("users", "users");
-    entityDefinition.setHasPrimaryKey(true);
-    entityDefinition.addProperty(new EntityDefinitionProperty("id", "Edm.Int32", false, true, null,
+    List<EntityDefinitionProperty> properties = new ArrayList<>();
+    EntityDefinitionProperty definitionProperty = new EntityDefinitionProperty("id", "Edm.Int32",
+        false, true, null, null, null, null, null, null, null);
+    properties.add(definitionProperty);
+    properties.add(new EntityDefinitionProperty("first_name", "Edm.String", false, false, null,
         null, null, null, null, null, null));
-    entityDefinition.addProperty(new EntityDefinitionProperty("first_name", "Edm.String", false,
-        false, null, null, null, null, null, null, null));
-    entityDefinition.addProperty(new EntityDefinitionProperty("last_name", "Edm.String", false,
-        false, null, null, null, null, null, null, null));
-    entityDefinition.addProperty(new EntityDefinitionProperty("email", "Edm.String", false, false,
-        null, null, null, null, null, null, null));
+    properties.add(new EntityDefinitionProperty("last_name", "Edm.String", false, false, null, null,
+        null, null, null, null, null));
+    properties.add(new EntityDefinitionProperty("email", "Edm.String", false, false, null, null,
+        null, null, null, null, null));
+    entityDefinition = new EntityDefinition("users", properties, "users");
+    entityDefinition.setHasPrimaryKey(true);
     newEntitySet.addEntity(entityDefinition);
 
     return newEntitySet;
