@@ -106,6 +106,15 @@
                             <includeSnapshots>true</includeSnapshots>
                         </discoverRuntimes>
                     </runtimeConfiguration>
+                    <sharedLibraries>
+                        <sharedLibrary>
+                            <groupId>mysql</groupId>
+                            <artifactId>mysql-connector-java</artifactId>
+                        </sharedLibrary>
+                    </sharedLibraries>
+                    <environmentVariables>
+                        <DATABASE_PORT>${database.port}</DATABASE_PORT>
+                    </environmentVariables>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -137,6 +146,17 @@
                         <artifactId>org.jacoco.agent</artifactId>
                         <version>${jacoco.version}</version>
                         <classifier>runtime</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.mule.connectors</groupId>
+                        <artifactId>mule-db-connector</artifactId>
+                        <version>1.3.3</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>8.0.11</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -253,6 +273,50 @@
                         <classifier>runtime</classifier>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.31.0</version>
+                <configuration>
+                    <images>
+                        <image>
+                            <alias>mysqldb</alias>
+                            <name>mysql</name>
+                            <run>
+                                <env>
+                                    <MYSQL_ROOT_PASSWORD>mysql</MYSQL_ROOT_PASSWORD>
+                                    <MYSQL_DATABASE>apikit-odata-example</MYSQL_DATABASE>
+                                </env>
+                                <ports>
+                                    <port>database.port:3306</port>
+                                </ports>
+                                <volumes>
+                                    <bind>
+                                        <volume>src/test/resources/mysql-example/init:/docker-entrypoint-initdb.d/:ro</volume>
+                                    </bind>
+                                </volumes>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>start</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>stop</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -386,6 +450,17 @@
             <artifactId>jsonassert</artifactId>
             <version>${jsonassert.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-db-connector</artifactId>
+            <version>1.3.3</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.11</version>
         </dependency>
     </dependencies>
 
