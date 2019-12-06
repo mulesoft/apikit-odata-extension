@@ -28,7 +28,7 @@
     </munit:validation>
   </munit:test>
 
-  <munit:test name="get-entity-collection">
+  <munit:test name="get-entity-collection-as-xml">
     <munit:enable-flow-sources>
       <munit:enable-flow-source value="mysql-example-api-main"/>
       <munit:enable-flow-source value="get:\orders:mysql-example-api-config"/>
@@ -174,7 +174,7 @@
         }]]>
         </http:body>
         <http:headers>
-          #[output application/java --- { "content-type" : "application/json" } ]
+          #[output application/java --- { "content-type" : "application/json", "Accept" : "application/json" } ]
         </http:headers>
       </http:request>
     </munit:execution>
