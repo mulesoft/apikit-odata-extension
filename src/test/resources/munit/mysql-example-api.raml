@@ -1,0 +1,68 @@
+#%RAML 1.0
+title: Auto-generated RAML
+version: 0.1
+mediaType:  application/json
+
+uses:
+  odata: libraries/odataLibrary.raml
+  model: mysql-example-odata.raml
+
+resourceTypes:
+  collection:
+    is: [odata.orderby, odata.top, odata.skip, odata.filter, odata.expand, odata.format, odata.select, odata.inlinecount]
+    get:
+      description: List of <<model | !pluralize>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>[]
+    post:
+      description: Create a new <<model>>
+      body:
+        application/json:
+          type: <<model>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>
+  member:
+    is: [odata.filter, odata.expand, odata.format, odata.select]
+    get:
+      description: Read <<model>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>
+    delete:
+      description: Delete <<model>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<model>>
+    put:
+      description: Update <<model>>
+      body:
+        application/json:
+          type: <<model>>
+      responses:
+        204:
+          body:
+            application/json:
+              type: <<model>>
+              
+/customers:
+  displayName: customers
+  type: { collection: { model: model.customers } }
+  /{CustomerID}:
+    displayName: customers
+    type: { member: { model: model.customers } }
+/orders:
+  displayName: orders
+  type: { collection: { model: model.orders } }
+  /OrderID_{OrderID}-ShipName_{ShipName}:
+    displayName: orders
+    type: { member: { model: model.orders } }
