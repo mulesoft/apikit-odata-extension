@@ -5,7 +5,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 
     <apikit:config name="mysql-example-api-config" raml="munit/mysql-example-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <db:config name="Database_Config" doc:name="Database Config" doc:id="315670d6-ea0e-4fea-93f9-27f01681bb68" >
-		<db:my-sql-connection host="localhost" port="3306" user="root" password="mysql" database="apikit-odata-example" />
+		<db:my-sql-connection host="localhost" port="${DATABASE_PORT}" user="root" password="mysql" database="apikit-odata-example" />
 	</db:config>
 	<flow name="mysql-example-api-main">
         <http:listener config-ref="http-listener-simple" path="/api/*">

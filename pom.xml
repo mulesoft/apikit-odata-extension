@@ -111,6 +111,9 @@
                             <artifactId>mysql-connector-java</artifactId>
                         </sharedLibrary>
                     </sharedLibraries>
+                    <environmentVariables>
+                        <DATABASE_PORT>${database.port}</DATABASE_PORT>
+                    </environmentVariables>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -285,7 +288,7 @@
                                     <MYSQL_DATABASE>apikit-odata-example</MYSQL_DATABASE>
                                 </env>
                                 <ports>
-                                    <port>3306:3306</port>
+                                    <port>database.port:3306</port>
                                 </ports>
                                 <volumes>
                                     <bind>
