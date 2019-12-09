@@ -13,7 +13,7 @@
 
   <munit:config name="mysql-example-test-suite"/>
 
-  <munit:test name="get-entity-collection-as-json">
+  <munit:test name="get-entity-collection-as-json" ignore="#[not Munit::muleVersionEqualTo('4.2.2')]">
     <munit:enable-flow-sources>
       <munit:enable-flow-source value="mysql-example-api-main"/>
       <munit:enable-flow-source value="get:\orders:mysql-example-api-config"/>
@@ -28,7 +28,7 @@
     </munit:validation>
   </munit:test>
 
-  <munit:test name="get-entity-collection-as-xml">
+  <munit:test name="get-entity-collection-as-xml" ignore="#[not Munit::muleVersionEqualTo('4.2.2')]">
     <munit:enable-flow-sources>
       <munit:enable-flow-source value="mysql-example-api-main"/>
       <munit:enable-flow-source value="get:\orders:mysql-example-api-config"/>
@@ -43,7 +43,7 @@
     </munit:validation>
   </munit:test>
 
-  <munit:test name="get-entity">
+  <munit:test name="get-entity" ignore="#[not Munit::muleVersionEqualTo('4.2.2')]">
     <munit:enable-flow-sources>
       <munit:enable-flow-source value="mysql-example-api-main"/>
       <munit:enable-flow-source value="get:\orders:mysql-example-api-config"/>
@@ -59,7 +59,7 @@
     </munit:validation>
   </munit:test>
 
-  <munit:test name="post-entity">
+  <munit:test name="post-entity" ignore="#[not Munit::muleVersionEqualTo('4.2.2')]">
     <munit:enable-flow-sources>
       <munit:enable-flow-source value="mysql-example-api-main"/>
       <munit:enable-flow-source value="post:\orders:application\json:mysql-example-api-config"/>
@@ -96,7 +96,7 @@
     </munit:validation>
   </munit:test>
 
-  <munit:test name="put-entity">
+  <munit:test name="put-entity" ignore="#[not Munit::muleVersionEqualTo('4.2.2')]">
     <munit:enable-flow-sources>
       <munit:enable-flow-source value="mysql-example-api-main"/>
       <munit:enable-flow-source value="put:\orders\OrderID_(OrderID)-ShipName_(ShipName):application\json:mysql-example-api-config"/>
@@ -131,7 +131,7 @@
     </munit:validation>
   </munit:test>
 
-  <munit:test name="post-entity-as-json">
+  <munit:test name="post-entity-as-json" ignore="#[not Munit::muleVersionEqualTo('4.2.2')]">
     <munit:enable-flow-sources>
       <munit:enable-flow-source value="mysql-example-api-main"/>
       <munit:enable-flow-source value="post:\customers:application\json:mysql-example-api-config"/>
@@ -158,7 +158,7 @@
     </munit:validation>
   </munit:test>
 
-  <munit:test name="put-entity-as-json">
+  <munit:test name="put-entity-as-json" ignore="#[not Munit::muleVersionEqualTo('4.2.2')]">
     <munit:enable-flow-sources>
       <munit:enable-flow-source value="mysql-example-api-main"/>
       <munit:enable-flow-source value="put:\customers\(CustomerID):application\json:mysql-example-api-config"/>
@@ -183,7 +183,7 @@
     </munit:validation>
   </munit:test>
 
-  <munit:test name="delete-entity">
+  <munit:test name="delete-entity" ignore="#[not Munit::muleVersionEqualTo('4.2.2')]">
     <munit:enable-flow-sources>
       <munit:enable-flow-source value="mysql-example-api-main"/>
       <munit:enable-flow-source value="delete:\orders\OrderID_(OrderID)-ShipName_(ShipName):mysql-example-api-config"/>
