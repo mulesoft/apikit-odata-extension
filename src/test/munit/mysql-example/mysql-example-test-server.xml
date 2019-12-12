@@ -4,7 +4,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <apikit:config name="mysql-example-api-config" raml="munit/mysql-example-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
-    <db:config name="Database_Config" doc:name="Database Config" doc:id="315670d6-ea0e-4fea-93f9-27f01681bb68" >
+    <db:config name="Database_Config" doc:name="Database Config">
 		<db:my-sql-connection host="localhost" port="${DATABASE_PORT}" user="root" password="mysql" database="apikit-odata-example" />
 	</db:config>
 	<flow name="mysql-example-api-main">
@@ -33,7 +33,7 @@ output application/json
                 </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:NOT_FOUND">
-                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="8ab48231-7453-4a37-bee4-cdd882b1f2ab">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -100,8 +100,8 @@ output application/json
         </error-handler>
     </flow>
     <flow name="put:\customers\(CustomerID):application\json:mysql-example-api-config">
-        <set-variable value="#[payload.CustomerID]" doc:name="Set CustomerID" doc:id="5d05f59d-254b-4f9d-8155-9465a60c8c46" variableName="id" />
-		<ee:transform doc:name="Build Query" doc:id="59237eea-9e73-4074-ae71-3b628b7f1c83" >
+        <set-variable value="#[payload.CustomerID]" doc:name="Set CustomerID" variableName="id" />
+		<ee:transform doc:name="Build Query" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
@@ -127,17 +127,17 @@ var sqlValues = (payload mapObject ((value, key) -> '$key': "$key = '$value'")) 
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" message="SQL Query: #[payload]" doc:name="Log Query"/>
-		<db:update doc:name="Update" doc:id="89d85e0e-7b1b-41ef-b4e7-7ff7e279e59f" config-ref="Database_Config">
+		<db:update doc:name="Update" config-ref="Database_Config">
 			<db:sql >#[payload]</db:sql>
 		</db:update>
-		<choice doc:name="Check Response" doc:id="b67eb8b0-ba3a-4658-9a10-e45c2001056c" >
+		<choice doc:name="Check Response" >
 			<when expression="#[payload.affectedRows == 0]" >
-				<set-variable value="404" doc:name="Set HTTP Status" doc:id="45b52d5d-d0b6-4bb1-bb78-81c7a38338c9" variableName="httpStatus" />
-				<set-payload value='{ "message": "Resource not found" }' doc:name="Set Payload" doc:id="b535d891-cad9-4007-9de8-755f0c0a7264" mimeType="application/json" />
+				<set-variable value="404" doc:name="Set HTTP Status" variableName="httpStatus" />
+				<set-payload value='{ "message": "Resource not found" }' doc:name="Set Payload" mimeType="application/json" />
 			</when>
 			<otherwise>
-				<set-variable value="204" doc:name="Set HTTP Status" doc:id="c8da6d09-8736-4fb7-b5aa-14f67e3fe6a0" variableName="httpStatus" />
-				<ee:transform doc:name="Set Payload" doc:id="c71d2f55-9f6b-4bb5-b707-0a777a31e0a0" >
+				<set-variable value="204" doc:name="Set HTTP Status" variableName="httpStatus" />
+				<ee:transform doc:name="Set Payload">
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
@@ -149,7 +149,7 @@ null]]></ee:set-payload>
 		</choice>
     </flow>
     <flow name="put:\orders\OrderID_(OrderID)-ShipName_(ShipName):application\json:mysql-example-api-config">
-		<ee:transform doc:name="Build Query" doc:id="a5b065a0-aa87-4984-991c-d42c9a25902e" >
+		<ee:transform doc:name="Build Query">
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
@@ -181,18 +181,18 @@ var sqlValues = (payload mapObject ((value, key) -> '$key': "$key = '$value'")) 
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Log Query" doc:id="e5fdbd22-249f-4649-a8d5-4622fafc5772" message="SQL Query: #[payload]" />
-		<db:update doc:name="Update" doc:id="27aee4ef-ad14-4826-b1b2-f0c26dfb7e5d" config-ref="Database_Config" >
+		<logger level="INFO" doc:name="Log Query" message="SQL Query: #[payload]" />
+		<db:update doc:name="Update" config-ref="Database_Config" >
 			<db:sql >#[payload]</db:sql>
 		</db:update>
-		<choice doc:name="Check Response" doc:id="7212c2a3-d0c1-4d52-8dfd-648bd33f0bad" >
+		<choice doc:name="Check Response">
 			<when expression="#[payload.affectedRows == 0]" >
-				<set-variable value="404" doc:name="Set HTTP Status" doc:id="ce2038cd-0381-468c-b09d-ed87cdf2dbc5" variableName="httpStatus" />
-				<set-payload value='{ "message": "Resource not found" }' doc:name="Set Payload" doc:id="b6d0e1af-4126-4acc-85bf-ebf65b4e05d6" mimeType="application/json" />
+				<set-variable value="404" doc:name="Set HTTP Status" variableName="httpStatus" />
+				<set-payload value='{ "message": "Resource not found" }' doc:name="Set Payload" mimeType="application/json" />
 			</when>
 			<otherwise >
-				<set-variable value="204" doc:name="Set HTTP Status" doc:id="3089b915-91af-4fcb-92f1-3f8e9b680302" variableName="httpStatus" />
-				<ee:transform doc:name="Set Payload" doc:id="f9cf6900-ee12-425f-afd8-45eab2d3dcfd" >
+				<set-variable value="204" doc:name="Set HTTP Status" variableName="httpStatus" />
+				<ee:transform doc:name="Set Payload">
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
@@ -204,7 +204,7 @@ null]]></ee:set-payload>
 		</choice>
     </flow>
     <flow name="delete:\customers\(CustomerID):mysql-example-api-config">
-		<ee:transform doc:name="Build Query" doc:id="8c59ac14-13eb-42b8-9f87-5dab4bf5fed0" >
+		<ee:transform doc:name="Build Query" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
@@ -231,21 +231,21 @@ var id = attributes.uriParams.CustomerID match {
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<db:delete doc:name="Delete" doc:id="8765e4d2-2de4-418b-a379-c15db3174a92" config-ref="Database_Config">
+		<db:delete doc:name="Delete" config-ref="Database_Config">
 			<db:sql >#[payload]</db:sql>
 		</db:delete>
-		<choice doc:name="Check Response " doc:id="f0642c73-89e2-40bf-826c-607fb2e2656a" >
+		<choice doc:name="Check Response " >
 			<when expression="#[payload == 0]" >
-				<set-variable value="404" doc:name="Set HTTP Satus" doc:id="09879eff-08ee-45c9-b0dd-fb08f6874dfc" variableName="httpStatus" />
-				<set-payload value='{ "message": "Resource not found" }' doc:name="Set Payload" doc:id="c14b5aa9-d1a8-4ec8-8c7b-1c621768c960" mimeType="application/json" />
+				<set-variable value="404" doc:name="Set HTTP Satus" variableName="httpStatus" />
+				<set-payload value='{ "message": "Resource not found" }' doc:name="Set Payload" mimeType="application/json" />
 			</when>
 			<otherwise >
-				<set-payload value="#[null]" doc:name="Set Payload" doc:id="25d9d962-6e72-4d7f-a233-3c62bbeb6b61" />
+				<set-payload value="#[null]" doc:name="Set Payload" />
 			</otherwise>
 		</choice>
     </flow>
     <flow name="delete:\orders\OrderID_(OrderID)-ShipName_(ShipName):mysql-example-api-config">
-		<ee:transform doc:name="Build Query" doc:id="182decf7-c575-45e1-bb93-07960d56cc65" >
+		<ee:transform doc:name="Build Query" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
@@ -278,21 +278,21 @@ var OrderID = attributes.uriParams.OrderID match {
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<db:delete doc:name="Delete" doc:id="ee730c01-09eb-4754-8710-c64d26d9cbf2" config-ref="Database_Config" >
+		<db:delete doc:name="Delete" config-ref="Database_Config" >
 			<db:sql >#[payload]</db:sql>
 		</db:delete>
-		<choice doc:name="Check Response" doc:id="f47cfd3c-66e5-4d0d-8e85-1fd07812d779" >
+		<choice doc:name="Check Response" >
 			<when expression="#[payload == 0]" >
-				<set-variable value="404" doc:name="Set HTTP Status" doc:id="90270c1b-6d53-4d97-969e-4c63cae0a241" variableName="httpStatus" />
-				<set-payload value='{ "message": "Resource not found" }' doc:name="Set Payload" doc:id="1019aad7-a8b3-4beb-b25f-1948a74df597" mimeType="application/json" />
+				<set-variable value="404" doc:name="Set HTTP Status" variableName="httpStatus" />
+				<set-payload value='{ "message": "Resource not found" }' doc:name="Set Payload" mimeType="application/json" />
 			</when>
 			<otherwise >
-				<set-payload value="#[null]" doc:name="Set Payload" doc:id="f05c5a0e-c216-4bd5-a124-10fdd97eb362" />
+				<set-payload value="#[null]" doc:name="Set Payload" />
 			</otherwise>
 		</choice>
     </flow>
     <flow name="get:\customers\(CustomerID):mysql-example-api-config">
-        <ee:transform doc:name="Build Query" doc:id="6019294e-cf98-430f-b007-9054eb663609" >
+        <ee:transform doc:name="Build Query" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
@@ -342,17 +342,17 @@ var generateSqlFields = (select) -> ((if (select != "" )( (select splitBy ",") -
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" message="Running sql query : #[payload]" doc:name="Log Query"/>
-		<db:select doc:name="Select" doc:id="5659b0aa-11f7-4331-b98b-8646ab252648" config-ref="Database_Config">
+		<db:select doc:name="Select" config-ref="Database_Config">
 			<ee:repeatable-file-store-iterable />
 			<db:sql >#[payload]</db:sql>
 		</db:select>
-		<choice doc:name="Check Response" doc:id="eb26b1b9-80d3-47d3-9faa-5d20cf5a6729" >
+		<choice doc:name="Check Response" >
 			<when expression="#[sizeOf(payload) == 0]" >
-				<set-variable value="404" doc:name="Set HTTP Status" doc:id="c2076711-ba16-4173-afd8-531ea97f128d" variableName="httpStatus"/>
-				<set-payload value='{ "message": "Resource not found" }' doc:name="Set Payload" doc:id="94d760d0-3b53-4e12-853a-4de7a1419c55" mimeType="application/json"/>
+				<set-variable value="404" doc:name="Set HTTP Status" variableName="httpStatus"/>
+				<set-payload value='{ "message": "Resource not found" }' doc:name="Set Payload"  mimeType="application/json"/>
 			</when>
 			<otherwise >
-				<ee:transform doc:name="Build Response" doc:id="a43d33e1-1427-402c-9c5c-cd7ff25f66b5">
+				<ee:transform doc:name="Build Response">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -366,8 +366,8 @@ output application/json
 		</choice>
     </flow>
     <flow name="get:\customers:mysql-example-api-config">
-        <flow-ref doc:name="Flow Reference" doc:id="fe9905c2-9305-4a03-952b-5925f0b8a2b0" name="inlineCount" target="inlineCount" targetValue="#[payload[0][0] as String]"/>
-		<ee:transform doc:name="Build Query" doc:id="e87812fc-998d-41a2-ac6d-cb7f10616416" >
+        <flow-ref doc:name="Flow Reference" name="inlineCount" target="inlineCount" targetValue="#[payload[0][0] as String]"/>
+		<ee:transform doc:name="Build Query" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
@@ -469,16 +469,16 @@ var toSQLWhere = (odataFilter) -> if(odataFilter !=  "") " WHERE " ++ odataFilte
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" message="#[payload]" doc:name="Log Query"/>
-		<db:select doc:name="Select" doc:id="ba2c5a71-e983-4216-9cf2-bd44b175f087" config-ref="Database_Config">
+		<db:select doc:name="Select" config-ref="Database_Config">
 			<db:sql >#[payload]</db:sql>
 		</db:select>
-		<choice doc:name="Check Response" doc:id="048790b8-7a44-46a0-bb9e-e2891923cae4" >
+		<choice doc:name="Check Response" >
 			<when  expression="#[sizeOf(payload) == 0]">
-				<set-variable value="404" doc:name="Set HTTP Status" doc:id="8e14b31b-8c7f-4cd3-bb15-8daf605ad8cd" variableName="httpStatus" />
-				<set-payload value='{ "message": "Resource not found" }' doc:name="Set Payload" doc:id="0ec41017-33f7-4e66-8ddd-40bc09ac69df" mimeType="application/json" />
+				<set-variable value="404" doc:name="Set HTTP Status" variableName="httpStatus" />
+				<set-payload value='{ "message": "Resource not found" }' doc:name="Set Payload" mimeType="application/json" />
 			</when>
 			<otherwise >
-				<ee:transform doc:name="Build Response" doc:id="23613ec2-3e68-4efb-ae26-62cfe6feaecf" >
+				<ee:transform doc:name="Build Response" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -492,7 +492,7 @@ output application/json
 		</choice>
     </flow>
     <flow name="get:\orders:mysql-example-api-config">
-		<ee:transform doc:name="Build Query" doc:id="d0e5fdb0-00af-4a1d-bb25-fab8e7916f2c" >
+		<ee:transform doc:name="Build Query" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
@@ -593,11 +593,11 @@ var toSQLWhere = (odataFilter) -> if(odataFilter !=  "") " WHERE " ++ odataFilte
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Log Query" doc:id="ac24b182-0fd3-401d-9c5c-4879586dcae0" message="#[payload]" />
-		<db:select doc:name="Select" doc:id="dceac56d-95f0-4f73-9ed4-e69e031abcb8" config-ref="Database_Config" >
+		<logger level="INFO" doc:name="Log Query" message="#[payload]" />
+		<db:select doc:name="Select" config-ref="Database_Config" >
 			<db:sql >#[payload]</db:sql>
 		</db:select>
-		<ee:transform doc:name="Build Response" doc:id="97c142cf-ae5e-4926-b13b-47cab986042c">
+		<ee:transform doc:name="Build Response" >
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -607,11 +607,11 @@ output application/json
 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
-		<flow-ref doc:name="Get inlineCount" doc:id="3676aaee-c896-42c8-8445-03c77d904e47" name="get:\orders\OrderID_(OrderID)-ShipName_(ShipName):mysql-example-api-config" target="inlineCount" targetValue="#[payload]"/>
-		<logger level="INFO" doc:name="Logger" doc:id="5f3858ac-518e-4a19-9a1f-4c595f5d6857" />
+		<flow-ref doc:name="Get inlineCount" name="get:\orders\OrderID_(OrderID)-ShipName_(ShipName):mysql-example-api-config" target="inlineCount" targetValue="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" />
     </flow>
     <flow name="get:\orders\OrderID_(OrderID)-ShipName_(ShipName):mysql-example-api-config">
-		<ee:transform doc:name="Build Query" doc:id="28324aec-2122-442c-b369-471dc7d7fce2" >
+		<ee:transform doc:name="Build Query" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
@@ -666,18 +666,18 @@ var generateSqlFields = (select) -> ((if (select != "" )( (select splitBy ",") -
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Log Query" doc:id="a8141a67-9f6d-474c-b85f-2c145957ef34" message="Running sql query : #[payload]" />
-		<db:select doc:name="Select" doc:id="d0b2bce3-7319-4e21-80fb-c73119bdc3ef" config-ref="Database_Config" >
+		<logger level="INFO" doc:name="Log Query" message="Running sql query : #[payload]" />
+		<db:select doc:name="Select" config-ref="Database_Config" >
 			<ee:repeatable-file-store-iterable />
 			<db:sql >#[payload]</db:sql>
 		</db:select>
-		<choice doc:name="Check Response" doc:id="00fb9f9d-718a-4ecc-920e-fe485c65915e" >
+		<choice doc:name="Check Response" >
 			<when expression="#[sizeOf(payload) == 0]" >
-				<set-variable value="404" doc:name="Set HTTP Status" doc:id="1743b392-a075-4818-b686-7dd41510427c" variableName="httpStatus" />
-				<set-payload value='{ "message": "Resource not found" }' doc:name="Set Payload" doc:id="e47b2fd2-332a-4a81-ba77-3dfac8d7c264" mimeType="application/json" />
+				<set-variable value="404" doc:name="Set HTTP Status" variableName="httpStatus" />
+				<set-payload value='{ "message": "Resource not found" }' doc:name="Set Payload" mimeType="application/json" />
 			</when>
 			<otherwise >
-				<ee:transform doc:name="Build Response" doc:id="04914177-97d2-4ae9-bb57-51b677c11300" >
+				<ee:transform doc:name="Build Response" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -691,8 +691,8 @@ output application/json
 		</choice>
     </flow>
     <flow name="post:\customers:application\json:mysql-example-api-config">
-		<set-variable value="#[payload.CustomerID]" doc:name="Set CustomerID" doc:id="c7ec9e83-4b95-435e-b81b-744992aed394" variableName="id"/>
-		<ee:transform doc:name="Build Query" doc:id="cbb948ef-02e6-4a01-97ef-b7618d99669e" >
+		<set-variable value="#[payload.CustomerID]" doc:name="Set CustomerID" variableName="id"/>
+		<ee:transform doc:name="Build Query" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
@@ -722,10 +722,10 @@ var values = (valuesFromPayload.values joinBy ", ") // 'myValue1', 'myValue2'
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" message="SQL query: #[payload]" doc:name="Log Query"/>
-		<db:insert doc:name="Insert" doc:id="e4eca36f-4fc5-45c9-98a2-f51033da99f2" config-ref="Database_Config">
+		<db:insert doc:name="Insert" config-ref="Database_Config">
 			<db:sql >#[payload]</db:sql>
 		</db:insert>
-		<ee:transform doc:name="Build Query" doc:id="570ee757-1069-4efa-8a33-24e9068b49b0" >
+		<ee:transform doc:name="Build Query" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
@@ -750,12 +750,12 @@ var id = vars.id
 "SELECT " ++ (entityFields joinBy ", ") ++ " FROM $remoteEntityName where CustomerID = '$id'"]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<db:select doc:name="Select" doc:id="265edd53-3682-4da4-88e0-d3c17d8dcf97" config-ref="Database_Config">
+		<db:select doc:name="Select" config-ref="Database_Config">
 			<ee:repeatable-file-store-iterable />
 			<db:sql >#[payload]
 </db:sql>
 		</db:select>
-		<ee:transform doc:name="Build Response" doc:id="aa982e64-1d39-4094-9302-07fe8d0989dc" >
+		<ee:transform doc:name="Build Response" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -767,9 +767,9 @@ output application/json
 		</ee:transform>
     </flow>
     <flow name="post:\orders:application\json:mysql-example-api-config">
-		<set-variable value="#[payload.ShipName]" doc:name="Set ShipName" doc:id="2d901089-4edc-41d0-bc8d-48f9a50aca6f" variableName="shipName" />
-		<set-variable value="#[payload.OrderID]" doc:name="Set OrderID" doc:id="48e32529-9f85-4915-9b0e-5c9b8b07e153" variableName="orderId" />
-		<ee:transform doc:name="Build Query" doc:id="6edc9fc4-e741-41ec-9254-38ae1859f2b2" >
+		<set-variable value="#[payload.ShipName]" doc:name="Set ShipName" variableName="shipName" />
+		<set-variable value="#[payload.OrderID]" doc:name="Set OrderID" variableName="orderId" />
+		<ee:transform doc:name="Build Query" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
@@ -798,11 +798,11 @@ var values = (valuesFromPayload.values joinBy ", ") // 'myValue1', 'myValue2'
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Log Query" doc:id="019a364c-1f38-4ac6-87b2-50e724f6731f" message="SQL query: #[payload]" />
-		<db:insert doc:name="Insert" doc:id="2f724dae-471f-4d30-8d41-460ae94b6615" config-ref="Database_Config" >
+		<logger level="INFO" doc:name="Log Query" message="SQL query: #[payload]" />
+		<db:insert doc:name="Insert" config-ref="Database_Config" >
 			<db:sql >#[payload]</db:sql>
 		</db:insert>
-		<ee:transform doc:name="Build Query" doc:id="663cc46b-3c0e-415d-87bd-fe05029fe621">
+		<ee:transform doc:name="Build Query">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/java
@@ -831,12 +831,12 @@ var shipName = vars.shipName
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<db:select doc:name="Select" doc:id="b1236dac-89a6-47a6-ab44-948020e4de70" config-ref="Database_Config" >
+		<db:select doc:name="Select" config-ref="Database_Config" >
 			<ee:repeatable-file-store-iterable />
 			<db:sql >#[payload]
 </db:sql>
 		</db:select>
-		<ee:transform doc:name="Build Response" doc:id="887412f1-4040-49d1-a52b-bf1cc2219b62" >
+		<ee:transform doc:name="Build Response" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -847,10 +847,10 @@ output application/json
 			</ee:message>
 		</ee:transform>
     </flow>
-	<sub-flow name="inlineCount" doc:id="24c6198d-d7ab-4c85-a4f6-1e4898472f4a" >
-		<choice doc:name="Choice" doc:id="17b88435-c66e-4f72-800c-9779ef6cb099" >
+	<sub-flow name="inlineCount" >
+		<choice doc:name="Choice" >
 			<when  expression='#[attributes.queryParams.inlinecount == "allpages"]'>
-				<ee:transform doc:name="Transform Message" doc:id="94aae446-a863-42be-95a0-5aabe9220d83">
+				<ee:transform doc:name="Transform Message" >
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/java

@@ -6,12 +6,18 @@
   xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
   xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
   xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:db="http://www.mulesoft.org/schema/mule/db"
   xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
-    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+    http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
   <munit:config name="mysql-example-test-suite"/>
+
+  <munit:before-suite name="data-setup" description="Restores and cleans up data for a clean run on each runtime version">
+    <db:execute-script config-ref="Database_Config" file="mysql-example/setup/data-setup.sql" />
+  </munit:before-suite>
 
   <munit:test name="get-entity-collection-as-json">
     <munit:enable-flow-sources>
