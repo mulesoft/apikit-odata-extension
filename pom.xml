@@ -296,6 +296,9 @@
                                         <volume>src/test/resources/mysql-example/init:/docker-entrypoint-initdb.d/:ro</volume>
                                     </bind>
                                 </volumes>
+                                <!--Workaround for avoiding name collisions with zombie containers left from failed executions-->
+                                <!--or parallel executions on same agent-->
+                                <containerNamePattern>%n-%i-%t</containerNamePattern>
                             </run>
                         </image>
                     </images>
