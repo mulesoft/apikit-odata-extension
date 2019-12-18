@@ -12,6 +12,7 @@
  */
 package org.mule.module.apikit.model;
 
+import org.mule.module.apikit.odata.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

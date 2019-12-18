@@ -6,7 +6,6 @@
  */
 package org.mule.module.apikit.odata.processor;
 
-import org.apache.commons.lang.StringUtils;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 import org.mule.module.apikit.odata.AbstractRouterInterface;
@@ -23,7 +22,6 @@ import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
-import org.mule.module.apikit.odata.metadata.exception.OdataMetadataResourceNotFound;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.model.Entry;
@@ -41,15 +39,20 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.ALL_PAGES;
 import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.NONE;
 
 public class ODataApikitProcessor extends ODataRequestProcessor {
   private static final String[] methodsWithBody = {"POST", "PUT"};
+  public static final String KEY_VALUE_SEPARATOR = "_";
+  public static final String KEYS_SEPARATOR = "-";
+  public static final String URL_RESOURCE_SEPARATOR = "/";
+
   private String path;
   private String query;
   private String entity;
@@ -107,29 +110,17 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 
   private String generatePath(String entity, Map<String, Object> keys)
       throws ODataInvalidUriException {
-    String path = "";
-    if (keys.size() == 0) {
-      path = "/" + entity;
-    } else if (keys.size() == 1) {
-      String key = (String) keys.keySet().toArray()[0];
-      String id = (String) keys.get(key);
-      path = "/" + entity + "/" + encode(id);
+    String keysPath = URL_RESOURCE_SEPARATOR + entity;
+    if (keys.size() == 1) {
+      keysPath =
+          keysPath + URL_RESOURCE_SEPARATOR + encode(keys.values().iterator().next().toString());
     } else if (keys.size() > 1) {
-      path = "/" + entity + "/";
-
-      String uriKeys = "";
-
-      String delimiter = "";
-      for (Map.Entry<String, Object> entry : keys.entrySet()) {
-        uriKeys += delimiter + entry.getKey() + "_" + entry.getValue();
-        delimiter = " :: ";
-      }
-      List<String> parsedKeys = Arrays.asList(uriKeys.split(" :: "));
-      Collections.sort(parsedKeys);
-
-      path += StringUtils.join(parsedKeys, "-");
+      Function<Map.Entry<String, Object>, String> parseKey =
+          entry -> entry.getKey() + KEY_VALUE_SEPARATOR + entry.getValue();
+      keysPath = keysPath + URL_RESOURCE_SEPARATOR + keys.entrySet().stream().map(parseKey).sorted()
+          .collect(Collectors.joining(KEYS_SEPARATOR));
     }
-    return path;
+    return keysPath;
   }
 
   private String encode(String id) throws ODataInvalidUriException {
@@ -228,8 +219,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 
   private ODataPayload<List<Entry>> verifyFlowResponse(CoreEvent event)
       throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
-      OdataMetadataResourceNotFound, OdataMetadataFormatException,
-      ODataInvalidFlowResponseException, ClientErrorException {
+      OdataMetadataFormatException, ODataInvalidFlowResponseException, ClientErrorException {
 
     int httpStatus = checkResponseHttpStatus(event);
     OdataMetadataManager metadataManager = getMetadataManager();
