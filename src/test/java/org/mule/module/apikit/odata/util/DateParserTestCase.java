@@ -34,4 +34,11 @@ public class DateParserTestCase {
     Date d2 = DateParser.parse("1996-07-04T00:00:00.0");
     assertEquals(d1, d2);
   }
+
+  @Test
+  public void dateParserInvalidFormatTest() throws ParseException {
+    Date d1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("0000-00-00 00:00:00.0");
+    Date d2 = DateParser.parse("199-2-1T4:5:3.");
+    assertEquals(d1, d2);
+  }
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.module.apikit.odata.metadata.raml;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
