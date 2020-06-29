@@ -22,6 +22,11 @@
 		<mule.version>3.8.1</mule.version>
 		<apikit.version>3.8.2</apikit.version>
 		<licensePath>LICENSE_HEADER.txt</licensePath>
+		<jacoco.version>0.8.5</jacoco.version>
+		<maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
+		<allureJunitVersion>2.13.3</allureJunitVersion>
+		<allureReportVersion>2.3.4</allureReportVersion>
+		<allure.maven.plugin.version>2.10.0</allure.maven.plugin.version>
 	</properties>
 
 	<build>
@@ -37,36 +42,80 @@
 				</configuration>
 			</plugin>
 			<plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <header>${licensePath}</header>
-                    <excludes>
-                        <exclude>target/**</exclude>
-                        <exclude>**/.gitignore</exclude>
-                        <exclude>**/*.txt</exclude>
-                        <exclude>**/*.ftl</exclude>
-                        <exclude>**/*.xml</exclude>
-                        <exclude>**/*.properties</exclude>
-                        <exclude>**/*.md</exclude>
-                    </excludes>
-                    <includes>
-                        <include>**/*.java</include>
-                    </includes>
-                    <mapping>
-                        <java>SLASHSTAR_STYLE</java>
-                    </mapping>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<header>${licensePath}</header>
+					<excludes>
+						<exclude>target/**</exclude>
+						<exclude>**/.gitignore</exclude>
+						<exclude>**/*.txt</exclude>
+						<exclude>**/*.ftl</exclude>
+						<exclude>**/*.xml</exclude>
+						<exclude>**/*.properties</exclude>
+						<exclude>**/*.md</exclude>
+					</excludes>
+					<includes>
+						<include>**/*.java</include>
+					</includes>
+					<mapping>
+						<java>SLASHSTAR_STYLE</java>
+					</mapping>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven.surefire.plugin.version}</version>
+				<configuration>
+					<argLine>-Dfile.encoding=UTF-8
+						-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'
+					</argLine>
+					<properties>
+						<property>
+							<name>listener</name>
+							<value>io.qameta.allure.junit4.AllureJunit4</value>
+						</property>
+					</properties>
+					<systemPropertyVariables>
+						<!-- Just propagate this variable due to surefire will not do this when forked vm for tests -->
+						<mule.freePortFinder.lockPath>${java.io.tmpdir}/mule/freePortFinder
+						</mule.freePortFinder.lockPath>
+						<maven.projectVersion>${project.version}</maven.projectVersion>
+					</systemPropertyVariables>
+					<systemProperties>
+						<property>
+							<name>allure.results.directory</name>
+							<value>${project.build.directory}/allure-results</value>
+						</property>
+					</systemProperties>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.jacoco</groupId>
+						<artifactId>org.jacoco.agent</artifactId>
+						<version>${jacoco.version}</version>
+						<classifier>runtime</classifier>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>io.qameta.allure</groupId>
+				<artifactId>allure-maven</artifactId>
+				<version>${allure.maven.plugin.version}</version>
+				<configuration>
+					<reportVersion>${allureReportVersion}</reportVersion>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -166,15 +215,22 @@
 		</dependency>
 
 		<dependency>
-            <groupId>org.skyscreamer</groupId>
-            <artifactId>jsonassert</artifactId>
-            <version>1.3.0</version>
-        </dependency>
+			<groupId>org.skyscreamer</groupId>
+			<artifactId>jsonassert</artifactId>
+			<version>1.3.0</version>
+		</dependency>
 
 		<dependency>
-		    <groupId>org.jibx</groupId>
-		    <artifactId>jibx-tools</artifactId>
-		    <version>1.2.6</version>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-tools</artifactId>
+			<version>1.2.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.qameta.allure</groupId>
+			<artifactId>allure-junit4</artifactId>
+			<version>${allureJunitVersion}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
