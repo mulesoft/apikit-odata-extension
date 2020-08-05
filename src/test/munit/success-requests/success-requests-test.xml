@@ -23,10 +23,16 @@
       </http:request>
     </munit:execution>
     <munit:validation>
-      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/json')]"/>
-      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
-      <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[0]]" is="#[MunitTools::equalTo(10248)]"/>
-      <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[1]]" is="#[MunitTools::equalTo(10249)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']"
+                               is="#[MunitTools::equalTo('application/json')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]"
+                               is="#[MunitTools::equalTo(200)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[0]]"
+                               is="#[MunitTools::equalTo(10248)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[1]]"
+                               is="#[MunitTools::equalTo(10249)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results[0].'__metadata'.uri]"
+                               is="#[MunitTools::startsWith('http://127.0.0.1')]"/>
     </munit:validation>
   </munit:test>
 
