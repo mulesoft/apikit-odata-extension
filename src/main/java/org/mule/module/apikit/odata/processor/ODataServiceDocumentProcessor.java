@@ -6,7 +6,6 @@
  */
 package org.mule.module.apikit.odata.processor;
 
-import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.module.apikit.odata.AbstractRouterInterface;
 import org.mule.module.apikit.odata.ODataPayload;
 import org.mule.module.apikit.odata.context.OdataContext;
@@ -18,6 +17,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import java.util.List;
 
 public class ODataServiceDocumentProcessor extends ODataRequestProcessor {
+
   private static final String FULL_DOMAIN = "fullDomain";
 
   public ODataServiceDocumentProcessor(OdataContext odataContext) {
@@ -38,12 +38,4 @@ public class ODataServiceDocumentProcessor extends ODataRequestProcessor {
     }
   }
 
-  @Override
-  protected String getHost(HttpRequestAttributes attributes) {
-    String cloudHubFullDomain = System.getProperty(FULL_DOMAIN);
-    if (cloudHubFullDomain != null) {
-      return cloudHubFullDomain;
-    }
-    return super.getHost(attributes);
-  }
 }
