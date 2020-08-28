@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+  xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+  <munit:config name="success-requests-url-test-suite">
+    <munit:parameterizations>
+      <munit:parameterization name="CLOUDHUB">
+        <munit:parameters>
+          <munit:parameter propertyName="fullDomain" value="ch-https-41-demo.au-s1.cloudhub.io"/>
+        </munit:parameters>
+      </munit:parameterization>
+      <munit:parameterization name="ON-PREM">
+        <munit:parameters>
+          <munit:parameter propertyName="fullDomain" value=""/>
+        </munit:parameters>
+      </munit:parameterization>
+    </munit:parameterizations>
+  </munit:config>
+
+
+  <munit:test name="get-entity-collection-results-metadata-uri-with-full-domain" ignore="#['${fullDomain}' == '']">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$format=json">
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results[0].'__metadata'.uri]"
+        is="#[MunitTools::startsWith('http://ch-https-41-demo.au-s1.cloudhub.io')]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="get-entity-collection-results-metadata-uri-without-full-domain" ignore="#['${fullDomain}' == 'ch-https-41-demo.au-s1.cloudhub.io']">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$format=json">
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results[0].'__metadata'.uri]"
+        is="#[MunitTools::startsWith('http://localhost')]"/>
+    </munit:validation>
+  </munit:test>
+
+
+  <munit:test name="get-entity-by-id-with-atom-format-uri-with-full-domain" ignore="#['${fullDomain}' == '']">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders\(orderId):success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders(10248)?$format=atom">
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/atom+xml')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.feed.id]" is="#[MunitTools::startsWith('http://ch-https-41-demo.au-s1.cloudhub.io')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.feed.entry.id]" is="#[MunitTools::startsWith('http://ch-https-41-demo.au-s1.cloudhub.io')]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="get-entity-by-id-with-atom-format-uri-without-full-domain" ignore="#['${fullDomain}' == 'ch-https-41-demo.au-s1.cloudhub.io']">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders\(orderId):success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders(10248)?$format=atom">
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/atom+xml')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.feed.id]" is="#[MunitTools::startsWith('http://localhost')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.feed.entry.id]" is="#[MunitTools::startsWith('http://localhost')]"/>
+    </munit:validation>
+  </munit:test>
+
+</mule>

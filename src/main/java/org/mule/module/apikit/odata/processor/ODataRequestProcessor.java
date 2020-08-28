@@ -6,6 +6,9 @@
  */
 package org.mule.module.apikit.odata.processor;
 
+import static java.lang.System.getProperty;
+import static org.mule.module.apikit.api.UrlUtils.FULL_DOMAIN;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.module.apikit.odata.AbstractRouterInterface;
 import org.mule.module.apikit.odata.ODataPayload;
@@ -13,7 +16,6 @@ import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -40,13 +42,11 @@ public abstract class ODataRequestProcessor {
   }
 
   protected String getHost(HttpRequestAttributes attributes) {
-    String host = attributes.getLocalAddress();
-    return host;
-  }
-
-  protected String getUrl(HttpRequestAttributes attributes) {
-    String url = getProtocol(attributes) + "://" + getHost(attributes);
-    return url;
+    String cloudHubFullDomain = getProperty(FULL_DOMAIN);
+    if (!isBlank(cloudHubFullDomain)) {
+      return cloudHubFullDomain;
+    }
+    return attributes.getHeaders().get("host");
   }
 
   protected String getCompleteUrl(HttpRequestAttributes attributes) {
