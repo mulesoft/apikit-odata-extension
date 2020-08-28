@@ -37,7 +37,7 @@ public class ODataApiKitFormatter extends ODataPayloadFormatter {
     this.setSupportsAtom(true);
   }
 
-  public String format(Format format) throws Exception {
+  public String format(Format format) {
     if (Format.Default.equals(format)) {
       format = Format.Atom;
     }
