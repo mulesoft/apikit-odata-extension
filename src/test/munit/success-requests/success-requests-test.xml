@@ -31,8 +31,6 @@
                                is="#[MunitTools::equalTo(10248)]"/>
       <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[1]]"
                                is="#[MunitTools::equalTo(10249)]"/>
-      <munit-tools:assert-that expression="#[output application/java --- payload.d.results[0].'__metadata'.uri]"
-                               is="#[MunitTools::startsWith('http://127.0.0.1')]"/>
     </munit:validation>
   </munit:test>
 
