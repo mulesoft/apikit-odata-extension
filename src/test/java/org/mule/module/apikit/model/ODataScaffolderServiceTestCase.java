@@ -12,60 +12,55 @@
  */
 package org.mule.module.apikit.model;
 
+import java.io.IOException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import java.io.File;
-import static org.junit.Assert.assertEquals;
+import static org.apache.commons.io.FileUtils.contentEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author arielsegura
- */
+
 public class ODataScaffolderServiceTestCase {
 
   @Rule
-  public ExpectedException thrown = ExpectedException.none();
+  public ExpectedException expectedException = ExpectedException.none();
 
-  public ODataScaffolderService scaffolder;
-  public String RESOURCES_PATH = "src/test/resources/";
+  private ODataScaffolderService scaffolder;
+  private String RESOURCES_PATH = "src/test/resources/";
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     scaffolder = new ODataScaffolderService();
   }
 
   private File getResource(String path) {
-    File file = new File((RESOURCES_PATH + path).replace("/", File.separator));
-    return file;
+    return new File((RESOURCES_PATH + path).replace("/", File.separator));
   }
 
   @Test
-  public void scaffoldPositive() {
+  public void scaffoldPositive() throws IOException {
     File model = getResource("valid/api/odata.raml");
     File api = scaffolder.generateApi(model);
+    assertTrue(contentEquals(getResource("valid/api/libraries/odataLibrary.raml"),
+        new File("src/main/resources/libraries/odataLibrary.raml")));
     assertTrue(api.exists());
   }
 
   @Test
   public void scaffoldNegative() {
-    File model = getResource("invalid/api/odata.raml");
-    try {
-      scaffolder.generateApi(model);
-    } catch (Exception e) {
-      assertEquals("Error: Property \"remote name\" is missing in entity Employee", e.getMessage());
-    }
+    expectedException.expect(RuntimeException.class);
+    expectedException
+        .expectMessage("Error: Property \"remote name\" is missing in entity Employee");
+    scaffolder.generateApi(getResource("invalid/api/odata.raml"));
   }
 
   @Test
   public void noKeyError() {
-    File model = getResource("nokeyerror/api/odata.raml");
-    try {
-      scaffolder.generateApi(model);
-    } catch (Exception e) {
-      assertEquals("Error: Entity defition must have a primary key.", e.getMessage());
-    }
+    expectedException.expect(RuntimeException.class);
+    expectedException.expectMessage("Error: Entity defition must have a primary key.");
+    scaffolder.generateApi(getResource("nokeyerror/api/odata.raml"));
   }
 
 }
