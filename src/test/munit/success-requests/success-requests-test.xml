@@ -126,6 +126,7 @@
                     <d:OrderID type="Edm.Int32">20000</d:OrderID>
                     <d:ShipName>ship-name</d:ShipName>
                     <d:ShipAddress>ship-address-1</d:ShipAddress>
+                    <d:Time>PT13H20M</d:Time>
                   </m:properties>
                 </content>
             </entry>']]]>
@@ -145,7 +146,7 @@
     </munit:enable-flow-sources>
     <munit:execution>
       <http:request method="POST" config-ref="http-requester-simple" path="api/odata.svc/orders">
-        <http:body>#['{"OrderID":20000,"ShipAddress":"ship-address-1","ShipName":"ship-name"}']
+        <http:body>#['{"OrderID":20000,"ShipAddress":"ship-address-1","ShipName":"ship-name", "Time": "PT13H20M10S"}']
         </http:body>
         <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
       </http:request>

@@ -12,11 +12,11 @@
  */
 package org.mule.module.apikit.model;
 
+import static org.mule.module.apikit.odata.util.FileUtils.createFolder;
+import static org.mule.module.apikit.odata.util.FileUtils.exportResource;
 import org.mule.module.apikit.odata.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ODataScaffolderService {
 
@@ -33,14 +33,11 @@ public class ODataScaffolderService {
    * @return
    */
   public File generateApi(File model) {
-    File ramlFile = null;
-
     if (model != null && isODataModel(model)) {
-      copyRamlTemplateFiles(model);
-      ramlFile = generateApiRaml(model);
+      copyLibraryFiles(model.getParentFile().getAbsolutePath());
+      return generateApiRaml(model);
     }
-
-    return ramlFile;
+    return null;
   }
 
   /**
@@ -50,38 +47,26 @@ public class ODataScaffolderService {
    * @return
    */
   private File generateApiRaml(File model) {
-    RamlGenerator ramlGenerator = new RamlGenerator();
-    File raml = null;
-
     try {
-      String ramlContents = ramlGenerator.generate(model.toURI().toString());
+      String ramlContents = new RamlGenerator().generate(model.toURI().toString());
       String path = model.getCanonicalPath().replace(ODATA_MODEL_FILE, FINAL_RAML_FILE);
-      raml = FileUtils.stringToFile(path, ramlContents);
+      return FileUtils.stringToFile(path, ramlContents);
     } catch (Exception e) {
       throw new RuntimeException("Error: " + e.getMessage());
     }
-
-    return raml;
   }
 
   /**
-   * Copies the api.raml dependencies to the project
-   *
-   * @param model
-   * @return
+   * Create folder /libraries
+   * and copy odataLibrary.raml to the project
    */
-  private List<String> copyRamlTemplateFiles(File model) {
-    List<String> ramlFiles = new ArrayList<String>();
-
+  private void copyLibraryFiles(String absolutePath) {
     try {
-      FileUtils.createFolder(model.getParentFile().getAbsolutePath() + LIBRARIES_FOLDER);
-      ramlFiles.add(FileUtils.exportResource(LIBRARIES_ODATA_RAML,
-          model.getParentFile().getAbsolutePath() + LIBRARIES_ODATA_RAML));
+      createFolder(absolutePath + LIBRARIES_FOLDER);
+      exportResource(LIBRARIES_ODATA_RAML, absolutePath + LIBRARIES_ODATA_RAML);
     } catch (Exception e) {
       throw new RuntimeException("Error copying template files", e);
     }
-
-    return ramlFiles;
   }
 
   private boolean isODataModel(File file) {
