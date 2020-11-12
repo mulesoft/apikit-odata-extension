@@ -26,6 +26,7 @@
       <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']" is="#[MunitTools::equalTo('application/xml')]"/>
       <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
       <munit-tools:assert-that expression="#[output application/java --- payload.Edmx.DataServices.Schema.EntityType.@Name]" is="#[MunitTools::equalTo('orders')]"/>
+      <munit-tools:assert-that expression="#[output text/plain --- write(payload,'application/xml')]" is='#[MunitTools::containsString("&lt;Property Name=\"Time\" Type=\"Edm.Time\" Nullable=\"true\" Unicode=\"false\"/&gt;")]'/>
     </munit:validation>
   </munit:test>
 
