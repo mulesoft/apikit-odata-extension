@@ -63,16 +63,23 @@ import amf.client.model.domain.UnionShape;
 import amf.plugins.features.validation.AMFValidatorPlugin;
 
 public class AMFWrapper {
-  public static final String AMF_STRING = "http://www.w3.org/2001/XMLSchema#string";
-  public static final String AMF_BOOLEAN = "http://www.w3.org/2001/XMLSchema#boolean";
-  public static final String AMF_NUMBER = "http://a.ml/vocabularies/shapes#number";
-  public static final String AMF_FLOAT = "http://www.w3.org/2001/XMLSchema#float";
-  public static final String AMF_DATE_TIME_ONLY = "http://a.ml/vocabularies/shapes#dateTimeOnly";
-  public static final String AMF_INTEGER = "http://www.w3.org/2001/XMLSchema#integer";
-  public static final String AMF_TIME = "http://www.w3.org/2001/XMLSchema#time";
-  public static final String AMF_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
-  public static final String AMF_DATE_ONLY = "http://www.w3.org/2001/XMLSchema#date";
-  public static final String AMF_LONG = "http://www.w3.org/2001/XMLSchema#long";
+
+  private final Map<String, CheckedFunction<ScalarShape, String>> typesMapping =
+      this.initialiseTypeMapping();
+
+  private static final String AMF_STRING = "http://www.w3.org/2001/XMLSchema#string";
+  private static final String AMF_BOOLEAN = "http://www.w3.org/2001/XMLSchema#boolean";
+  private static final String AMF_NUMBER = "http://a.ml/vocabularies/shapes#number";
+  private static final String AMF_FLOAT = "http://www.w3.org/2001/XMLSchema#float";
+  private static final String AMF_DATE_TIME_ONLY = "http://a.ml/vocabularies/shapes#dateTimeOnly";
+  private static final String AMF_INTEGER = "http://www.w3.org/2001/XMLSchema#integer";
+  private static final String AMF_TIME = "http://www.w3.org/2001/XMLSchema#time";
+  private static final String AMF_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
+  private static final String AMF_DATE_ONLY = "http://www.w3.org/2001/XMLSchema#date";
+  private static final String AMF_LONG = "http://www.w3.org/2001/XMLSchema#long";
+
+  private static final String EDM_TIME_PATTERN =
+      "^PT([0-1]?[0-9]|2[0-3])H[0-5][0-9]M(|[0-5][0-9]S)$";
 
   static {
     try {
@@ -84,7 +91,7 @@ public class AMFWrapper {
   }
 
   private List<NodeShape> nodeShapesList;
-  private Map<String, NodeShape> shapes = new HashMap<String, NodeShape>();
+  private Map<String, NodeShape> shapes = new HashMap<>();
   private EntityDefinitionSet entityDefinitionSet = new EntityDefinitionSet();
 
   public AMFWrapper(String ramlPath)
@@ -240,34 +247,11 @@ public class AMFWrapper {
 
   private String getOdataType(ScalarShape scalarShape) throws OdataMetadataFieldsException {
     String dataType = scalarShape.dataType().value();
-
-    if (dataType.equals(AMF_BOOLEAN)) {
-      return EDM_BOOLEAN;
+    if (!typesMapping.containsKey(dataType)) {
+      throw new UnsupportedOperationException(
+          "Type not supported " + dataType + " of property " + scalarShape.name());
     }
-    if (dataType.equals(AMF_STRING)) {
-      return getStringType(scalarShape);
-    }
-    if (dataType.equals(AMF_FLOAT)) {
-      return EDM_SINGLE;
-    }
-    if (dataType.equals(AMF_DATE_TIME_ONLY)) {
-      return EDM_DATETIME;
-    }
-    if (dataType.equals(AMF_NUMBER) || dataType.equals(AMF_INTEGER) || dataType.equals(AMF_LONG)) {
-      return getNumberType(scalarShape);
-    }
-    if (dataType.equals(AMF_TIME)) {
-      return EDM_TIME;
-    }
-    if (dataType.equals(AMF_DATE_TIME)) {
-      return EDM_DATETIME;
-    }
-    if (dataType.equals(AMF_DATE_ONLY)) {
-      return EDM_DATETIMEOFFSET;
-    }
-
-    throw new UnsupportedOperationException(
-        "Type not supported " + dataType + " of property " + scalarShape.name());
+    return typesMapping.get(dataType).apply(scalarShape);
   }
 
   private Shape getScalarShape(Shape shape) throws OdataMetadataFieldsException {
@@ -325,6 +309,13 @@ public class AMFWrapper {
     if (GUID.equals(subType)) {
       return EDM_GUID;
     }
+    // workaround: raml time-only format (e: 12:30:00),
+    // is not compatible with odata v2 Edm.Time (e: PT12H30M00S),
+    // and does not exist a type for validate this type in RAML spec
+    if (scalarShape.pattern() != null
+        && EDM_TIME_PATTERN.equals(scalarShape.pattern().toString())) {
+      return EDM_TIME;
+    }
 
     return EDM_STRING;
   }
@@ -344,5 +335,27 @@ public class AMFWrapper {
     }
 
     return null;
+  }
+
+  @FunctionalInterface
+  private interface CheckedFunction<T, R> {
+    R apply(T t) throws OdataMetadataFieldsException;
+  }
+
+  private Map<String, CheckedFunction<ScalarShape, String>> initialiseTypeMapping() {
+
+    Map<String, CheckedFunction<ScalarShape, String>> mapping = new HashMap<>();
+    mapping.put(AMF_BOOLEAN, scalarShape -> EDM_BOOLEAN);
+    mapping.put(AMF_STRING, this::getStringType);
+    mapping.put(AMF_FLOAT, scalarShape -> EDM_SINGLE);
+    mapping.put(AMF_DATE_TIME_ONLY, scalarShape -> EDM_DATETIME);
+    mapping.put(AMF_NUMBER, this::getNumberType);
+    mapping.put(AMF_INTEGER, this::getNumberType);
+    mapping.put(AMF_LONG, this::getNumberType);
+    mapping.put(AMF_TIME, scalarShape -> EDM_TIME);
+    mapping.put(AMF_DATE_TIME, scalarShape -> EDM_DATETIMEOFFSET);
+    mapping.put(AMF_DATE_ONLY, scalarShape -> EDM_DATETIMEOFFSET);
+
+    return mapping;
   }
 }
