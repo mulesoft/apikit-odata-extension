@@ -9,13 +9,11 @@ package org.mule.module.apikit.model;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mule.module.apikit.model.exception.EntityModelParsingException;
-import org.mule.module.apikit.model.exception.InvalidModelException;
 
 /**
  * 
@@ -41,6 +39,21 @@ public class EntityModelParserTestCase {
     Assert.assertEquals("Employee", entity.getElementName());
     Assert.assertEquals("Employees", entity.getCollectionName());
     Assert.assertEquals("EmployeeId", entity.getIdElementName());
+  }
+
+  @Test
+  public void scaffoldWithSpacesInDir() throws IOException, EntityModelParsingException {
+    URL url =
+        Thread.currentThread().getContextClassLoader().getResource("spaces dir/validOdata.raml");
+    List<Entity> entities = EntityModelParser.getEntities(url.toString());
+    Assert.assertEquals("Customer", entities.get(0).getName());
+    Assert.assertEquals("Customer", entities.get(0).getElementName());
+    Assert.assertEquals("Customers", entities.get(0).getCollectionName());
+    Assert.assertEquals("CustomerId", entities.get(0).getIdElementName());
+    Assert.assertEquals("Employee", entities.get(1).getName());
+    Assert.assertEquals("Employee", entities.get(1).getElementName());
+    Assert.assertEquals("Employees", entities.get(1).getCollectionName());
+    Assert.assertEquals("EmployeeId", entities.get(1).getIdElementName());
   }
 
   @Test
