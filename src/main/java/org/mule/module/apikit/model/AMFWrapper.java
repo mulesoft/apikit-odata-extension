@@ -32,6 +32,7 @@ import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_INT64;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_SINGLE;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_STRING;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_TIME;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -127,7 +128,9 @@ public class AMFWrapper {
     nodeShapesList = new ArrayList<>();
 
     Raml10Parser parser = AMF.raml10Parser();
-    Object object = parser.parseFileAsync(ramlPath).get();
+
+    Object object = parser.parseFileAsync(URLDecoder.decode(ramlPath)).get();
+
     validateOdataRaml(parser);
 
     if (object instanceof Module) { // If the parsed file is a module it comes from scaffolding odata.raml
