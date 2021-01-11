@@ -1,0 +1,35 @@
+#%RAML 1.0 Library
+uses:
+  odata: libraries/odataLibrary.raml
+
+types:
+  Employee:
+    (odata.remote): myEntity
+    properties:
+      id:
+        type: number
+        (odata.key): true
+        (odata.nullable): false
+      name:
+        type: string
+        (odata.key): false
+        (odata.nullable): false
+      age:
+        type: integer
+        (odata.key): false
+        (odata.nullable): false
+  Customer:
+    (odata.remote): myEntity
+    properties:
+      id:
+        type: number
+        (odata.key): true
+        (odata.nullable): false
+      name:
+        type: string
+        (odata.key): false
+        (odata.nullable): false    
+      address:
+        type: string
+        (odata.key): false
+        (odata.nullable): false 
