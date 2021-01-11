@@ -127,7 +127,7 @@
     </munit:execution>
     <munit:validation>
       <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(400)]"/>
-      <munit-tools:assert-that expression="#[output application/java --- payload.error.message]" is="#[MunitTools::startsWith('/Time string [12:30:00] does not match pattern')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.error.message]" is="#[MunitTools::containsString('/Time string [12:30:00] does not match pattern')]"/>
     </munit:validation>
   </munit:test>
 
