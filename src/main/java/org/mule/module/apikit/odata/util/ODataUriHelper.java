@@ -41,7 +41,6 @@ public class ODataUriHelper {
   public static final String ODATA_EXPAND_REGEXP =
       "^(\\w|\\-)+(/(\\w|\\-)+)?(,\\s*(\\w|\\-)+(/(\\w|\\-)+)?)*$";
   public static final String ODATA_FORMAT_REGEXP = "^(atom|json|xml)$";
-  public static final String ODATA_SELECT_REGEXP = "^(\\w|\\-)+(,\\s*(\\w|\\-)+)*$";
   public static final String ODATA_INLINECOUNT_REGEXP = "^(allpages|none)$";
   public static final String ODATA_PRIMITIVE_STRING_REGEXP = "^'([^']*)'$";
   public static final String ODATA_LONG_REGEXP = "^(\\d+L)$";
@@ -57,7 +56,6 @@ public class ODataUriHelper {
   public static final Pattern ODATA_SKIP_PATTERN = Pattern.compile(ODATA_SKIP_REGEXP);
   public static final Pattern ODATA_EXPAND_PATTERN = Pattern.compile(ODATA_EXPAND_REGEXP);
   public static final Pattern ODATA_FORMAT_PATTERN = Pattern.compile(ODATA_FORMAT_REGEXP);
-  public static final Pattern ODATA_SELECT_PATTERN = Pattern.compile(ODATA_SELECT_REGEXP);
   public static final Pattern ODATA_INLINECOUNT_PATTERN = Pattern.compile(ODATA_INLINECOUNT_REGEXP);
   public static final Pattern ODATA_PRIMITIVE_STRING_PATTERN =
       Pattern.compile(ODATA_PRIMITIVE_STRING_REGEXP);
@@ -346,8 +344,7 @@ public class ODataUriHelper {
         break;
 
       case "$select":
-        m = ODATA_SELECT_PATTERN.matcher(value);
-        if (!m.matches())
+        if (!isValidSelectValue(value))
           throw new ODataInvalidUriException(
               "Incorrect format for $select argument '" + value + "'.");
         break;
@@ -367,6 +364,11 @@ public class ODataUriHelper {
     }
 
     return true;
+  }
+
+  private static boolean isValidSelectValue(String value) {
+    return !(value.isEmpty()
+        || (value.contains(",") && value.substring(value.lastIndexOf(",") + 1).isEmpty()));
   }
 
   // SE-5650: the complex filter validations were replaced with the OData4J filter parser methods.
