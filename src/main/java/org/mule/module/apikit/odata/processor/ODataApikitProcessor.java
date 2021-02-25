@@ -210,11 +210,21 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
     MultiMap<String, String> httpQueryParams = Helper.queryToMap(query);
     httpRequestAttributesBuilder.queryParams(httpQueryParams);
 
-    MultiMap<String, String> headers = new MultiMap<>();
-    headers.put("host", attributes.getRemoteAddress());
-    headers.put("content-type", MediaType.APPLICATION_JSON.toString());
+    MultiMap<String, String> headers = new MultiMap<>(attributes.getHeaders());
+    mergeHeader(headers, "host", attributes.getRemoteAddress());
+    mergeHeader(headers, "content-type", MediaType.APPLICATION_JSON.toString());
+    mergeHeader(headers, "accept", MediaType.APPLICATION_JSON.toString());
     httpRequestAttributesBuilder.headers(headers);
     return httpRequestAttributesBuilder.build();
+  }
+
+  private static void mergeHeader(MultiMap<String, String> multiMap, String key, String value) {
+    String currentValue = multiMap.get(key);
+    if (currentValue != null) {
+      multiMap.remove(key);
+    }
+
+    multiMap.put(key, value);
   }
 
   private ODataPayload<List<Entry>> verifyFlowResponse(CoreEvent event)
