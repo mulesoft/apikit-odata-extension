@@ -20,6 +20,7 @@
     </munit:enable-flow-sources>
     <munit:execution>
       <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$format=json">
+        <http:headers>#[output application/java --- { "custom-header" : "value" }]</http:headers>
       </http:request>
     </munit:execution>
     <munit:validation>
@@ -31,6 +32,9 @@
                                is="#[MunitTools::equalTo(10248)]"/>
       <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[1]]"
                                is="#[MunitTools::equalTo(10249)]"/>
+      <munit-tools:retrieve key="headers"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.'custom-header']"
+                               is="#[MunitTools::equalTo('value')]"/>
     </munit:validation>
   </munit:test>
 
