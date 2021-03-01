@@ -12,20 +12,26 @@ import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsExcept
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 import java.net.URLDecoder;
+import org.mule.runtime.api.scheduler.Scheduler;
 
 public class OdataMetadataManagerImpl extends OdataMetadataManager {
   private final EntityDefinitionSet entitySet;
   private static Logger logger = Logger.getLogger(OdataMetadataManagerImpl.class);
 
-  public OdataMetadataManagerImpl(String ramlPath) throws OdataMetadataFormatException {
+  public OdataMetadataManagerImpl(String ramlPath, Scheduler scheduler)
+      throws OdataMetadataFormatException {
     logger.info("Initializing Odata Metadata");
     try {
-      AMFWrapper apiWrapper = new AMFWrapper(URLDecoder.decode(ramlPath));
+      AMFWrapper apiWrapper = new AMFWrapper(URLDecoder.decode(ramlPath), scheduler);
       entitySet = apiWrapper.getSchemas();
     } catch (OdataMetadataFieldsException e) {
       throw new OdataMetadataFormatException(e.getMessage());
     }
     logger.info("Odata Metadata initialized");
+  }
+
+  public OdataMetadataManagerImpl(String ramlPath) throws OdataMetadataFormatException {
+    this(ramlPath, null);
   }
 
   @Override
