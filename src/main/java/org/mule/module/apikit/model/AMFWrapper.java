@@ -32,6 +32,9 @@ import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_INT64;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_SINGLE;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_STRING;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_TIME;
+import amf.client.environment.DefaultEnvironment;
+import amf.client.environment.Environment;
+import amf.client.execution.ExecutionEnvironment;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,7 +64,7 @@ import amf.client.model.domain.ScalarNode;
 import amf.client.model.domain.ScalarShape;
 import amf.client.model.domain.Shape;
 import amf.client.model.domain.UnionShape;
-import amf.plugins.features.validation.AMFValidatorPlugin;
+import org.mule.runtime.api.scheduler.Scheduler;
 
 public class AMFWrapper {
 
@@ -82,23 +85,18 @@ public class AMFWrapper {
   private static final String EDM_TIME_PATTERN =
       "^PT([0-1]?[0-9]|2[0-3])H[0-5][0-9]M(|[0-5][0-9]S)$";
 
-  static {
-    try {
-      AMF.init().get();
-      AMFValidatorPlugin.withEnabledValidation(true);
-    } catch (final Exception e) {
-      e.printStackTrace();
-    }
-  }
-
   private List<NodeShape> nodeShapesList;
   private Map<String, NodeShape> shapes = new HashMap<>();
   private EntityDefinitionSet entityDefinitionSet = new EntityDefinitionSet();
 
-  public AMFWrapper(String ramlPath)
+  public AMFWrapper(String ramlPath, Scheduler scheduler)
       throws OdataMetadataFormatException, OdataMetadataFieldsException {
     try {
-      initNodeShapesList(ramlPath);
+      ExecutionEnvironment executionEnvironment =
+          scheduler != null ? new ExecutionEnvironment(scheduler) : new ExecutionEnvironment();
+      Environment environment = DefaultEnvironment.apply(executionEnvironment);
+      AMF.init(executionEnvironment).get();
+      initNodeShapesList(ramlPath, environment);
     } catch (ExecutionException | InterruptedException e) {
       throw new OdataMetadataFormatException("RAML is invalid. See log list.");
     }
@@ -107,6 +105,11 @@ public class AMFWrapper {
       shapes.put(nodeShape.name().value(), nodeShape);
       entityDefinitionSet.addEntity(buildEntityDefinition(nodeShape));
     }
+  }
+
+  public AMFWrapper(String ramlPath)
+      throws OdataMetadataFormatException, OdataMetadataFieldsException {
+    this(ramlPath, null);
   }
 
   private void validateOdataRaml(Raml10Parser parser)
@@ -123,11 +126,12 @@ public class AMFWrapper {
     throw new OdataMetadataFieldsException(errorMessage);
   }
 
-  private void initNodeShapesList(String ramlPath) throws ExecutionException, InterruptedException,
-      OdataMetadataFieldsException, OdataMetadataFormatException {
+  private void initNodeShapesList(String ramlPath, Environment environment)
+      throws ExecutionException, InterruptedException, OdataMetadataFieldsException,
+      OdataMetadataFormatException {
     nodeShapesList = new ArrayList<>();
 
-    Raml10Parser parser = AMF.raml10Parser();
+    Raml10Parser parser = new Raml10Parser(environment);
 
     Object object = parser.parseFileAsync(URLDecoder.decode(ramlPath)).get();
 
@@ -333,7 +337,7 @@ public class AMFWrapper {
   private String getAnnotation(Shape nodeShape, String annotationName) {
     for (DomainExtension annotation : nodeShape.customDomainProperties()) {
       if (annotationName.equals(annotation.name().value())) {
-        return ((ScalarNode) annotation.extension()).value();
+        return ((ScalarNode) annotation.extension()).value().value();
       }
     }
 
