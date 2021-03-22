@@ -199,7 +199,8 @@
     </munit:execution>
     <munit:validation>
       <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(400)]"/>
-      <munit-tools:assert-that expression="#[output application/java --- payload.error.message]" is="#[MunitTools::startsWith('/OrderID expected type: Number, found: String')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.error.message]"
+                               is="#[MunitTools::startsWith('/OrderID expected type: Integer, found: String')]"/>
     </munit:validation>
   </munit:test>
 
