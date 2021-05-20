@@ -19,6 +19,7 @@ import org.mule.module.apikit.odata.processor.ODataMetadataProcessor;
 import org.mule.module.apikit.odata.processor.ODataRequestProcessor;
 import org.mule.module.apikit.odata.processor.ODataServiceDocumentProcessor;
 import org.mule.module.apikit.odata.util.ODataUriHelper;
+import org.mule.runtime.api.util.MultiMap;
 
 public class ODataUriParser {
 
@@ -31,8 +32,8 @@ public class ODataUriParser {
    * @throws ODataInvalidFormatException
    */
 
-  public static ODataRequestProcessor parse(OdataContext odataContext, String path, String query)
-      throws ODataException {
+  public static ODataRequestProcessor parse(OdataContext odataContext, String path, String query,
+      MultiMap<String, String> queryParams) throws ODataException {
 
     path = path.replace(ODATA_SVC_URI_PREFIX, "");
     query = decodeQuery(query);
@@ -54,7 +55,7 @@ public class ODataUriParser {
         String entity = ODataUriHelper.parseEntity(path);
 
         // parse query
-        String querystring = handleQuerystring(query);
+        String querystring = handleQuerystring(query, queryParams);
 
         // parse keys
         HashMap<String, Object> keys = ODataUriHelper.parseKeys(path,
@@ -97,12 +98,11 @@ public class ODataUriParser {
     }
   }
 
-  private static String handleQuerystring(String query)
+  private static String handleQuerystring(String query, MultiMap<String, String> queryParams)
       throws ODataInvalidUriException, ODataInvalidFormatException {
-    String querystring = "";
-    if (ODataUriHelper.validQuery(query)) {
-      querystring = query.replace("?", "").replace("$", "");
-    }
-    return querystring;
+
+    ODataUriHelper.validQuery(query, queryParams);
+
+    return query.replace("?", "").replace("$", "");
   }
 }

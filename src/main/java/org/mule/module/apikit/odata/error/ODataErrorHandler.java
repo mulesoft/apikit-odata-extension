@@ -72,22 +72,6 @@ public class ODataErrorHandler {
    * @return
    */
   private static ODataException processMuleException(MuleException ex) {
-    /*
-    		if (ex instanceof MethodNotAllowedException) {
-    			return new ODataMethodNotAllowedException();
-    		} else if (ex instanceof BadRequestException) {º
-    			return new ODataBadRequestException(ex.getMessage(), ex);
-    		} else if (ex instanceof NotAcceptableException) {
-    			return new ODataNotAcceptableException();
-    		} else if (ex instanceof NotFoundException) {
-    			return new ODataNotFoundException(ex.getMessage());
-    		} else if (ex instanceof UnsupportedMediaTypeException) {
-    			return new ODataUnsupportedMediaTypeException(ex.getMessage());
-    		} else {
-    			return new ODataInternalServerErrorException(ex);
-    		}
-    */
-
     if (ex instanceof BadRequestException) {
       return new ODataBadRequestException(ex.getMessage(), ex);
     } else {

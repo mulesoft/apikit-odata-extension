@@ -207,7 +207,8 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
     httpRequestAttributesBuilder.localAddress(attributes.getLocalAddress());
     httpRequestAttributesBuilder.remoteAddress(attributes.getRemoteAddress());
 
-    MultiMap<String, String> httpQueryParams = Helper.queryToMap(query);
+    MultiMap<String, String> httpQueryParams =
+        Helper.replaceQueryParams(attributes.getQueryParams());
     httpRequestAttributesBuilder.queryParams(httpQueryParams);
 
     MultiMap<String, String> headers = new MultiMap<>(attributes.getHeaders());

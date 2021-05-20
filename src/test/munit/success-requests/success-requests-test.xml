@@ -38,6 +38,48 @@
     </munit:validation>
   </munit:test>
 
+  <munit:test name="get-entity-collection-with-system-query-options">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$top=100&amp;$filter=indexof(first_name,%27RL%27)%20ne%20-1">
+        <http:headers>#[output application/java --- { "custom-header" : "value" }]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]"
+        is="#[MunitTools::equalTo(200)]"/>
+      <munit-tools:retrieve key="query-parameters"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.'filter']"
+        is='#[MunitTools::equalTo("indexof(first_name,&apos;RL&apos;) ne -1")]'/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.'top']"
+        is='#[MunitTools::equalTo("100")]'/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="get-entity-collection-filter-with-&amp;-value-is-valid">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$top=100&amp;$filter=indexof(first_name,%27R%26L%27)%20ne%20-1">
+        <http:headers>#[output application/java --- { "custom-header" : "value" }]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]"
+        is="#[MunitTools::equalTo(200)]"/>
+      <munit-tools:retrieve key="query-parameters"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.'filter']"
+        is='#[MunitTools::equalTo("indexof(first_name,&apos;R&amp;L&apos;) ne -1")]'/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.'top']"
+        is='#[MunitTools::equalTo("100")]'/>
+    </munit:validation>
+  </munit:test>
+
   <munit:test name="count-entity-collection-result">
     <munit:enable-flow-sources>
       <munit:enable-flow-source value="success-server-main"/>

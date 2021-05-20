@@ -141,19 +141,18 @@ public class Helper {
     }
   }
 
-  public static MultiMap<String, String> queryToMap(String query) {
-    MultiMap<String, String> queryMap = new MultiMap<>();
+  public static MultiMap<String, String> replaceQueryParams(
+      MultiMap<String, String> queryParameters) {
+    MultiMap<String, String> result = new MultiMap<>();
 
-    if (query != null && !"".equals(query)) {
-      String[] queries = query.split("&");
-      for (String q : queries) {
-        String[] parts = q.split("=");
-        queryMap.put(parts[0], parts[1]);
-      }
+    for (Map.Entry<String, String> queryParam : queryParameters.entrySet()) {
+      result.put(queryParam.getKey().startsWith("$") ? queryParam.getKey().replace("$", "")
+          : queryParam.getKey(), queryParam.getValue());
     }
-
-    return queryMap;
+    return result;
   }
+
+
 
   public static List<Entry> transformJsonToEntryList(String payload)
       throws ODataInvalidFlowResponseException {
