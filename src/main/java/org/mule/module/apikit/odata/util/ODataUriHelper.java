@@ -6,13 +6,18 @@
  */
 package org.mule.module.apikit.odata.util;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.exception.ODataInvalidUriException;
+import org.mule.runtime.api.util.MultiMap;
 import org.odata4j.expression.BoolCommonExpression;
 import org.odata4j.producer.resources.OptionsQueryParser;
 import com.google.common.base.Strings;
@@ -143,7 +148,7 @@ public class ODataUriHelper {
     String[] parsedKeys;
 
     // parse raw keys
-    if (!Strings.isNullOrEmpty(parsedId)) {
+    if (!isNullOrEmpty(parsedId)) {
       if (matchPattern(ODATA_MULTIPLE_KEYS_PATTERN, parsedId)) {
         parsedKeys = parsedId.split(",");
       } else if (matchPattern(ODATA_SINGLE_KEY_PATTERN, parsedId)) {
@@ -280,27 +285,25 @@ public class ODataUriHelper {
     return true;
   }
 
-  public static boolean validQuery(String query)
+  public static void validQuery(String query, MultiMap<String, String> queryParameters)
       throws ODataInvalidUriException, ODataInvalidFormatException {
-    if (!query.isEmpty()) {
-      String[] queryParams = query.replace("?", "").split("&");
-      ArrayList<String> usedParams = new ArrayList<String>();
-      for (String queryParam : queryParams) {
-        String[] elems = queryParam.split("=");
-        if (elems.length == 2) {
-          String key = elems[0];
-          String value = elems[1];
-          if (usedParams.contains(key)) {
-            throw new ODataInvalidUriException("The query argument '" + key + "' is repeated.");
-          }
-          usedParams.add(key);
-          validArgumentValue(key, value);
-        } else {
-          throw new ODataInvalidUriException("Incorrect format, missing '=' in query argument.");
-        }
-      }
+    if (query.isEmpty()) {
+      return;
     }
-    return true;
+
+
+    for (Entry<String, String> queryParam : queryParameters.entrySet()) {
+      if (queryParameters.getAll(queryParam.getKey()).size() > 1) {
+        throw new ODataInvalidUriException(
+            "The query argument '" + queryParam.getKey() + "' is repeated.");
+      }
+
+      if (isNullOrEmpty(queryParam.getValue())) {
+        throw new ODataInvalidUriException("Incorrect format, missing '=' in query argument.");
+      }
+      validArgumentValue(queryParam.getKey(), queryParam.getValue());
+
+    }
   }
 
   public static boolean validArgumentValue(String argument, String value)
@@ -376,7 +379,7 @@ public class ODataUriHelper {
   // break the parser.
   private static boolean validFilter(String filter) throws ODataInvalidUriException {
     try {
-      BoolCommonExpression parsedfilter = OptionsQueryParser.parseFilter(filter.replace(".", ""));
+      OptionsQueryParser.parseFilter(filter.replace(".", ""));
       return true;
     } catch (Exception e) {
       throw new ODataInvalidUriException(e.getMessage());
