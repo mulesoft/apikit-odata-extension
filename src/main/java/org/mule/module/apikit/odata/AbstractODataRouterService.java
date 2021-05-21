@@ -57,7 +57,8 @@ public abstract class AbstractODataRouterService {
       String query = attributes.getQueryString();
 
       // URIParser
-      ODataRequestProcessor odataRequestProcessor = ODataUriParser.parse(oDataContext, path, query);
+      ODataRequestProcessor odataRequestProcessor =
+          ODataUriParser.parse(oDataContext, path, query, attributes.getQueryParams());
 
       // Validate format
       formats = ODataFormatHandler.getFormats(attributes);
