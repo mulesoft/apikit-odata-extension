@@ -7,20 +7,15 @@
 package org.mule.module.apikit.odata.util;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.mule.module.apikit.odata.exception.ODataInvalidFormatException;
 import org.mule.module.apikit.odata.exception.ODataInvalidUriException;
 import org.mule.runtime.api.util.MultiMap;
-import org.odata4j.expression.BoolCommonExpression;
 import org.odata4j.producer.resources.OptionsQueryParser;
-import com.google.common.base.Strings;
 
 /**
  * @author juancazala
@@ -67,6 +62,8 @@ public class ODataUriHelper {
   public static final Pattern ODATA_LONG_PATTERN = Pattern.compile(ODATA_LONG_REGEXP);
 
   private static final String ODATA_SVC_URI_PREFIX = "/odata.svc";
+  private static final String SKIP_FILTER_VALIDATION_PROPERTY =
+      "apikit.odata.SkipFilterValidationProperty";
 
 
   public static boolean isMetadata(String path) {
@@ -360,7 +357,7 @@ public class ODataUriHelper {
         break;
 
       case "$filter":
-        if (!validFilter(value))
+        if (!getSkipFilterValidationProperty() && !validFilter(value))
           throw new ODataInvalidUriException(
               "Incorrect format for $filter argument '" + value + "'.");
         break;
@@ -390,4 +387,9 @@ public class ODataUriHelper {
     return completeUrl.substring(0,
         completeUrl.indexOf(ODATA_SVC_URI_PREFIX) + ODATA_SVC_URI_PREFIX.length() + 1);
   }
+
+  private static boolean getSkipFilterValidationProperty() {
+    return Boolean.valueOf(System.getProperty(SKIP_FILTER_VALIDATION_PROPERTY, "false"));
+  }
+
 }
