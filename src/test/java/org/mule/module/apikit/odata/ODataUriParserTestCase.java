@@ -37,7 +37,7 @@ public class ODataUriParserTestCase {
 
   private static OdataContext oDataContext;
   private static final String SKIP_FILTER_VALIDATION_PROPERTY =
-      "apikit.odata.SkipFilterValidationProperty";
+      "apikit.odata.skipFilterValidation";
 
 
   @BeforeClass
@@ -4734,9 +4734,8 @@ public class ODataUriParserTestCase {
     return ODataUriParser.parse(context, path, query, queryParams);
   }
 
-
   @Test
-  public void invalidQueryFilterTes() throws ODataException {
+  public void invalidQueryFilterTest() throws ODataException {
     assertThrows(ODataInvalidUriException.class,
         () -> parse(oDataContext, "/odata.svc/orders", "?$filter=not a valid filter"));
   }

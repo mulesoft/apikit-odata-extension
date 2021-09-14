@@ -62,8 +62,7 @@ public class ODataUriHelper {
   public static final Pattern ODATA_LONG_PATTERN = Pattern.compile(ODATA_LONG_REGEXP);
 
   private static final String ODATA_SVC_URI_PREFIX = "/odata.svc";
-  private static final String SKIP_FILTER_VALIDATION_PROPERTY =
-      "apikit.odata.skipFilterValidation";
+  private static final String SKIP_FILTER_VALIDATION_PROPERTY = "apikit.odata.skipFilterValidation";
 
 
   public static boolean isMetadata(String path) {
