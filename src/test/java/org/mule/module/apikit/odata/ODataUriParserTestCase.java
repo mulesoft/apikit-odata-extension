@@ -36,8 +36,7 @@ import static org.junit.Assert.fail;
 public class ODataUriParserTestCase {
 
   private static OdataContext oDataContext;
-  private static final String SKIP_FILTER_VALIDATION_PROPERTY =
-      "apikit.odata.skipFilterValidation";
+  private static final String SKIP_FILTER_VALIDATION_PROPERTY = "apikit.odata.skipFilterValidation";
 
 
   @BeforeClass
