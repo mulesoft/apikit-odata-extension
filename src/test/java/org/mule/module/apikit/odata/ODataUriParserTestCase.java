@@ -16,6 +16,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.exception.ODataException;
+import org.mule.module.apikit.odata.exception.ODataInvalidUriException;
 import org.mule.module.apikit.odata.exception.ODataUnsupportedMediaTypeException;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManagerImpl;
@@ -28,12 +29,16 @@ import org.mule.module.apikit.odata.util.ODataUriHelper;
 import java.util.HashMap;
 import org.mule.runtime.api.util.MultiMap;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ODataUriParserTestCase {
 
   private static OdataContext oDataContext;
+  private static final String SKIP_FILTER_VALIDATION_PROPERTY =
+      "apikit.odata.skipFilterValidation";
+
 
   @BeforeClass
   public static void setUp() throws ODataException {
@@ -4728,5 +4733,23 @@ public class ODataUriParserTestCase {
     }
     return ODataUriParser.parse(context, path, query, queryParams);
   }
+
+  @Test
+  public void invalidQueryFilterTest() throws ODataException {
+    assertThrows(ODataInvalidUriException.class,
+        () -> parse(oDataContext, "/odata.svc/orders", "?$filter=not a valid filter"));
+  }
+
+  @Test
+  public void skipFilterValidationTest() throws ODataException {
+    System.setProperty(SKIP_FILTER_VALIDATION_PROPERTY, "true");
+
+    ODataRequestProcessor processor =
+        parse(oDataContext, "/odata.svc/orders", "?$filter=not a valid filter");
+    assertTrue(processor instanceof ODataApikitProcessor);
+
+    System.clearProperty(SKIP_FILTER_VALIDATION_PROPERTY);
+  }
+
 }
 
