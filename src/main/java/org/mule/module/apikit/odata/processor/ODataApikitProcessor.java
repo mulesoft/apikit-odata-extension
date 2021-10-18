@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.lang.String.format;
 import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.ALL_PAGES;
 import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.NONE;
 
@@ -52,6 +53,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
   public static final String KEY_VALUE_SEPARATOR = "_";
   public static final String KEYS_SEPARATOR = "-";
   public static final String URL_RESOURCE_SEPARATOR = "/";
+  private static final String ODATA_PREFIX = "/odata.svc";
 
   private String path;
   private String query;
@@ -191,9 +193,9 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 
   private HttpRequestAttributes getHttpRequestAttributes(HttpRequestAttributes attributes) {
     String uri = attributes.getRelativePath();
-    String basePath = uri.substring(0, uri.toLowerCase().indexOf("/odata.svc"));
-    String httpRequest = basePath + this.path + "?" + this.query;
+    String basePath = uri.substring(0, uri.toLowerCase().indexOf(ODATA_PREFIX));
     String httpRequestPath = basePath + this.path;
+    String httpRequest = concatToPath(httpRequestPath, attributes.getQueryString());
 
     HttpRequestAttributesBuilder httpRequestAttributesBuilder = new HttpRequestAttributesBuilder();
     httpRequestAttributesBuilder.listenerPath(attributes.getListenerPath());
@@ -203,9 +205,11 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
     httpRequestAttributesBuilder.method(attributes.getMethod());
     httpRequestAttributesBuilder.requestPath(httpRequestPath);
     httpRequestAttributesBuilder.requestUri(httpRequest);
-    httpRequestAttributesBuilder.queryString(this.query);
+    httpRequestAttributesBuilder.queryString(attributes.getQueryString());
     httpRequestAttributesBuilder.localAddress(attributes.getLocalAddress());
     httpRequestAttributesBuilder.remoteAddress(attributes.getRemoteAddress());
+    httpRequestAttributesBuilder
+        .rawRequestUri(concatToPath(this.path, getRawQueryString(attributes)));
 
     MultiMap<String, String> httpQueryParams =
         Helper.replaceQueryParams(attributes.getQueryParams());
@@ -217,6 +221,16 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
     mergeHeader(headers, "accept", MediaType.APPLICATION_JSON.toString());
     httpRequestAttributesBuilder.headers(headers);
     return httpRequestAttributesBuilder.build();
+  }
+
+  private static String concatToPath(String path, String queryString) {
+    return queryString != null && !queryString.isEmpty() ? format("%s?%s", path, queryString)
+        : path;
+  }
+
+  private static String getRawQueryString(HttpRequestAttributes attributes) {
+    int beginIndex = attributes.getRawRequestUri().indexOf("?");
+    return beginIndex != -1 ? attributes.getRawRequestUri().substring(beginIndex + 1) : null;
   }
 
   private static void mergeHeader(MultiMap<String, String> multiMap, String key, String value) {
