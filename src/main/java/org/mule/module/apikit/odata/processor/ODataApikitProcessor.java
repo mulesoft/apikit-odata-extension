@@ -224,8 +224,13 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
   }
 
   private static String concatToPath(String path, String queryString) {
-    return queryString != null && !queryString.isEmpty() ? format("%s?%s", path, queryString)
-        : path;
+    StringBuilder stringBuilder = new StringBuilder(path);
+
+    if(queryString != null && !queryString.isEmpty()){
+      stringBuilder.append("?").append(queryString);
+    }
+
+    return stringBuilder.toString();
   }
 
   private static String getRawQueryString(HttpRequestAttributes attributes) {
