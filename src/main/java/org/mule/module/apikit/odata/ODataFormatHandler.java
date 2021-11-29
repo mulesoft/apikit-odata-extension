@@ -41,7 +41,7 @@ public class ODataFormatHandler {
 
     List<Format> formats = new ArrayList<Format>();
     String acceptHeader = getAcceptHeader(attributes);
-    String formatQueryParam = getFormatQueryParam(attributes);
+    String formatQueryParam = attributes.getQueryParams().get("$format");
 
     if (formatQueryParam != null) {
       if (Arrays.asList(xmlFormatTypes).contains(formatQueryParam)) {
@@ -106,26 +106,5 @@ public class ODataFormatHandler {
       acceptHeader = defaultMimeTypes[0];
     }
     return acceptHeader.toLowerCase();
-  }
-
-  /**
-   * Looks for the $format param in the query string and returns its value if
-   * present
-   * 
-   * @param event
-   * @return
-   */
-  private static String getFormatQueryParam(HttpRequestAttributes attributes) {
-    String formatQueryParam = null;
-    String queryString = URLDecoder.decode(attributes.getQueryString());
-    if (queryString != null && queryString.contains("$format=")) {
-      String[] query = queryString.split("&");
-      for (String pair : query) {
-        if (pair.contains("$format=")) {
-          return pair.replace("$format=", "").toLowerCase();
-        }
-      }
-    }
-    return formatQueryParam;
   }
 }
