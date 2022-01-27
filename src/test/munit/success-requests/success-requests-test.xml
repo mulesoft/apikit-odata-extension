@@ -256,6 +256,28 @@
     </munit:validation>
   </munit:test>
 
+  <munit:test name="other-query-string-encoding-test">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="success-server-main"/>
+      <munit:enable-flow-source value="get:\orders:success-server-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="api/odata.svc/orders?$filter=CustomerID eq '12%25%2034'">
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+      <munit-tools:retrieve key="attributes"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.rawRequestUri ]"
+                               is="#[MunitTools::equalTo('/orders?\$filter=CustomerID%20eq%20\'12%25%2034\'')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.queryString ]"
+                               is="#[MunitTools::equalTo('\$filter=CustomerID eq \'12% 34\'')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.requestUri ]"
+                               is="#[MunitTools::equalTo('/api/orders?\$filter=CustomerID eq \'12% 34\'')]"/>
+    </munit:validation>
+  </munit:test>
+
   <munit:test name="get-with-logical-operators">
     <munit:enable-flow-sources>
       <munit:enable-flow-source value="success-server-main"/>

@@ -36,7 +36,6 @@ public class ODataUriParser {
       MultiMap<String, String> queryParams) throws ODataException {
 
     path = path.replace(ODATA_SVC_URI_PREFIX, "");
-    query = decodeQuery(query);
 
     if (ODataUriHelper.allowedQuery(path, query)) {
       // metadata
