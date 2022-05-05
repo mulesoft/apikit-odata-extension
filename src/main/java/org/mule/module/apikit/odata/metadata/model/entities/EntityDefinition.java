@@ -6,16 +6,18 @@
  */
 package org.mule.module.apikit.odata.metadata.model.entities;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.log4j.Logger;
 
 /**
- * 
  * @author arielsegura
  */
 public class EntityDefinition implements Comparable<EntityDefinition> {
+
+  private static Logger logger = LoggerFactory.getLogger(EntityDefinition.class);
 
   private String name;
   private List<EntityDefinitionProperty> properties;
@@ -142,11 +144,11 @@ public class EntityDefinition implements Comparable<EntityDefinition> {
     String delim = "";
     for (EntityDefinitionProperty property : properties) {
       if (property.isKey()) {
-        Logger.getLogger(getClass()).debug("Property " + property.getName() + " is key. ");
+        logger.debug("Property " + property.getName() + " is key. ");
         ret.append(delim + property.getName());
         delim = ",";
       } else {
-        Logger.getLogger(getClass()).debug("Property " + property.getName() + " is not key. ");
+        logger.debug("Property " + property.getName() + " is not key. ");
       }
     }
     return ret.toString();
