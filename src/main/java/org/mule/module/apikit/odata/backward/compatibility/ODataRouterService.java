@@ -6,7 +6,6 @@
  */
 package org.mule.module.apikit.odata.backward.compatibility;
 
-import org.apache.log4j.Logger;
 import org.mule.module.apikit.api.exception.ApikitRuntimeException;
 import org.mule.module.apikit.odata.AbstractODataRouterService;
 import org.mule.module.apikit.odata.context.OdataContext;
@@ -17,6 +16,8 @@ import org.mule.module.apikit.spi.RouterService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Router implementation only for backward compatibility purpose.
@@ -27,7 +28,7 @@ import org.reactivestreams.Publisher;
 @Deprecated
 public class ODataRouterService extends AbstractODataRouterService implements RouterService {
 
-  private static Logger logger = Logger.getLogger(ODataRouterService.class);
+  private static Logger logger = LoggerFactory.getLogger(ODataRouterService.class);
 
   private OdataContext oDataContext;
 

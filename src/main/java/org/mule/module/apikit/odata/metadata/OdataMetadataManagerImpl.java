@@ -6,17 +6,18 @@
  */
 package org.mule.module.apikit.odata.metadata;
 
-import org.apache.log4j.Logger;
 import org.mule.module.apikit.model.AMFWrapper;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
-import java.net.URLDecoder;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.net.URLDecoder;
 
 public class OdataMetadataManagerImpl extends OdataMetadataManager {
   private final EntityDefinitionSet entitySet;
-  private static Logger logger = Logger.getLogger(OdataMetadataManagerImpl.class);
+  private static Logger logger = LoggerFactory.getLogger(OdataMetadataManagerImpl.class);
 
   public OdataMetadataManagerImpl(String ramlPath, Scheduler scheduler)
       throws OdataMetadataFormatException {
