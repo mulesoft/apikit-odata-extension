@@ -423,12 +423,23 @@
             <groupId>org.jibx</groupId>
             <artifactId>jibx-tools</artifactId>
             <version>${jibx-tools.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-apikit-module-spi</artifactId>
             <version>${apikit.spi.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.36</version>
         </dependency>
 
         <!-- Testing -->
