@@ -6,11 +6,12 @@
  */
 package org.mule.module.apikit.odata.backward.compatibility;
 
-import org.apache.log4j.Logger;
 import org.mule.module.apikit.model.AMFWrapper;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.net.URLDecoder;
 
 /**
@@ -21,9 +22,10 @@ import java.net.URLDecoder;
  */
 @Deprecated
 public class OdataMetadataManagerImpl extends OdataMetadataManager {
+
   private static EntityDefinitionSet entitySet = null;
   private static final Object lock = new Object();
-  private static Logger logger = Logger.getLogger(OdataMetadataManager.class);
+  private static Logger logger = LoggerFactory.getLogger(OdataMetadataManager.class);
 
 
   public OdataMetadataManagerImpl(String ramlPath) throws OdataMetadataFormatException {
