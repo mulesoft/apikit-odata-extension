@@ -192,7 +192,7 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
   }
 
   private HttpRequestAttributes getHttpRequestAttributes(HttpRequestAttributes attributes) {
-    String uri = attributes.getRelativePath();
+    String uri = attributes.getRawRequestPath();
     String basePath = uri.substring(0, uri.toLowerCase().indexOf(ODATA_PREFIX));
     String httpRequestPath = basePath + this.path;
     String httpRequest = concatToPath(httpRequestPath, attributes.getQueryString());

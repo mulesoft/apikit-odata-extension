@@ -47,13 +47,12 @@ public abstract class AbstractODataRouterService {
   }
 
   protected static Publisher<CoreEvent> processODataRequest(HttpRequestAttributes attributes,
-      AbstractRouterInterface router, OdataContext oDataContext, CoreEvent event)
-      throws MuleException {
+      AbstractRouterInterface router, OdataContext oDataContext, CoreEvent event) {
     List<ODataPayloadFormatter.Format> formats = null;
     try {
       String listenerPath =
           attributes.getListenerPath().substring(0, attributes.getListenerPath().lastIndexOf("/*"));
-      String path = attributes.getRelativePath().replaceAll(listenerPath, "");
+      String path = attributes.getRawRequestPath().replaceAll(listenerPath, "");
       String query = attributes.getQueryString();
 
       // URIParser
