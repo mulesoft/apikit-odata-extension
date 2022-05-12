@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+  xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+  <munit:config name="http-base-path-test-suite"/>
+
+  <munit:test name="base-path-get-entity-collection">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="base-path-main"/>
+      <munit:enable-flow-source value="get:\orders:base-path-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="base/odata-ex-project/odata.svc/orders?$format=json">
+        <http:headers>#[output application/java --- { "custom-header" : "value" }]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]"
+        is="#[MunitTools::equalTo(200)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.headers.'Content-type']"
+        is="#[MunitTools::equalTo('application/json')]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[0]]"
+        is="#[MunitTools::equalTo(10248)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[1]]"
+        is="#[MunitTools::equalTo(10249)]"/>
+      <munit-tools:retrieve key="headers"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.'custom-header']"
+        is="#[MunitTools::equalTo('value')]"/>
+    </munit:validation>
+  </munit:test>
+
+  <munit:test name="base-path-get-entity-by-id">
+    <munit:enable-flow-sources>
+      <munit:enable-flow-source value="base-path-main"/>
+      <munit:enable-flow-source value="get:\orders\(orderId):base-path-config"/>
+    </munit:enable-flow-sources>
+    <munit:execution>
+      <http:request method="GET" config-ref="http-requester-simple" path="base/odata-ex-project/odata.svc/orders(10248)?$format=json">
+        <http:headers>#[output application/java --- {"Accept" : "application/json"}]</http:headers>
+      </http:request>
+    </munit:execution>
+    <munit:validation>
+      <munit-tools:assert-that expression="#[output application/java --- attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[0]]" is="#[MunitTools::equalTo(10248)]"/>
+    </munit:validation>
+  </munit:test>
+
+</mule>
