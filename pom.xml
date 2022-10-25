@@ -25,7 +25,7 @@
         <apikit.version>2.0.0-SNAPSHOT</apikit.version>
         <apikit.spi.version>1.2.4</apikit.spi.version>
         <muleHttpConnector>1.7.1</muleHttpConnector>
-        <mule.plugin.maven.plugin.version>1.1.6</mule.plugin.maven.plugin.version>
+        <mule.plugin.maven.plugin.version>1.5.0-20221024</mule.plugin.maven.plugin.version>
         <amfVersion>4.6.0</amfVersion>
         <licensePath>LICENSE_HEADER.txt</licensePath>
         <javaFormatter.plugin.version>1.9.0</javaFormatter.plugin.version>
