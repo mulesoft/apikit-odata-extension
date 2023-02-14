@@ -25,15 +25,15 @@ import org.odata4j.edm.EdmSimpleType;
 public class EDMTypeConverterTestCase {
 
   @Test
-  public void dataStringConversionTest() throws ODataInvalidFormatException {
-    assertTrue(compareOProperties(OProperties.string("test", String.valueOf("test")),
+  public void dataStringConversionTest() {
+    assertTrue(compareOProperties(OProperties.string("test", "test"),
         EDMTypeConverter.getOProperty("test", "test", EdmSimpleType.STRING)));
     assertTrue(compareOProperties(OProperties.string("test", null),
         EDMTypeConverter.getOProperty("test", null, EdmSimpleType.STRING)));
   }
 
   @Test
-  public void dataInt16ConversionTest() throws ODataInvalidFormatException {
+  public void dataInt16ConversionTest() {
     Short s = 2;
     assertTrue(compareOProperties(OProperties.int16("test", s),
         EDMTypeConverter.getOProperty("test", 2, EdmSimpleType.INT16)));
@@ -42,7 +42,7 @@ public class EDMTypeConverterTestCase {
   }
 
   @Test
-  public void dataInt32ConversionTest() throws ODataInvalidFormatException {
+  public void dataInt32ConversionTest() {
     assertTrue(compareOProperties(OProperties.int32("test", 2),
         EDMTypeConverter.getOProperty("test", 2, EdmSimpleType.INT32)));
     assertTrue(compareOProperties(OProperties.int32("test", null),
@@ -50,7 +50,7 @@ public class EDMTypeConverterTestCase {
   }
 
   @Test
-  public void dataInt64ConversionTest() throws ODataInvalidFormatException {
+  public void dataInt64ConversionTest() {
     Long s = 2L;
     assertTrue(compareOProperties(OProperties.int64("test", s),
         EDMTypeConverter.getOProperty("test", 2, EdmSimpleType.INT64)));
@@ -59,7 +59,7 @@ public class EDMTypeConverterTestCase {
   }
 
   @Test
-  public void dataBinaryConversionTest() throws ODataInvalidFormatException {
+  public void dataBinaryConversionTest() {
     byte[] b = "1".getBytes();
     assertTrue(compareArraysOProperties(OProperties.binary("test", b),
         EDMTypeConverter.getOProperty("test", "1", EdmSimpleType.BINARY)));
@@ -68,7 +68,7 @@ public class EDMTypeConverterTestCase {
   }
 
   @Test
-  public void dataBooleanConversionTest() throws ODataInvalidFormatException {
+  public void dataBooleanConversionTest() {
     assertTrue(compareOProperties(OProperties.boolean_("test", true),
         EDMTypeConverter.getOProperty("test", true, EdmSimpleType.BOOLEAN)));
     assertTrue(compareOProperties(OProperties.boolean_("test", null),
@@ -76,7 +76,7 @@ public class EDMTypeConverterTestCase {
   }
 
   @Test
-  public void dataByteConversionTest() throws ODataInvalidFormatException {
+  public void dataByteConversionTest() {
     UnsignedByte b = new UnsignedByte(244);
     assertTrue(compareOProperties(OProperties.byte_("test", b),
         EDMTypeConverter.getOProperty("test", 244, EdmSimpleType.BYTE)));
@@ -85,17 +85,17 @@ public class EDMTypeConverterTestCase {
   }
 
   @Test
-  public void dataDecimalConversionTest() throws ODataInvalidFormatException {
+  public void dataDecimalConversionTest() {
     double d = new Double(1.0);
     BigDecimal d1 = null;
     assertTrue(compareOProperties(OProperties.decimal("test", d),
-        EDMTypeConverter.getOProperty("test", 1, EdmSimpleType.DECIMAL)));
+        EDMTypeConverter.getOProperty("test", 1.0, EdmSimpleType.DECIMAL)));
     assertTrue(compareOProperties(OProperties.decimal("test", d1),
         EDMTypeConverter.getOProperty("test", null, EdmSimpleType.DECIMAL)));
   }
 
   @Test
-  public void dataDoubleConversionTest() throws ODataInvalidFormatException {
+  public void dataDoubleConversionTest() {
     double d = 1.0;
     assertTrue(compareOProperties(OProperties.double_("test", d),
         EDMTypeConverter.getOProperty("test", 1.0, EdmSimpleType.DOUBLE)));
@@ -104,7 +104,7 @@ public class EDMTypeConverterTestCase {
   }
 
   @Test
-  public void dataSingleConversionTest() throws ODataInvalidFormatException {
+  public void dataSingleConversionTest() {
     float f = 1f;
     assertTrue(compareOProperties(OProperties.single("test", f),
         EDMTypeConverter.getOProperty("test", 1, EdmSimpleType.SINGLE)));
@@ -113,7 +113,7 @@ public class EDMTypeConverterTestCase {
   }
 
   @Test
-  public void dataSbyteConversionTest() throws ODataInvalidFormatException {
+  public void dataSbyteConversionTest() {
     byte b = 100;
     byte b1 = 0;
     assertTrue(compareOProperties(OProperties.sbyte_("test", b),
@@ -123,7 +123,7 @@ public class EDMTypeConverterTestCase {
   }
 
   @Test
-  public void dataDateTimeConversionTest() throws ODataInvalidFormatException, ParseException {
+  public void dataDateTimeConversionTest() throws ParseException {
     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.s");
     Date parsedDate = formatter.parse("1996-07-04 00:00:00.0");
     LocalDateTime d1 = null;
@@ -134,8 +134,7 @@ public class EDMTypeConverterTestCase {
   }
 
   @Test
-  public void dataDateTimeOffsetConversionTest()
-      throws ODataInvalidFormatException, ParseException {
+  public void dataDateTimeOffsetConversionTest() throws ParseException {
     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.s");
     Date parsedDate = formatter.parse("1996-07-04 00:00:00.0");
     DateTime d1 = null;
@@ -147,7 +146,7 @@ public class EDMTypeConverterTestCase {
   }
 
   @Test
-  public void dataTimeConversionTest() throws ODataInvalidFormatException, ParseException {
+  public void dataTimeConversionTest() throws ParseException {
     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.s");
     Date parsedDate = formatter.parse("1996-07-04 00:00:00.0");
     Date d1 = null;
