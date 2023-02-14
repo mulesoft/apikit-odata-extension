@@ -47,7 +47,7 @@
       <munit-tools:value>#[attributes]</munit-tools:value>
     </munit-tools:store>
     <set-variable value="2" variableName="inlineCount"/>
-    <set-payload value='{ "entries" : [{"OrderID":10248,"ShipName":"Vins et alcools Chevalier","ShipAddress":"59 rue de l-Abbaye"}, {"OrderID":10249,"ShipName":"Toms Spezialitten","ShipAddress":"Luisenstr. 48"}]}'/>
+    <set-payload value='{ "entries" : [{"OrderID":10248,"ShipName":"Vins et alcools Chevalier","ShipAddress":"59 rue de l-Abbaye", "NumberDecimal" : 12345678901234567890}, {"OrderID":10249,"ShipName":"Toms Spezialitten","ShipAddress":"Luisenstr. 48", "NumberDecimal" : 12345678901234567899}]}'/>
   </flow>
 
   <flow name="post:\orders:application\json:success-server-config">
