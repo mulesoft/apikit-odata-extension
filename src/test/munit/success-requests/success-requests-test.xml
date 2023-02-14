@@ -32,6 +32,10 @@
                                is="#[MunitTools::equalTo(10248)]"/>
       <munit-tools:assert-that expression="#[output application/java --- payload.d.results.OrderID[1]]"
                                is="#[MunitTools::equalTo(10249)]"/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results.NumberDecimal[0]]"
+        is='#[MunitTools::equalTo("12345678901234567890")]'/>
+      <munit-tools:assert-that expression="#[output application/java --- payload.d.results.NumberDecimal[1]]"
+        is='#[MunitTools::equalTo("12345678901234567899")]'/>
       <munit-tools:retrieve key="headers"/>
       <munit-tools:assert-that expression="#[output application/java --- payload.'custom-header']"
                                is="#[MunitTools::equalTo('value')]"/>
