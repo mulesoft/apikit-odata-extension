@@ -14,20 +14,8 @@ import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class EntityModelParser {
-
-  static final String typesPattern = "^types:\\s*$";
-  static final Pattern elementPattern = Pattern.compile("^\\s{2}(\\w+):\\s*$");
-  static final Pattern remotePattern = Pattern.compile("^\\s{4}\\(odata.remote\\):\\s*(\\w+)\\s*$");
-  static final String propertiesPattern = "^\\s{4}properties:\\s*$";
-  static final Pattern fieldPattern = Pattern.compile("^\\s{6}(\\w+):\\s*$");
-  static final Pattern typePropertyPattern = Pattern.compile("^\\s{8}type:\\s*(\\w+)\\s*$");
-  static final Pattern keyPropertyPattern =
-      Pattern.compile("^\\s{8}\\(odata.key\\):\\s*(\\w+)\\s*$");
-  static final Pattern nullablePropertyPattern =
-      Pattern.compile("^\\s{8}\\(odata.nullable\\):\\s*(\\w+)\\s*$");
 
   /**
    * Parses the entities out of the RAML file and looks for required fields
@@ -36,8 +24,7 @@ public class EntityModelParser {
    * @throws IOException
    * @throws EntityModelParsingException
    */
-  public static List<Entity> getEntities(String pathToModel)
-      throws IOException, EntityModelParsingException {
+  public static List<Entity> getEntities(String pathToModel) throws EntityModelParsingException {
 
     try {
       AMFWrapper amfWrapper = new AMFWrapper(pathToModel);
@@ -50,7 +37,7 @@ public class EntityModelParser {
 
   private static List<Entity> getEntities(EntityDefinitionSet entityDefinitionSet)
       throws InvalidModelException {
-    List<Entity> entities = new ArrayList<Entity>();
+    List<Entity> entities = new ArrayList<>();
     boolean typesFound = false;
 
     Entity entity;

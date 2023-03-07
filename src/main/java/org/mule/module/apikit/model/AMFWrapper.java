@@ -6,6 +6,7 @@
  */
 package org.mule.module.apikit.model;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.String.format;
 import static org.mule.module.apikit.odata.metadata.raml.RamlParser.GUID;
 import static org.mule.module.apikit.odata.metadata.raml.RamlParser.INT16;
@@ -32,9 +33,26 @@ import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_INT64;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_SINGLE;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_STRING;
 import static org.mule.module.apikit.odata.util.EDMTypeConverter.EDM_TIME;
-import amf.client.environment.DefaultEnvironment;
-import amf.client.environment.Environment;
-import amf.client.execution.ExecutionEnvironment;
+import amf.apicontract.client.platform.AMFBaseUnitClient;
+import amf.apicontract.client.platform.AMFConfiguration;
+import amf.apicontract.client.platform.AMFLibraryResult;
+import amf.apicontract.client.platform.APIConfiguration;
+import amf.core.client.common.transform.PipelineId;
+import amf.core.client.platform.AMFParseResult;
+import amf.core.client.platform.AMFResult;
+import amf.core.client.platform.execution.ExecutionEnvironment;
+import amf.core.client.platform.model.domain.DomainExtension;
+import amf.core.client.platform.model.domain.ScalarNode;
+import amf.core.client.platform.model.domain.Shape;
+import amf.core.client.platform.model.document.BaseUnit;
+import amf.core.client.platform.model.document.Document;
+import amf.core.client.platform.model.document.Module;
+import amf.core.client.platform.model.domain.DomainElement;
+import amf.core.client.platform.model.domain.PropertyShape;
+import amf.core.client.platform.validation.AMFValidationResult;
+import amf.shapes.client.platform.model.domain.FileShape;
+import amf.shapes.client.platform.model.domain.NodeShape;
+import amf.shapes.client.platform.model.domain.UnionShape;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,28 +60,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.Nullable;
-import amf.ProfileNames;
-import amf.client.model.document.BaseUnit;
-import amf.client.model.document.Document;
-import amf.client.parse.Raml10Parser;
-import amf.client.validate.ValidationResult;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
 import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionSet;
-import com.google.common.base.Strings;
-import amf.client.AMF;
-import amf.client.model.document.Module;
-import amf.client.model.domain.DomainElement;
-import amf.client.model.domain.DomainExtension;
-import amf.client.model.domain.FileShape;
-import amf.client.model.domain.NodeShape;
-import amf.client.model.domain.PropertyShape;
-import amf.client.model.domain.ScalarNode;
-import amf.client.model.domain.ScalarShape;
-import amf.client.model.domain.Shape;
-import amf.client.model.domain.UnionShape;
+import amf.shapes.client.platform.model.domain.ScalarShape;
 import org.mule.runtime.api.scheduler.Scheduler;
 
 public class AMFWrapper {
@@ -85,24 +87,18 @@ public class AMFWrapper {
   private static final String EDM_TIME_PATTERN =
       "^PT([0-1]?[0-9]|2[0-3])H[0-5][0-9]M(|[0-5][0-9]S)$";
 
-  private List<NodeShape> nodeShapesList;
-  private Map<String, NodeShape> shapes = new HashMap<>();
+  private List<NodeShape> nodeShapesList = new ArrayList<>();
   private EntityDefinitionSet entityDefinitionSet = new EntityDefinitionSet();
 
   public AMFWrapper(String ramlPath, Scheduler scheduler)
       throws OdataMetadataFormatException, OdataMetadataFieldsException {
-    try {
-      ExecutionEnvironment executionEnvironment =
-          scheduler != null ? new ExecutionEnvironment(scheduler) : new ExecutionEnvironment();
-      Environment environment = DefaultEnvironment.apply(executionEnvironment);
-      AMF.init(executionEnvironment).get();
-      initNodeShapesList(ramlPath, environment);
-    } catch (ExecutionException | InterruptedException e) {
-      throw new OdataMetadataFormatException("RAML is invalid. See log list.");
-    }
+
+    ExecutionEnvironment executionEnvironment =
+        scheduler != null ? new ExecutionEnvironment(scheduler) : new ExecutionEnvironment();
+
+    tryParse(ramlPath, executionEnvironment);
 
     for (NodeShape nodeShape : nodeShapesList) {
-      shapes.put(nodeShape.name().value(), nodeShape);
       entityDefinitionSet.addEntity(buildEntityDefinition(nodeShape));
     }
   }
@@ -112,43 +108,74 @@ public class AMFWrapper {
     this(ramlPath, null);
   }
 
-  private void validateOdataRaml(Raml10Parser parser)
-      throws InterruptedException, ExecutionException, OdataMetadataFieldsException {
-    List<ValidationResult> validationResults =
-        parser.reportValidation(ProfileNames.RAML()).get().results();
+  private void validateODataRAML(AMFResult result) throws OdataMetadataFieldsException {
+    List<AMFValidationResult> validationResults = result.results();
     if (validationResults.isEmpty()) {
       return;
     }
     String errorMessage = "Parse of odata.raml file failed: ";
-    for (ValidationResult validationResult : validationResults) {
+
+    for (AMFValidationResult validationResult : validationResults) {
       errorMessage = errorMessage.concat(validationResult.message() + "\n");
     }
     throw new OdataMetadataFieldsException(errorMessage);
   }
 
-  private void initNodeShapesList(String ramlPath, Environment environment)
-      throws ExecutionException, InterruptedException, OdataMetadataFieldsException,
-      OdataMetadataFormatException {
-    nodeShapesList = new ArrayList<>();
+  private void tryParse(String ramlPath, ExecutionEnvironment environment)
+      throws OdataMetadataFieldsException, OdataMetadataFormatException {
 
-    Raml10Parser parser = new Raml10Parser(environment);
+    AMFConfiguration amfConfiguration =
+        APIConfiguration.API().withExecutionEnvironment(environment);
 
-    Object object = parser.parseFileAsync(URLDecoder.decode(ramlPath)).get();
-
-    validateOdataRaml(parser);
-
-    if (object instanceof Module) { // If the parsed file is a module it comes from scaffolding odata.raml
-      addNodeShapes((Module) object, true); //in this case we should throw an exception if remote name is missing
-    } else if (object instanceof Document) {
-      Document document = (Document) object;
-      for (BaseUnit baseUnit : document.references()) { // If the parsed file is a document it is the initialization from the apikit based on the api.raml
-        if (baseUnit instanceof Module)
-          addNodeShapes((Module) baseUnit, false); // In order to allow the user to add other types at the api.raml we shouldn't throw an exception if remote name is missing
-      }
-    }
+    tryParseAsLibrary(amfConfiguration, URLDecoder.decode(ramlPath), environment);
 
     if (nodeShapesList.isEmpty()) {
       throw new OdataMetadataFieldsException("odata.raml must declare at least one type");
+    }
+  }
+
+  private void tryParseAsLibrary(AMFConfiguration amfConfiguration, String path,
+      ExecutionEnvironment environment)
+      throws OdataMetadataFormatException, OdataMetadataFieldsException {
+    try {
+      AMFLibraryResult result =
+          amfConfiguration.baseUnitClient().parseLibrary(URLDecoder.decode(path)).get();
+
+      validateODataRAML(result);
+
+      addNodeShapes(result.library(), true);
+    } catch (InterruptedException | ExecutionException e) {
+      tryParseAsAPISpec(amfConfiguration, path, environment);
+    }
+  }
+
+  private void tryParseAsAPISpec(AMFConfiguration amfConfiguration, String path,
+      ExecutionEnvironment environment)
+      throws OdataMetadataFormatException, OdataMetadataFieldsException {
+    try {
+      AMFParseResult result =
+          amfConfiguration.baseUnitClient().parse(URLDecoder.decode(path)).get();
+
+      amfConfiguration =
+          APIConfiguration.fromSpec(result.sourceSpec()).withExecutionEnvironment(environment);
+
+      AMFBaseUnitClient client = amfConfiguration.baseUnitClient();
+
+      AMFResult transformResult = client.transform(result.baseUnit(), PipelineId.Editing());
+
+      validateODataRAML(transformResult);
+
+      Document document = (Document) result.baseUnit();
+
+      for (BaseUnit baseUnit : document.references()) {
+
+        if (baseUnit instanceof Module) {
+          addNodeShapes((Module) baseUnit, false);
+        }
+      }
+
+    } catch (InterruptedException | ExecutionException e) {
+      throw new OdataMetadataFormatException("odata.raml must declare at least one type");
     }
   }
 
@@ -156,6 +183,7 @@ public class AMFWrapper {
   private void addNodeShapes(Module module, boolean throwException)
       throws OdataMetadataFormatException, OdataMetadataFieldsException {
     for (DomainElement domainElement : module.declares()) {
+
       if (domainElement instanceof Shape) {
         String remoteName = getAnnotation((Shape) domainElement, NAMESPACE_REMOTE_NAME);
         if (domainElement instanceof NodeShape) {
@@ -215,7 +243,7 @@ public class AMFWrapper {
       if (shape instanceof ScalarShape) {
         final ScalarShape scalarShape = (ScalarShape) shape;
 
-        final String type = getOdataType(scalarShape);
+        final String type = getODataType(scalarShape);
         notNull("Property \"type\" is missing in field \"" + propertyName + "\" in entity \""
             + entityName + "\"", type);
 
@@ -252,7 +280,7 @@ public class AMFWrapper {
     return entityDefinition;
   }
 
-  private String getOdataType(ScalarShape scalarShape) throws OdataMetadataFieldsException {
+  private String getODataType(ScalarShape scalarShape) throws OdataMetadataFieldsException {
     String dataType = scalarShape.dataType().value();
     if (!typesMapping.containsKey(dataType)) {
       throw new UnsupportedOperationException(
@@ -328,7 +356,7 @@ public class AMFWrapper {
   }
 
   private void notNull(String message, Object actual) throws OdataMetadataFieldsException {
-    if (actual == null || Strings.isNullOrEmpty(actual.toString())) {
+    if (actual == null || isNullOrEmpty(actual.toString())) {
       throw new OdataMetadataFieldsException(message);
     }
   }
