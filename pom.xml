@@ -26,7 +26,7 @@
         <apikit.spi.version>1.2.4</apikit.spi.version>
         <muleHttpConnector>1.7.1</muleHttpConnector>
         <mule.plugin.maven.plugin.version>1.1.6</mule.plugin.maven.plugin.version>
-        <amfVersion>4.6.0</amfVersion>
+        <amfVersion>5.2.3</amfVersion>
         <licensePath>LICENSE_HEADER.txt</licensePath>
         <javaFormatter.plugin.version>1.9.0</javaFormatter.plugin.version>
         <javaVersion>1.8</javaVersion>
@@ -387,7 +387,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.amlorg</groupId>
-            <artifactId>amf-client_2.12</artifactId>
+            <artifactId>amf-api-contract_2.12</artifactId>
             <version>${amfVersion}</version>
         </dependency>
 
