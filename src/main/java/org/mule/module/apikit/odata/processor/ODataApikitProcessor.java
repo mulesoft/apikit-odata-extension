@@ -19,9 +19,6 @@ import org.mule.module.apikit.odata.formatter.ODataApiKitFormatter;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
-import org.mule.module.apikit.odata.metadata.exception.OdataMetadataEntityNotFoundException;
-import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFieldsException;
-import org.mule.module.apikit.odata.metadata.exception.OdataMetadataFormatException;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinition;
 import org.mule.module.apikit.odata.metadata.model.entities.EntityDefinitionProperty;
 import org.mule.module.apikit.odata.model.Entry;
@@ -44,7 +41,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static java.lang.String.format;
 import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.ALL_PAGES;
 import static org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.InlineCount.NONE;
 
@@ -134,61 +130,68 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
   }
 
   @Override
-  public ODataPayload process(CoreEvent event, AbstractRouterInterface router, List<Format> formats)
-      throws Exception {
-    String oDataURL = getCompleteUrl(CoreEventUtils.getHttpRequestAttributes(event));
+  public Mono<ODataPayload<?>> process(CoreEvent event, AbstractRouterInterface router,
+      List<Format> formats) {
+    String oDataCompleteURL = getCompleteUrl(CoreEventUtils.getHttpRequestAttributes(event));
 
     // truncate the URL at the entity
-    oDataURL = ODataUriHelper.getOdataUrl(oDataURL);
+    String oDataURL = ODataUriHelper.getOdataUrl(oDataCompleteURL);
 
     // invoke flow and validate response
-    ODataPayload<List<Entry>> oDataPayload = processEntityRequest(event, router, formats);
-    final List<Entry> entries = oDataPayload.getValue();
+    return processEntityRequest(event, router, formats).flatMap((oDataPayload) -> {
+      final List<Entry> entries = oDataPayload.getValue();
 
-    if (isEntityCount()) {
-      if (formats.contains(Format.Plain) || formats.contains(Format.Default)) {
-        String count = String.valueOf(entries.size());
-        return new ODataPayload<String>(oDataPayload.getMuleEvent(), count,
-            oDataPayload.getStatus());
+      if (isEntityCount()) {
+        if (formats.contains(Format.Plain) || formats.contains(Format.Default)) {
+          String count = String.valueOf(entries.size());
+          return Mono.just(
+              new ODataPayload<>(oDataPayload.getMuleEvent(), count, oDataPayload.getStatus()));
+        } else {
+          return Mono
+              .error(new ODataUnsupportedMediaTypeException("Unsupported media type requested."));
+        }
       } else {
-        throw new ODataUnsupportedMediaTypeException("Unsupported media type requested.");
+        oDataPayload.setFormatter(new ODataApiKitFormatter(getMetadataManager(), entity, oDataURL,
+            entries, oDataPayload.getInlineCount(getInlineCountParam(event))));
       }
-    } else {
-      oDataPayload.setFormatter(new ODataApiKitFormatter(getMetadataManager(), entity, oDataURL,
-          entries, oDataPayload.getInlineCount(getInlineCountParam(event))));
-    }
 
-    return oDataPayload;
+      return Mono.just(oDataPayload);
+    });
   }
 
-  public ODataPayload<List<Entry>> processEntityRequest(CoreEvent event,
-      AbstractRouterInterface router, List<Format> formats) throws Exception {
-    HttpRequestAttributes attributes = CoreEventUtils.getHttpRequestAttributes(event);
-    HttpRequestAttributes httpRequestAttributes = getHttpRequestAttributes(attributes);
+  public Mono<ODataPayload<List<Entry>>> processEntityRequest(CoreEvent event,
+      AbstractRouterInterface router, List<Format> formats) {
+    Publisher<CoreEvent> processResponse;
+    try {
+      HttpRequestAttributes attributes = CoreEventUtils.getHttpRequestAttributes(event);
+      HttpRequestAttributes httpRequestAttributes = getHttpRequestAttributes(attributes);
 
-    Message message;
+      Message message;
 
-    if (Arrays.asList(methodsWithBody).contains(attributes.getMethod().toUpperCase())) {
-      String payloadAsString = CoreEventUtils.getPayloadAsString(event);
-      if (payloadAsString == null) {
-        payloadAsString = "";
+      if (Arrays.asList(methodsWithBody).contains(attributes.getMethod().toUpperCase())) {
+        String payloadAsString = CoreEventUtils.getPayloadAsString(event);
+        if (payloadAsString == null) {
+          payloadAsString = "";
+        }
+        boolean isXMLFormat = !formats.contains(Format.Json);
+        payloadAsString = BodyToJsonConverter.convertPayload(entity, isXMLFormat, payloadAsString);
+        message = Message.builder().value(payloadAsString).mediaType(MediaType.APPLICATION_JSON)
+            .attributesValue(httpRequestAttributes).build();
+      } else {
+        message =
+            Message.builder(event.getMessage()).attributesValue(httpRequestAttributes).build();
       }
-      boolean isXMLFormat = !formats.contains(Format.Json);
-      payloadAsString = BodyToJsonConverter.convertPayload(entity, isXMLFormat, payloadAsString);
-      message = Message.builder().value(payloadAsString).mediaType(MediaType.APPLICATION_JSON)
-          .attributesValue(httpRequestAttributes).build();
-    } else {
-      message = Message.builder(event.getMessage()).attributesValue(httpRequestAttributes).build();
+
+      final CoreEvent odataEvent = CoreEvent.builder(event).message(message)
+          .addVariable("odata", this.getMetadataManager().getOdataContextVariables(entity)).build();
+
+      processResponse = router.processEvent(odataEvent);
+    } catch (Exception e) {
+      return Mono.error(e);
     }
-
-    final CoreEvent odataEvent = CoreEvent.builder(event).message(message)
-        .addVariable("odata", this.getMetadataManager().getOdataContextVariables(entity)).build();
-
-    Publisher<CoreEvent> processResponse = router.processEvent(odataEvent);
-    final CoreEvent response = Mono.from(processResponse)
-        .onErrorMap(error -> new ODataInvalidFlowResponseException(error.getMessage())).block();
-
-    return verifyFlowResponse(response);
+    return Mono.from(processResponse)
+        .onErrorMap(error -> new ODataInvalidFlowResponseException(error.getMessage()))
+        .flatMap(this::verifyFlowResponse);
   }
 
   private HttpRequestAttributes getHttpRequestAttributes(HttpRequestAttributes attributes) {
@@ -247,42 +250,43 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
     multiMap.put(key, value);
   }
 
-  private ODataPayload<List<Entry>> verifyFlowResponse(CoreEvent event)
-      throws OdataMetadataEntityNotFoundException, OdataMetadataFieldsException,
-      OdataMetadataFormatException, ODataInvalidFlowResponseException, ClientErrorException {
+  private Mono<ODataPayload<List<Entry>>> verifyFlowResponse(CoreEvent event) {
+    try {
+      int httpStatus = checkResponseHttpStatus(event);
+      OdataMetadataManager metadataManager = getMetadataManager();
+      EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
+      List<Entry> entries;
 
-    int httpStatus = checkResponseHttpStatus(event);
-    OdataMetadataManager metadataManager = getMetadataManager();
-    EntityDefinition entityDefinition = metadataManager.getEntityByName(entity);
-    List<Entry> entries;
+      String payload = CoreEventUtils.getPayloadAsString(event);
 
-    String payload = CoreEventUtils.getPayloadAsString(event);
-
-
-    if (isNullOrEmpty(payload)) {
-      entries = new ArrayList<>();
-    } else {
-      entries = Helper.transformJsonToEntryList(payload);
-    }
-    int entryNumber = 1;
-    for (Entry entry : entries) {
-      // verifies the # of properties matches the definition
-      if (entry.getProperties().entrySet().size() > entityDefinition.getProperties().size()) {
-        throw new ODataInvalidFlowResponseException(
-            "There are absent properties in flow response (entry #" + (entryNumber++) + ")");
+      if (isNullOrEmpty(payload)) {
+        entries = new ArrayList<>();
+      } else {
+        entries = Helper.transformJsonToEntryList(payload);
       }
-      // verifies each property against the definition
-      for (String propertyName : entry.getProperties().keySet()) {
-        EntityDefinitionProperty entityDefinitionProperty =
-            entityDefinition.findPropertyDefinition(propertyName);
-        if (entityDefinitionProperty == null) {
-          throw new ODataInvalidFlowResponseException("Property '" + propertyName
-              + "' was not expected for entity '" + entityDefinition.getName() + "'");
+      int entryNumber = 1;
+      for (Entry entry : entries) {
+        // verifies the # of properties matches the definition
+        if (entry.getProperties().entrySet().size() > entityDefinition.getProperties().size()) {
+          throw new ODataInvalidFlowResponseException(
+              "There are absent properties in flow response (entry #" + entryNumber + ")");
         }
+        // verifies each property against the definition
+        for (String propertyName : entry.getProperties().keySet()) {
+          EntityDefinitionProperty entityDefinitionProperty =
+              entityDefinition.findPropertyDefinition(propertyName);
+          if (entityDefinitionProperty == null) {
+            throw new ODataInvalidFlowResponseException("Property '" + propertyName
+                + "' was not expected for entity '" + entityDefinition.getName() + "'");
+          }
+        }
+        entryNumber++;
       }
-    }
 
-    return new ODataPayload<>(event, entries, httpStatus);
+      return Mono.just(new ODataPayload<>(event, entries, httpStatus));
+    } catch (Exception e) {
+      return Mono.error(e);
+    }
   }
 
   public String getPath() {

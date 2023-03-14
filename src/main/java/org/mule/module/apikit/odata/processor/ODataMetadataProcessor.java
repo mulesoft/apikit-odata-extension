@@ -13,6 +13,7 @@ import org.mule.module.apikit.odata.exception.ODataMethodNotAllowedException;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.formatter.ODataPayloadMetadataFormatter;
 import org.mule.runtime.core.api.event.CoreEvent;
+import reactor.core.publisher.Mono;
 import java.util.List;
 
 public class ODataMetadataProcessor extends ODataRequestProcessor {
@@ -20,14 +21,14 @@ public class ODataMetadataProcessor extends ODataRequestProcessor {
     super(odataContext);
   }
 
-  public ODataPayload process(CoreEvent event, AbstractRouterInterface router, List<Format> formats)
-      throws Exception {
+  public Mono<ODataPayload<?>> process(CoreEvent event, AbstractRouterInterface router,
+      List<Format> formats) {
     if ("GET".equalsIgnoreCase(super.oDataContext.getMethod())) {
-      ODataPayload oDataPayload = new ODataPayload(event);
+      ODataPayload<?> oDataPayload = new ODataPayload<>(event);
       oDataPayload.setFormatter(new ODataPayloadMetadataFormatter(getMetadataManager()));
-      return oDataPayload;
+      return Mono.just(oDataPayload);
     } else {
-      throw new ODataMethodNotAllowedException("GET");
+      return Mono.error(new ODataMethodNotAllowedException("GET"));
     }
 
   }
