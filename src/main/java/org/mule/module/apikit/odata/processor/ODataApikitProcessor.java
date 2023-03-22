@@ -143,17 +143,18 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
 
       if (!isEntityCount()) {
         oDataPayload.setFormatter(new ODataApiKitFormatter(getMetadataManager(), entity, oDataURL,
-                entries, oDataPayload.getInlineCount(getInlineCountParam(event))));
+            entries, oDataPayload.getInlineCount(getInlineCountParam(event))));
         return Mono.just(oDataPayload);
       }
 
       if (formats.contains(Format.Plain) || formats.contains(Format.Default)) {
         String count = String.valueOf(entries.size());
-        return Mono.just(
-            new ODataPayload<>(oDataPayload.getMuleEvent(), count, oDataPayload.getStatus()));
+        return Mono
+            .just(new ODataPayload<>(oDataPayload.getMuleEvent(), count, oDataPayload.getStatus()));
       }
 
-      return Mono.error(new ODataUnsupportedMediaTypeException("Unsupported media type requested."));
+      return Mono
+          .error(new ODataUnsupportedMediaTypeException("Unsupported media type requested."));
     });
   }
 
