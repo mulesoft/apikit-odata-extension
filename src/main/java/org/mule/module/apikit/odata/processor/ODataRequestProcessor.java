@@ -16,6 +16,7 @@ import org.mule.module.apikit.odata.context.OdataContext;
 import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.metadata.OdataMetadataManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -28,8 +29,8 @@ public abstract class ODataRequestProcessor {
     this.oDataContext = oDataContext;
   }
 
-  public abstract ODataPayload process(CoreEvent event, AbstractRouterInterface router,
-      List<Format> formats) throws Exception;
+  public abstract Mono<ODataPayload<?>> process(CoreEvent event, AbstractRouterInterface router,
+      List<Format> formats);
 
   protected OdataMetadataManager getMetadataManager() {
     return oDataContext.getOdataMetadataManager();

@@ -33,10 +33,9 @@ public class ODataErrorHandler {
     return handle(event, ex, null);
   }
 
-  public static CoreEvent handle(CoreEvent event, Exception ex, List<Format> formats) {
-    Exception exceptionToBeThrown;
+  public static CoreEvent handle(CoreEvent event, Throwable ex, List<Format> formats) {
     Throwable cause = ExceptionUtils.getMessagingExceptionCause(ex);
-    exceptionToBeThrown = cause != null ? (Exception) cause : ex;
+    Throwable exceptionToBeThrown = cause != null ? cause : ex;
     if (exceptionToBeThrown instanceof MuleException) {
       // Exception thrown by APIkit
       exceptionToBeThrown = processMuleException((MuleException) exceptionToBeThrown);
