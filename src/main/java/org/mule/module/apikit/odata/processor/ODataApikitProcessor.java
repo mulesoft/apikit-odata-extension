@@ -141,21 +141,19 @@ public class ODataApikitProcessor extends ODataRequestProcessor {
     return processEntityRequest(event, router, formats).flatMap((oDataPayload) -> {
       final List<Entry> entries = oDataPayload.getValue();
 
-      if (isEntityCount()) {
-        if (formats.contains(Format.Plain) || formats.contains(Format.Default)) {
-          String count = String.valueOf(entries.size());
-          return Mono.just(
-              new ODataPayload<>(oDataPayload.getMuleEvent(), count, oDataPayload.getStatus()));
-        } else {
-          return Mono
-              .error(new ODataUnsupportedMediaTypeException("Unsupported media type requested."));
-        }
-      } else {
+      if (!isEntityCount()) {
         oDataPayload.setFormatter(new ODataApiKitFormatter(getMetadataManager(), entity, oDataURL,
-            entries, oDataPayload.getInlineCount(getInlineCountParam(event))));
+                entries, oDataPayload.getInlineCount(getInlineCountParam(event))));
+        return Mono.just(oDataPayload);
       }
 
-      return Mono.just(oDataPayload);
+      if (formats.contains(Format.Plain) || formats.contains(Format.Default)) {
+        String count = String.valueOf(entries.size());
+        return Mono.just(
+            new ODataPayload<>(oDataPayload.getMuleEvent(), count, oDataPayload.getStatus()));
+      }
+
+      return Mono.error(new ODataUnsupportedMediaTypeException("Unsupported media type requested."));
     });
   }
 
