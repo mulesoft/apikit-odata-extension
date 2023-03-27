@@ -14,6 +14,7 @@ import org.mule.module.apikit.odata.formatter.ODataPayloadFormatter.Format;
 import org.mule.module.apikit.odata.formatter.ServiceDocumentPayloadFormatter;
 import org.mule.module.apikit.odata.util.CoreEventUtils;
 import org.mule.runtime.core.api.event.CoreEvent;
+import reactor.core.publisher.Mono;
 import java.util.List;
 
 public class ODataServiceDocumentProcessor extends ODataRequestProcessor {
@@ -24,17 +25,17 @@ public class ODataServiceDocumentProcessor extends ODataRequestProcessor {
     super(odataContext);
   }
 
-  public ODataPayload process(CoreEvent event, AbstractRouterInterface router, List<Format> formats)
-      throws Exception {
+  public Mono<ODataPayload<?>> process(CoreEvent event, AbstractRouterInterface router,
+      List<Format> formats) {
     if ("GET".equalsIgnoreCase(super.oDataContext.getMethod())) {
 
       String url = getCompleteUrl(CoreEventUtils.getHttpRequestAttributes(event));
 
-      ODataPayload result = new ODataPayload(event);
+      ODataPayload<?> result = new ODataPayload<>(event);
       result.setFormatter(new ServiceDocumentPayloadFormatter(getMetadataManager(), url));
-      return result;
+      return Mono.just(result);
     } else {
-      throw new ODataMethodNotAllowedException("GET");
+      return Mono.error(new ODataMethodNotAllowedException("GET"));
     }
   }
 

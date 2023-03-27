@@ -48,7 +48,8 @@ public abstract class AbstractODataRouterService {
 
   protected static Publisher<CoreEvent> processODataRequest(HttpRequestAttributes attributes,
       AbstractRouterInterface router, OdataContext oDataContext, CoreEvent event) {
-    List<ODataPayloadFormatter.Format> formats = null;
+    List<ODataPayloadFormatter.Format> formats;
+    ODataRequestProcessor odataRequestProcessor;
     try {
       String listenerPath =
           attributes.getListenerPath().substring(0, attributes.getListenerPath().lastIndexOf("/*"));
@@ -56,24 +57,27 @@ public abstract class AbstractODataRouterService {
       String query = attributes.getQueryString();
 
       // URIParser
-      ODataRequestProcessor odataRequestProcessor =
+      odataRequestProcessor =
           ODataUriParser.parse(oDataContext, path, query, attributes.getQueryParams());
 
       // Validate format
       formats = ODataFormatHandler.getFormats(attributes);
-
-      // Request processor
-      ODataPayload odataPayload = odataRequestProcessor.process(event, router, formats);
-
-      // Response transformer
-      Message message = ODataResponseTransformer.transform(odataPayload, formats);
-
-      CoreEvent newEvent = CoreEvent.builder(odataPayload.getMuleEvent()).message(message)
-          .addVariable("httpStatus", odataPayload.getStatus()).build();
-      return Mono.just(newEvent);
     } catch (Exception ex) {
-      return Mono.just(ODataErrorHandler.handle(event, ex, formats));
+      return Mono.just(ODataErrorHandler.handle(event, ex));
     }
+
+    // Request processor
+    return odataRequestProcessor.process(event, router, formats).flatMap(odataPayload -> {
+      try {
+        // Response transformer
+        Message message = ODataResponseTransformer.transform(odataPayload, formats);
+
+        return Mono.just(CoreEvent.builder(odataPayload.getMuleEvent()).message(message)
+            .addVariable("httpStatus", odataPayload.getStatus()).build());
+      } catch (Exception ex) {
+        return Mono.error(ex);
+      }
+    }).onErrorResume(ex -> Mono.just(ODataErrorHandler.handle(event, ex, formats)));
   }
 
 }
