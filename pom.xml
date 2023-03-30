@@ -291,7 +291,7 @@
                                 </ports>
                                 <volumes>
                                     <bind>
-                                        <volume>src/test/resources/mysql-example/init:/docker-entrypoint-initdb.d/:ro</volume>
+                                        <volume>src/test/resources/mysql-example/init:/docker-entrypoint-initdb.d:ro</volume>
                                     </bind>
                                 </volumes>
                                 <!--Workaround for avoiding name collisions with zombie containers left from failed executions-->
