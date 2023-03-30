@@ -40,16 +40,16 @@
         <jacoco.version>0.8.5</jacoco.version>
         <maven.surefire.plugin.version>2.22.0</maven.surefire.plugin.version>
         <mavenResourcesVersion>3.0.2</mavenResourcesVersion>
-        <jibx-tools.version>1.2.6</jibx-tools.version>
-        <json.version>20190722</json.version>
+        <jibx-tools.version>1.4.2</jibx-tools.version>
+        <json.version>20230227</json.version>
         <commons-lang.version>2.6</commons-lang.version>
         <odata-core.version>0.8.1</odata-core.version>
-        <jsonassert.version>1.3.0</jsonassert.version>
-        <junit.version>4.13.1</junit.version>
-        <cxf-rt-frontend-jaxrs.version>3.2.5</cxf-rt-frontend-jaxrs.version>
-        <reactor-core.version>3.2.0.M1</reactor-core.version>
-        <freemarker.version>2.3.23</freemarker.version>
-        <guava.version>25.1-jre</guava.version>
+        <jsonassert.version>1.5.1</jsonassert.version>
+        <junit.version>4.13.2</junit.version>
+        <cxf-rt-frontend-jaxrs.version>3.5.5</cxf-rt-frontend-jaxrs.version>
+        <reactor-core.version>3.5.4</reactor-core.version>
+        <freemarker.version>2.3.31</freemarker.version>
+        <guava.version>31.1-jre</guava.version>
     </properties>
 
     <build>

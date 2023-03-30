@@ -9,6 +9,7 @@ package org.mule.module.apikit.odata.processor;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.mule.module.apikit.odata.util.FileUtils;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -23,13 +24,13 @@ public class BodyToJsonConverterTestCase {
         FileUtils.readFromFile("org/mule/module/apikit/odata/processor/_api_create_order.xml");
     String json = BodyToJsonConverter.convertPayload(null, true, input);
     JSONObject jsonObject = new JSONObject(json);
-    assertTrue(Double.compare((Double) jsonObject.get("Double"), 1.2) == 0);
-    assertTrue(jsonObject.get("OrderDate").equals("1996-08-05 00:00:00"));
-    assertTrue(Double.compare((Double) jsonObject.get("Freight"), 32.01) == 0);
-    assertTrue(jsonObject.get("ShipAddress").equals("Direccion"));
-    assertTrue(Integer.compare((Integer) jsonObject.get("SmallInt"), 1) == 0);
-    assertTrue(jsonObject.get("ShipName").equals("Testing"));
+    assertEquals(1.2, jsonObject.getDouble("Double"), 1E-9);
+    assertEquals("1996-08-05 00:00:00", jsonObject.get("OrderDate"));
+    assertEquals(32.01, jsonObject.getDouble("Freight"), 1E-9);
+    assertEquals("Direccion", jsonObject.get("ShipAddress"));
+    assertEquals(1, jsonObject.get("SmallInt"));
+    assertEquals("Testing", jsonObject.get("ShipName"));
     assertTrue(jsonObject.isNull("NullValue"));
-    assertTrue(jsonObject.getString("String").equals("111"));
+    assertEquals("111", jsonObject.get("String"));
   }
 }
