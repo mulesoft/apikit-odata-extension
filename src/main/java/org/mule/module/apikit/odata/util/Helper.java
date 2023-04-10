@@ -175,7 +175,7 @@ public class Helper {
 
       return entities;
     } catch (Exception e) {
-      throw new ODataInvalidFlowResponseException("Flow response is not a valid json");
+      throw new ODataInvalidFlowResponseException("Flow response is not a valid json", e);
     }
   }
 
