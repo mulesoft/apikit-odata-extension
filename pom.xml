@@ -41,7 +41,7 @@
         <maven.surefire.plugin.version>2.22.0</maven.surefire.plugin.version>
         <mavenResourcesVersion>3.0.2</mavenResourcesVersion>
         <jibx-tools.version>1.4.2</jibx-tools.version>
-        <json.version>20230227</json.version>
+        <json.version>20231013</json.version>
         <commons-lang.version>2.6</commons-lang.version>
         <odata-core.version>0.8.1</odata-core.version>
         <jsonassert.version>1.5.1</jsonassert.version>
