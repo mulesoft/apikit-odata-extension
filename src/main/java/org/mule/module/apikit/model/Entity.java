@@ -6,26 +6,28 @@
  */
 package org.mule.module.apikit.model;
 
+import static java.util.Arrays.asList;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import org.jibx.schema.codegen.extend.DefaultNameConverter;
-import org.jibx.schema.codegen.extend.NameConverter;
+import java.util.Set;
 import org.mule.module.apikit.model.exception.InvalidModelException;
 
 public class Entity {
 
-  private static final NameConverter NAME_CONVERTER = new DefaultNameConverter();
-
   private String name;
   private String remote;
   private boolean hasProperties;
-  private List<Property> properties = new ArrayList<Property>();
+
+  private static final Set<String> exceptionalCases =
+      new HashSet<>(asList("ay", "ey", "iy", "oy", "uy"));
+  private final List<Property> properties = new ArrayList<>();
 
   public Entity(String name) throws InvalidModelException {
     setName(name);
   }
 
-  private void setName(String name) throws InvalidModelException {
+  private void setName(String name) {
     this.name = name;
   }
 
@@ -93,6 +95,16 @@ public class Entity {
   }
 
   public static String pluralizeName(String name) {
-    return (name.endsWith("s") ? name : NAME_CONVERTER.pluralize(name));
+    if (name.endsWith("List") || "any".equalsIgnoreCase(name)) {
+      return name;
+    }
+    if (name.endsWith("s")) {
+      return name.endsWith("ss") ? name + "es" : name;
+    }
+
+    if (name.endsWith("y") && !exceptionalCases.contains(name.substring(name.length() - 2))) {
+      return name.substring(0, name.length() - 1) + "ies";
+    }
+    return name + "s";
   }
 }
