@@ -17,4 +17,8 @@ public class ODataInvalidFlowResponseException extends ODataInternalServerErrorE
     super(message);
   }
 
+  public ODataInvalidFlowResponseException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
 }
