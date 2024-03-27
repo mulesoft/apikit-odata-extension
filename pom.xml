@@ -17,14 +17,13 @@
     </organization>
 
     <!-- Project -->
-    <name>APIKit OData Extension</name>
 
     <!-- Properties -->
     <properties>
         <mule.version>4.1.5</mule.version>
         <apikit.version>2.0.0-SNAPSHOT</apikit.version>
         <apikit.spi.version>1.2.4</apikit.spi.version>
-        <muleHttpConnector>1.9.0-SNAPSHOT</muleHttpConnector>
+        <muleHttpConnector>1.9.2</muleHttpConnector>
         <mule.plugin.maven.plugin.version>1.1.6</mule.plugin.maven.plugin.version>
         <amfVersion>5.2.3</amfVersion>
         <licensePath>LICENSE_HEADER.txt</licensePath>
@@ -35,8 +34,8 @@
         <skipVerifications>false</skipVerifications>
         <munit.input.directory>src/test/munit</munit.input.directory>
         <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
-        <munit.extensions.maven.plugin.version>1.2.0-SNAPSHOT</munit.extensions.maven.plugin.version>
-        <munit.version>3.1.0-SNAPSHOT</munit.version>
+        <munit.extensions.maven.plugin.version>1.2.0</munit.extensions.maven.plugin.version>
+        <munit.version>3.1.0</munit.version>
         <jacoco.version>0.8.10</jacoco.version>
         <maven.surefire.plugin.version>2.22.0</maven.surefire.plugin.version>
         <mavenResourcesVersion>3.0.2</mavenResourcesVersion>
