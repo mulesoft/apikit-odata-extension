@@ -39,7 +39,7 @@
         <munit.version>3.1.0</munit.version>
         <jacoco.version>0.8.11</jacoco.version>
         <maven.surefire.plugin.version>2.22.0</maven.surefire.plugin.version>
-        <mavenResourcesVersion>3.0.2</mavenResourcesVersion>
+        <mavenResourcesVersion>3.3.1</mavenResourcesVersion>
         <json.version>20231013</json.version>
         <commons-lang.version>2.6</commons-lang.version>
         <odata-core.version>0.8.1</odata-core.version>
