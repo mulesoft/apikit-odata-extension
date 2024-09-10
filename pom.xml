@@ -47,7 +47,7 @@
         <junit.version>4.13.2</junit.version>
         <cxf-rt-frontend-jaxrs.version>3.5.5</cxf-rt-frontend-jaxrs.version>
         <reactor-core.version>3.5.4</reactor-core.version>
-        <freemarker.version>2.3.31</freemarker.version>
+        <freemarker.version>2.3.33</freemarker.version>
         <guava.version>31.1-jre</guava.version>
     </properties>
 
