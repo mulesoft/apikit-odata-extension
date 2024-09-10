@@ -206,9 +206,11 @@
                         <exclude>**/*.xml</exclude>
                         <exclude>**/*.properties</exclude>
                         <exclude>**/*.md</exclude>
+                        <exclude>src/test/java/Fips*.java</exclude>
                     </excludes>
                     <includes>
-                        <include>**/*.java</include>
+                        <include>src/main/java/**/*.java</include>
+                        <include>src/test/java/**/*.java</include>
                     </includes>
                     <mapping>
                         <java>SLASHSTAR_STYLE</java>
@@ -236,6 +238,13 @@
                     <aggregator>false</aggregator>
                     <executionRoot>true</executionRoot>
                     <encoding>UTF-8</encoding>
+                    <includes>
+                        <include>src/main/java/**/*.java</include>
+                        <include>src/test/java/**/*.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>src/test/java/Fips*.java</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
