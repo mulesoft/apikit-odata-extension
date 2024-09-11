@@ -43,7 +43,7 @@
         <json.version>20231013</json.version>
         <commons-lang.version>2.6</commons-lang.version>
         <odata-core.version>0.8.1</odata-core.version>
-        <jsonassert.version>1.5.1</jsonassert.version>
+        <jsonassert.version>1.5.3</jsonassert.version>
         <junit.version>4.13.2</junit.version>
         <cxf-rt-frontend-jaxrs.version>3.5.5</cxf-rt-frontend-jaxrs.version>
         <reactor-core.version>3.5.4</reactor-core.version>
