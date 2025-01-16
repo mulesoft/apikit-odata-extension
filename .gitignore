@@ -10,3 +10,4 @@ target
 build.log
 .mule
 /target/
+.codegenie
