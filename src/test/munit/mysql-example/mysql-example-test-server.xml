@@ -108,10 +108,7 @@ output application/java
 // This DataWeave generates a MySQL Update Query from your metadata for a particular entity
 
 // APIkit Odata Service creates a variable that contains the table's name 
-var remoteEntityName = vars.odata.remoteEntityName match {
-	case remoteEntityName is String -> remoteEntityName
-	else -> ""	
-}
+var remoteEntityName = vars.odata.remoteEntityName as String
 
 
 var id = attributes.uriParams.CustomerID match {
@@ -156,10 +153,7 @@ output application/java
 // This DataWeave generates a MySQL Update Query from your metadata for a particular entity
 
 // APIkit Odata Service creates a variable that contains the table's name 
-var remoteEntityName = vars.odata.remoteEntityName match {
-	case remoteEntityName is String -> remoteEntityName
-	else -> ""	
-}
+var remoteEntityName = vars.odata.remoteEntityName as String
 
 
 var ShipName = attributes.uriParams.ShipName match {
@@ -212,10 +206,7 @@ output application/java
 
 
 // APIkit Odata Service creates a variable that contains the table's name 
-var remoteEntityName = vars.odata.remoteEntityName match {
-	case remoteEntityName is String -> remoteEntityName
-	else -> ""	
-}
+var remoteEntityName = vars.odata.remoteEntityName as String
 
 var id = attributes.uriParams.CustomerID match {
 	case id is String -> id
@@ -253,10 +244,7 @@ output application/java
 
 
 // APIkit Odata Service creates a variable that contains the table's name 
-var remoteEntityName = vars.odata.remoteEntityName match {
-	case remoteEntityName is String -> remoteEntityName
-	else -> ""	
-}
+var remoteEntityName = vars.odata.remoteEntityName as String
 
 
 var ShipName = attributes.uriParams.ShipName match {
@@ -312,10 +300,7 @@ var keys : String = vars.odata.keyNames match {
 }
 
 // APIkit Odata Service creates a variable that contains the table's name 
-var remoteEntityName = vars.odata.remoteEntityName match {
-	case remoteEntityName is String -> remoteEntityName
-	else -> ""	
-}
+var remoteEntityName = vars.odata.remoteEntityName as String
 
 
 // APIkit Odata Service puts your oData filters into the queryParams
@@ -388,10 +373,7 @@ var keys : String = vars.odata.keyNames match {
 }
 
 // APIkit Odata Service creates a variable that contains the table's name 
-var remoteEntityName = vars.odata.remoteEntityName match {
-	case remoteEntityName is String -> remoteEntityName
-	else -> ""	
-}
+var remoteEntityName = vars.odata.remoteEntityName as String
 
 
 
@@ -513,10 +495,7 @@ var keys : String = vars.odata.keyNames match {
 }
 
 // APIkit Odata Service creates a variable that contains the table's name 
-var remoteEntityName = vars.odata.remoteEntityName match {
-	case remoteEntityName is String -> remoteEntityName
-	else -> ""	
-}
+var remoteEntityName = vars.odata.remoteEntityName as String
 
 
 
@@ -631,10 +610,7 @@ var keys : String = vars.odata.keyNames match {
 }
 
 // APIkit Odata Service creates a variable that contains the table's name 
-var remoteEntityName = vars.odata.remoteEntityName match {
-	case remoteEntityName is String -> remoteEntityName
-	else -> ""	
-}
+var remoteEntityName = vars.odata.remoteEntityName as String
 
 
 // APIkit Odata Service puts your oData filters into the queryParams
@@ -699,10 +675,7 @@ output application/java
 // This DataWeave generates a MySQL Insert Query from your payload and metadata
 
 // APIkit Odata Service creates a variable that contains the table's name 
-var remoteEntityName = vars.odata.remoteEntityName match {
-	case remoteEntityName is String -> remoteEntityName
-	else -> ""	
-}
+var remoteEntityName = vars.odata.remoteEntityName as String
 
 // Transform your payload into something like this: { myKey1: 'myValue1', myKey2: 'myValue2'}.
 var valuesFromPayload = {
@@ -776,10 +749,7 @@ output application/java
 // This DataWeave generates a MySQL Insert Query from your payload and metadata
 
 // APIkit Odata Service creates a variable that contains the table's name 
-var remoteEntityName = vars.odata.remoteEntityName match {
-	case remoteEntityName is String -> remoteEntityName
-	else -> ""	
-}
+var remoteEntityName = vars.odata.remoteEntityName as String
 
 // Transform your payload into something like this: { myKey1: 'myValue1', myKey2: 'myValue2'}.
 var valuesFromPayload = {
@@ -858,10 +828,7 @@ output application/java
 // This DataWeave generates a MySQL Select Query from your metadata
 
 // APIkit Odata Service creates a variable that contains the table's name 
-var remoteEntityName = vars.odata.remoteEntityName match {
-	case remoteEntityName is String -> remoteEntityName
-	else -> ""	
-}
+var remoteEntityName = vars.odata.remoteEntityName as String
 
 ---
 

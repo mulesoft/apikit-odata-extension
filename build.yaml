@@ -1,7 +1,8 @@
 enableAllureTestReportStage: false
 mavenSettingsXmlId: ab7820eb-e393-4e88-9962-92104044ed75
 projectType: extension
+mavenAdditionalArgs: -DruntimeProduct=MULE_EE -DruntimeVersion="4.6.6"
 additionalTestConfigs:
   jdk17:
     testJdkTool: OPEN-JDK17
-    mavenAdditionalArgs: -DruntimeVersion=4.6.0 -DruntimeProduct=MULE_EE
+    mavenAdditionalArgs: -DruntimeVersion=4.9.0-rc4 -DruntimeProduct=MULE_EE
