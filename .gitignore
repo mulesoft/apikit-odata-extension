@@ -5,6 +5,7 @@
 *.iml
 target
 .DS_Store
+.codegenie
 .zip
 .jar
 build.log
