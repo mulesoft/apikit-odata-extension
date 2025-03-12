@@ -10,13 +10,25 @@ import java.util.List;
 
 public class OdataContextVariables {
 
-  public String remoteEntityName;
-  public String keyNames;
-  public List<String> fields;
+  private String remoteEntityName;
+  private String keyNames;
+  private List<String> fields;
 
   public OdataContextVariables(String remoteEntityName, String keyNames, List<String> fields) {
     this.remoteEntityName = remoteEntityName;
     this.keyNames = keyNames;
     this.fields = fields;
+  }
+
+  public String getRemoteEntityName() {
+    return remoteEntityName;
+  }
+
+  public String getKeyNames() {
+    return keyNames;
+  }
+
+  public List<String> getFields() {
+    return fields;
   }
 }
