@@ -3,6 +3,7 @@ mavenSettingsXmlId: ab7820eb-e393-4e88-9962-92104044ed75
 projectType: extension
 mavenAdditionalArgs: -DruntimeProduct=MULE_EE -DruntimeVersion="4.6.6"
 additionalTestConfigs:
-  jdk17:
+  jdk17-4.9.x:
     testJdkTool: OPEN-JDK17
     mavenAdditionalArgs: -DruntimeVersion=4.9.0-rc4 -DruntimeProduct=MULE_EE
+
